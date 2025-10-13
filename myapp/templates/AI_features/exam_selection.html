@@ -1,0 +1,60 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Exam Practice - Quizolve</title>
+    <link rel="stylesheet" href="{% static 'css/main.css' %}">
+    <link rel="stylesheet" href="{% static 'css/exam_selection.css' %}">
+</head>
+
+<body class="quiz-page-body">
+    {% if messages %}
+    <div id="toast" class="toast">
+        {% for message in messages %}
+        <span class="{{ message.tags }}">{{ message }}</span>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    {% include 'components/navbar.html' %}
+
+    <main class="selection-container">
+        <div class="page-header">
+            <h1>National Exam Practice</h1>
+            <p>Select an exam to start a 50-question practice quiz.</p>
+        </div>
+
+        <div class="exam-card-container">
+            <div class="exam-grid">
+                <a href="{% url 'start-exam-quiz' exam_name='UPSC' %}" class="exam-btn">UPSC</a>
+                <a href="{% url 'start-exam-quiz' exam_name='JEE' %}" class="exam-btn">JEE (Mains & Advanced)</a>
+                <a href="{% url 'start-exam-quiz' exam_name='NEET' %}" class="exam-btn">NEET</a>
+                <a href="{% url 'start-exam-quiz' exam_name='CAT' %}" class="exam-btn">CAT</a>
+                <a href="{% url 'start-exam-quiz' exam_name='SSC CGL' %}" class="exam-btn">SSC CGL</a>
+                <a href="{% url 'start-exam-quiz' exam_name='GATE' %}" class="exam-btn">GATE</a>
+            </div>
+        </div>
+    </main>
+
+    {% include 'components/footer.html' %}
+
+    <script>
+        const toast = document.getElementById("toast");
+        if (toast) {
+            toast.style.display = "block";
+            toast.style.backgroundColor = toast.querySelector(".success")
+                ? "green"
+                : "#f44336";
+        }
+        setTimeout(() => {
+            const toasts = document.querySelectorAll(".toast-message");
+            toasts.forEach((el) => el.remove());
+            toast.style.display = "none";
+        }, 4000);
+    </script>
+</body>
+
+</html>

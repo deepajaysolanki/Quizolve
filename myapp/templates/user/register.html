@@ -1,0 +1,190 @@
+{% load static %}
+{% load socialaccount %}
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <title>Registration Form</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="stylesheet" href="{% static 'css/main.css' %}" />
+  <link rel="stylesheet" href="{% static 'css/registration.css' %}" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+</head>
+
+<body>
+  {% if messages %}
+  <div id="toast" class="toast">
+    {% for message in messages %}
+    <span class="{{ message.tags }}">{{ message }}</span>
+    {% endfor %}
+  </div>
+  {% endif %} {% with field_errors=field_errors old_data=old_data %}
+
+    <!-- {% if messages %}
+      <ul class="messages">
+          {% for message in messages %}
+              <li style="color: red;">{{ message }}</li>
+          {% endfor %}
+      </ul>
+    {% endif %} -->
+
+  <div class="loader" id="loader">
+    <div class="loader-logo">
+      <div class="logo-icon"><i class="fas fa-brain"></i></div>
+    </div>
+    <div class="loader-text">Initializing AI Core...</div>
+  </div>
+  <div class="auth-container">
+    <div class="auth-branding-panel">
+      <div class="floating-orbs">
+        <div class="orb orb-1" style="top: -20%; left: -20%"></div>
+        <div class="orb orb-2" style="bottom: -20%; right: -20%"></div>
+      </div>
+      <div class="branding-content">
+        <h1>Unlock Your Potential with AI</h1>
+        <p>
+          Join a community of learners and thinkers. Create, share, and
+          conquer quizzes like never before.
+        </p>
+      </div>
+      <div class="branding-footer"></div>
+    </div>
+
+    <div class="auth-form-panel">
+      <div class="auth-form-box">
+        <div class="auth-form-header">
+          <h2>Create an Account</h2>
+        </div>
+
+        <!-- registration-form -->
+        <form method="post" enctype="multipart/form-data" id="registration-form">
+          {% csrf_token %}
+
+          <div class="form-row">
+            <div class="form-group">
+              <label for="first-name">First Name</label>
+              <input type="text" name="first_name" value="{{ old_data.first_name|default:'' }}" class="form-input"
+                required />
+              {% if field_errors.first_name %}
+              <p style="color: red">{{ field_errors.first_name }}</p>
+              {% endif %}
+            </div>
+            <div class="form-group">
+              <label for="last_name">Last Name</label>
+              <input type="text" name="last_name" value="{{ old_data.last_name|default:'' }}" class="form-input"
+                required />
+              {% if field_errors.last_name %}
+              <p style="color: red">{{ field_errors.last_name }}</p>
+              {% endif %}
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="email">Email Address</label>
+            <input type="email" name="email" value="{{ old_data.email|default:'' }}" class="form-input" required />
+            {% if field_errors.email %}
+            <p style="color: red">{{ field_errors.email }}</p>
+            {% endif %}
+          </div>
+          <div class="form-group">
+            <label for="dob">Date of Birth</label>
+            <input type="date" name="date_of_birth" value="{{ old_data.date_of_birth|default:'' }}" class="form-input"
+              required />
+            {% if field_errors.date_of_birth %}
+            <p style="color: red">{{ field_errors.date_of_birth }}</p>
+            {% endif %}
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label for="password">Password</label>
+              <input type="password" name="password" value="{{ old_data.password|default:'' }}" class="form-input"
+                required />
+              {% if field_errors.password %}
+              <p style="color: red">{{ field_errors.password }}</p>
+              {% endif %}
+            </div>
+            <div class="form-group">
+              <label for="confirm-password">Confirm Password</label>
+              <input type="password" name="confirm_password" value="{{ old_data.confirm_password|default:'' }}"
+                class="form-input" required />
+              {% if field_errors.confirm_password %}
+              <p style="color: red">{{ field_errors.confirm_password }}</p>
+              {% endif %}
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label>Profile Picture (Optional)</label>
+            <div class="file-input-wrapper">
+              <input type="file" id="profile_photo" name="profile_photo" class="file-input-hidden" />
+              <label for="profile_photo" class="file-input-label">
+                <i class="fas fa-upload"></i>
+                <span>Choose a file</span>
+              </label>
+              <span class="file-name-display" id="file-name-display">No file chosen</span>
+            </div>
+          </div>
+
+          <button type="submit" class="signup-btn">Create Account</button>
+        </form>
+
+        <div class="divider">OR</div>
+
+        <a href="{% provider_login_url 'google' process='signup' %}">
+          <button class="social-login-btn">
+            <i class="fab fa-google"></i>
+            Sign up with Google
+          </button>
+        </a>
+
+        <div class="login-redirect">
+          <p>
+            Already have an account?
+            <a href="{% url 'login' %}">Log in</a>
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+  {% endwith %}
+  <script>
+    const toast = document.getElementById("toast");
+    if (toast) {
+      toast.style.display = "block";
+      toast.style.backgroundColor = toast.querySelector(".success")
+        ? "green"
+        : "#f44336";
+    }
+    setTimeout(() => {
+      const toasts = document.querySelectorAll(".toast-message");
+      toasts.forEach((el) => el.remove());
+      toast.style.display = "none";
+    }, 4000);
+  </script>
+  <script>
+    document.addEventListener("DOMContentLoaded", function () {
+      const profilePictureInput = document.getElementById("profile_photo");
+      const fileNameDisplay = document.getElementById("file-name-display");
+
+      if (profilePictureInput && fileNameDisplay) {
+        profilePictureInput.addEventListener("change", function () {
+          // Check if a file was selected
+          if (this.files && this.files.length > 0) {
+            fileNameDisplay.textContent = this.files[0].name;
+            fileNameDisplay.style.fontStyle = "normal";
+            fileNameDisplay.style.color = "var(--text-primary)";
+          } else {
+            fileNameDisplay.textContent = "No file chosen";
+            fileNameDisplay.style.fontStyle = "italic";
+            fileNameDisplay.style.color = "var(--text-secondary)";
+          }
+        });
+      }
+    });
+  </script>
+  <script src="{% static 'js/main.js' %}"></script>
+  {% include 'components/footer.html' %}
+</body>
+
+</html>

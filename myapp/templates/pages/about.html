@@ -1,0 +1,111 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>About Us - Quizolve</title>
+    <link rel="stylesheet" href="{% static 'css/main.css' %}">
+    <link rel="stylesheet" href="{% static 'css/about.css' %}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+</head>
+<body>
+    <div class="loader" id="loader">
+      <div class="loader-logo"><div class="logo-icon"><i class="fas fa-brain"></i></div></div>
+      <div class="loader-text">Initializing AI Core...</div>
+    </div>
+     {% include 'components/navbar.html' %}
+        <section class="about-hero">
+            <div class="hero-background"><div class="grid-pattern"></div><div class="floating-orbs"><div class="orb orb-1"></div><div class="orb orb-2"></div><div class="orb orb-3"></div></div></div>
+            <div class="container hero-content">
+                <h1 class="about-title animate-on-load" data-animation="fade-in-up">We are pioneering the future of personalized education.</h1>
+                <p class="about-subtitle animate-on-load" data-animation="fade-in-up" style="animation-delay: 150ms;">Quizolve was founded on the principle that technology can unlock human potential. We are a passionate team of educators, engineers, and AI researchers dedicated to creating a more intelligent and accessible learning experience for everyone.</p>
+            </div>
+        </section>
+
+        <section class="mission-vision">
+            <div class="container">
+                <div class="mission-grid" data-animation-container>
+                    <div class="mission-card animate-on-scroll" data-animation="fade-in-up">
+                        <div class="aurora-border"></div>
+                        <div class="mission-content">
+                            <div class="mission-icon"><i class="fas fa-bullseye"></i></div>
+                            <h2>Our Mission</h2>
+                            <p>To empower learners worldwide by providing adaptive, engaging, and personalized educational tools that make learning effective, accessible, and enjoyable.</p>
+                        </div>
+                    </div>
+                    <div class="mission-card animate-on-scroll" data-animation="fade-in-up">
+                        <div class="aurora-border"></div>
+                        <div class="mission-content">
+                            <div class="mission-icon"><i class="fas fa-eye"></i></div>
+                            <h2>Our Vision</h2>
+                            <p>To create a world where anyone, anywhere, can master any subject through the power of artificially intelligent learning companions that understand and adapt to their unique needs.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <section class="core-values">
+            <div class="container">
+                <div class="section-header" data-animation-container>
+                    <h2 class="section-title animate-on-scroll" data-animation="fade-in-up">Our Core Values</h2>
+                </div>
+                <div class="values-grid" data-animation-container>
+                    <div class="value-tag animate-on-scroll" data-animation="zoom-in"><span><i class="fas fa-lightbulb"></i> Innovation</span></div>
+                    <div class="value-tag animate-on-scroll" data-animation="zoom-in"><span><i class="fas fa-universal-access"></i> Accessibility</span></div>
+                    <div class="value-tag animate-on-scroll" data-animation="zoom-in"><span><i class="fas fa-shield-alt"></i> Integrity</span></div>
+                    <div class="value-tag animate-on-scroll" data-animation="zoom-in"><span><i class="fas fa-rocket"></i> Empowerment</span></div>
+                    <div class="value-tag animate-on-scroll" data-animation="zoom-in"><span><i class="fas fa-users"></i> Collaboration</span></div>
+                </div>
+            </div>
+        </section>
+
+        <section class="team">
+            <div class="container">
+                <div class="section-header" data-animation-container>
+                    <h2 class="section-title animate-on-scroll" data-animation="fade-in-up">Meet the Team</h2>
+                </div>
+                <div class="team-grid" data-animation-container>
+                    <div class="team-card-wrapper animate-on-scroll" data-animation="fade-in-up">
+                        <div class="team-card">
+                            <div class="team-photo-wrapper"><img src="https://randomuser.me/api/portraits/women/68.jpg" alt="Jane Doe" class="team-photo"></div>
+                            <div class="team-info">
+                                <h3 class="team-name">Dr. Evelyn Reed</h3>
+                                <p class="team-role">Founder & CEO</p>
+                                <p class="team-bio">AI visionary with a Ph.D. in Cognitive Science, leading the charge to revolutionize education.</p>
+                                <div class="team-social"><a href="#"><i class="fab fa-linkedin-in"></i></a><a href="#"><i class="fab fa-twitter"></i></a></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="team-card-wrapper animate-on-scroll" data-animation="fade-in-up">
+                         <div class="team-card">
+                            <div class="team-photo-wrapper"><img src="https://randomuser.me/api/portraits/men/75.jpg" alt="John Smith" class="team-photo"></div>
+                             <div class="team-info">
+                                <h3 class="team-name">Marcus Chen</h3>
+                                <p class="team-role">Chief Technology Officer</p>
+                                <p class="team-bio">Leads our engineering team, architecting the scalable and robust AI infrastructure that powers Quizolve.</p>
+                                <div class="team-social"><a href="#"><i class="fab fa-linkedin-in"></i></a><a href="#"><i class="fab fa-github"></i></a></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="team-card-wrapper animate-on-scroll" data-animation="fade-in-up">
+                         <div class="team-card">
+                            <div class="team-photo-wrapper"><img src="https://randomuser.me/api/portraits/women/78.jpg" alt="Maria Garcia" class="team-photo"></div>
+                             <div class="team-info">
+                                <h3 class="team-name">Aisha Khan</h3>
+                                <p class="team-role">Head of Product</p>
+                                <p class="team-bio">Passionate about user-centric design, ensuring our platform is both powerful and intuitive for all learners.</p>
+                                <div class="team-social"><a href="#"><i class="fab fa-linkedin-in"></i></a><a href="#"><i class="fab fa-dribbble"></i></a></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        {% include 'components/footer.html' %}
+    </div>
+    
+    <script src="{% static 'js/main.js' %}"></script>
+</body>
+</html>

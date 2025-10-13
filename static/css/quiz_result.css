@@ -1,0 +1,154 @@
+/* Base Styles */
+body {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  padding: 1rem;
+  background-color: var(--background-dark);
+  color: var(--text-primary);
+  font-family: "Poppins", sans-serif;
+}
+
+.result-card {
+  width: 100%;
+  max-width: 450px;
+  background-color: var(--card-dark);
+  border: 1px solid var(--border-color);
+  border-radius: 1.5rem;
+  padding: 2.5rem;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+  text-align: center;
+  transition: all 0.3s ease;
+  /* Add transition for smooth resizing */
+}
+
+.result-header h1 {
+  font-size: 1.8rem;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+}
+
+.result-header p {
+  color: var(--text-secondary);
+  font-size: 1rem;
+  margin-bottom: 2rem;
+}
+
+.score-circle {
+  width: 150px;
+  height: 150px;
+  border-radius: 50%;
+  margin: 0 auto 2rem auto;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: conic-gradient(
+    var(--primary-color) var(--score-percent, 0%),
+    rgba(71, 85, 105, 0.2) 0
+  );
+  position: relative;
+  transition: all 0.3s ease;
+}
+
+.score-circle::before {
+  content: "";
+  position: absolute;
+  width: 85%;
+  height: 85%;
+  background: var(--card-dark);
+  border-radius: 50%;
+}
+
+.score-text {
+  position: relative;
+  font-size: 2.5rem;
+  font-weight: 700;
+  transition: all 0.3s ease;
+}
+
+.score-text sup {
+  font-size: 1.5rem;
+}
+
+.stats-breakdown {
+  display: flex;
+  justify-content: space-around;
+  text-align: center;
+  margin-bottom: 2.5rem;
+}
+
+.stat-item h3 {
+  font-size: 1.5rem;
+  font-weight: 600;
+}
+
+.stat-item p {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+}
+
+.button-container {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.result-btn {
+  padding: 0.8rem 1.5rem;
+  border: 1px solid transparent;
+  border-radius: 2rem;
+  color: white;
+  font-weight: 500;
+  cursor: pointer;
+  text-decoration: none;
+  transition: all 0.3s ease;
+}
+
+.btn-primary {
+  background: var(--text-gradient);
+}
+
+.btn-secondary {
+  border-color: var(--border-color);
+  color: var(--text-secondary);
+}
+
+.btn-secondary:hover {
+  background-color: rgba(255, 255, 255, 0.05);
+  border-color: var(--text-primary);
+  color: var(--text-primary);
+}
+
+/* --- NEW: Responsive Styles for Mobile --- */
+@media (max-width: 500px) {
+  .result-card {
+    padding: 1.5rem;
+    /* Reduce padding on small screens */
+  }
+
+  .result-header h1 {
+    font-size: 1.5rem;
+    /* Make heading smaller */
+  }
+
+  .score-circle {
+    width: 120px;
+    /* Make score circle smaller */
+    height: 120px;
+  }
+
+  .score-text {
+    font-size: 2rem;
+    /* Make percentage text smaller */
+  }
+
+  .score-text sup {
+    font-size: 1.2rem;
+  }
+
+  .stat-item h3 {
+    font-size: 1.2rem;
+    /* Make stat numbers smaller */
+  }
+}

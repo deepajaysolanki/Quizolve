@@ -1,0 +1,155 @@
+/* =================================================================
+   STYLES FOR YOUR EXISTING PLAY_QUIZ.HTML
+   ================================================================= */
+
+/* --- Page Layout --- */
+body {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    padding: 2rem;
+    background-color: var(--background-dark);
+    font-family: 'Poppins', sans-serif;
+}
+
+/* --- The Main Quiz Card --- */
+.quiz-card {
+    width: 100%;
+    max-width: 800px;
+    background-color: var(--card-dark);
+    border: 1px solid var(--border-color);
+    border-radius: 1.5rem;
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.3);
+    display: flex;
+    flex-direction: column;
+}
+
+/* --- Header Section --- */
+.progress-bar-container {
+    padding: 1.5rem 2rem 1rem 2rem;
+}
+.progress-bar {
+    width: 100%;
+    height: 8px;
+    background: #22c55e;
+    border-radius: 4px;
+    transition: width 0.5s linear, background-color 0.5s ease;
+}
+.quiz-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+    padding: 0 2rem 1.5rem 2rem;
+    border-bottom: 1px solid var(--border-color);
+}
+.quiz-topic {
+    color: var(--text-primary);
+    font-weight: 600;
+    font-size: 1.1rem;
+}
+.timer-container {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+/* --- Body (Question & Options) --- */
+.quiz-container {
+    padding: 3rem 2.5rem;
+    text-align: center;
+}
+/* Target the p tag inside quiz-container for the question */
+.quiz-container > p {
+    font-size: 1.75rem;
+    font-weight: 600;
+    line-height: 1.4;
+    margin-bottom: 2.5rem;
+    min-height: 80px;
+    color: var(--text-primary);
+}
+.options-list {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+}
+.option {
+    width: 100%;
+    padding: 1rem;
+    background: rgba(255, 255, 255, 0.05);
+    border: 2px solid var(--border-color);
+    border-radius: 0.75rem;
+    color: var(--text-secondary);
+    font-size: 1rem;
+    text-align: left;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+.option:hover:not(:disabled) {
+    border-color: var(--primary-color);
+    color: var(--text-primary);
+}
+.option.correct {
+    border-color: #10b981;
+    background: rgba(16, 185, 129, 0.2);
+    color: var(--text-primary);
+}
+.option.incorrect {
+    border-color: #ef4444;
+    background: rgba(239, 68, 68, 0.2);
+    color: var(--text-primary);
+}
+.option:disabled {
+    cursor: not-allowed;
+    opacity: 0.7;
+}
+
+/* --- Footer & Buttons --- */
+.button-container {
+    padding: 1.5rem 2rem;
+    border-top: 1px solid var(--border-color);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+.quiz-action-btn {
+    padding: 0.75rem 1.5rem;
+    border-radius: 2rem;
+    font-weight: 500;
+    cursor: pointer;
+    border: 1px solid transparent;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    transition: all 0.2s ease;
+    font-size: 1rem;
+}
+#end-quiz-btn {
+    background-color: transparent;
+    border-color: var(--border-color);
+    color: var(--text-secondary);
+}
+#next-question-btn {
+    background: var(--text-gradient);
+    color: white;
+}
+#next-question-btn:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+    background: var(--card-dark);
+    border-color: var(--border-color);
+    color: var(--text-secondary);
+}
+
+/* --- Responsive Styles --- */
+@media (max-width: 768px) {
+    .options-list {
+        grid-template-columns: 1fr;
+    }
+    .quiz-container > p {
+        font-size: 1.3rem;
+    }
+}

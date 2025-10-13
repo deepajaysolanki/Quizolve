@@ -1,0 +1,461 @@
+/* =================================================================
+   QUIZ.CSS - STYLES FOR QUIZ.HTML
+   ================================================================= */
+
+/* --- Main Container (padding reset) --- */
+.quiz-page-body {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  background: var(--background-dark);
+}
+
+/* THIS IS THE CRITICAL FIX */
+.quiz-view-container {
+  flex-grow: 1;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  /* Changed padding to push content down from the navbar */
+  padding: 7rem 2rem 2rem 2rem;
+}
+
+.quiz-stage {
+  width: 100%;
+  max-width: 800px;
+  animation: zoomIn 0.5s forwards cubic-bezier(0.25, 0.8, 0.25, 1);
+}
+
+/* --- Stage 1: Category Selection --- */
+.category-selection-card {
+  margin-top: 50px;
+}
+.category-selection-card h1 {
+  font-size: 2rem;
+  font-weight: 600;
+  margin-bottom: 2rem;
+  color: var(--text-primary);
+  text-align: center;
+}
+
+/* --- Responsive Grid Layout for Categories --- */
+.category-grid {
+  display: grid;
+  /* Creates a responsive grid that fits as many columns as possible */
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1rem;
+}
+
+/* --- Category Button Styling --- */
+.category-btn {
+  background-color: #0d2a4c; /* Solid dark navy blue */
+  border: 1px solid var(--border-color);
+  color: var(--text-primary);
+  padding: 1.25rem;
+  border-radius: 0.75rem;
+  text-align: center;
+  font-size: 1rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.category-btn:hover,
+.category-btn.active {
+  background-color: var(--primary-color);
+  border-color: var(--primary-color);
+  transform: translateY(-5px); /* Lifts the card up slightly */
+  box-shadow: 0 10px 20px rgba(59, 130, 246, 0.2);
+}
+
+/* --- Stage 2 & 3 Styles (No changes needed here) --- */
+.quiz-box,
+.results-box {
+  background: var(--card-dark);
+  border: 1px solid var(--border-color);
+  border-radius: 1.5rem;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.3);
+  overflow: hidden;
+}
+.quiz-header {
+  padding: 2rem 2.5rem;
+  border-bottom: 1px solid var(--border-color);
+}
+.progress-bar-container {
+  width: 100%;
+  height: 8px;
+  background: rgba(0, 0, 0, 0.3);
+  border-radius: 4px;
+  margin-bottom: 1.5rem;
+}
+.progress-bar {
+  width: 0%;
+  height: 100%;
+  background: var(--text-gradient);
+  border-radius: 4px;
+  transition: width 0.4s ease;
+}
+.quiz-meta {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  color: var(--text-secondary);
+}
+.question-counter,
+.quiz-category-title,
+.timer {
+  font-weight: 500;
+}
+.category-header-box {
+  text-align: center;
+}
+.quiz-category-title {
+  font-size: 2.5rem;
+  font-weight: bold;
+  margin-bottom: 10px;
+  color: var(--text-primary);
+  font-size: 1.2rem;
+}
+.category-subtitle {
+  font-size: 1.2rem;
+  color: #aaa;
+}
+.timer {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+.quiz-body {
+  padding: 2.5rem;
+}
+.question-text {
+  font-size: 1.75rem;
+  font-weight: 600;
+  line-height: 1.4;
+  margin-bottom: 2.5rem;
+  text-align: center;
+  min-height: 80px;
+}
+.options-container {
+  width: 100%;
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1rem;
+}
+.option {
+  width: 100%;
+  padding: 1rem;
+  background: rgba(255, 255, 255, 0.05);
+  border: 2px solid var(--border-color);
+  border-radius: 0.75rem;
+  color: var(--text-primary);
+  font-family: "Poppins", sans-serif;
+  font-size: 1.1rem;
+  text-align: left;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+.option:hover:not([disabled]) {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: var(--primary-color);
+}
+.option.correct {
+  border-color: #10b981;
+  background: rgba(16, 185, 129, 0.2);
+}
+.option.incorrect {
+  border-color: #ef4444;
+  background: rgba(239, 68, 68, 0.2);
+}
+.option:disabled {
+  cursor: not-allowed;
+}
+.quiz-footer {
+  padding: 2rem 2.5rem;
+  border-top: 1px solid var(--border-color);
+  display: flex;
+  justify-content: flex-end;
+}
+.next-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.75rem;
+  background: var(--text-gradient);
+  color: white;
+  padding: 0.75rem 1.5rem;
+  border: none;
+  border-radius: 2rem;
+  font-size: 1rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+.next-btn:hover:not(:disabled) {
+  transform: translateY(-3px);
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+}
+.next-btn:disabled {
+  background: var(--border-color);
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+.results-box {
+  padding: 3rem;
+  text-align: center;
+}
+.results-title {
+  font-size: 2rem;
+  margin-bottom: 1rem;
+}
+.results-trophy {
+  font-size: 4rem;
+  color: #facc15;
+  margin-bottom: 1rem;
+}
+.results-score-text {
+  color: var(--text-secondary);
+  font-size: 1.1rem;
+  margin-bottom: 0.5rem;
+}
+.results-score {
+  font-size: 3rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: 2rem;
+}
+.results-summary {
+  border-top: 1px solid var(--border-color);
+  border-bottom: 1px solid var(--border-color);
+  padding: 1.5rem 0;
+  margin-bottom: 2rem;
+  display: flex;
+  justify-content: space-around;
+}
+.summary-item {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  font-size: 1.1rem;
+  color: var(--text-secondary);
+}
+.summary-item span {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+.results-buttons {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+}
+a {
+  color: #fff;
+  text-decoration: none;
+}
+.ai-btn {
+  background: var(--card-dark);
+  padding: 1rem;
+  border-radius: 1rem;
+  color: var(--text-primary);
+  font-size: 1.25rem;
+  font-weight: 500;
+  cursor: pointer;
+  gap: 1rem;
+  transition: all 0.3s ease;
+  border: none;
+}
+
+.ai-btn:hover {
+  background-color: var(--primary-color);
+  border-color: var(--primary-color);
+  box-shadow: 0 10px 20px rgba(59, 130, 246, 0.2);
+}
+
+/* Styling for the "OR" separator */
+.subtle-separator {
+  margin-top: 50px;
+  margin-bottom: 50px;
+}
+.separator {
+  margin-top: 2rem;
+  position: relative;
+  color: var(--text-secondary);
+}
+.separator::before,
+.separator::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  width: 35%;
+  height: 1px;
+  background-color: var(--border-color);
+}
+.separator::before {
+  left: 0;
+}
+.separator::after {
+  right: 0;
+}
+
+.simple-topic-form {
+  margin-top: 10px;
+  display: flex;
+  flex-wrap: wrap; /* Allows items to wrap on smaller screens */
+  gap: 1rem;
+  align-items: center;
+  padding: 0.5rem;
+  border: 1px solid var(--border-color);
+  border-radius: 0.75rem;
+}
+.simple-topic-form input[type="text"] {
+  flex-grow: 1; /* Makes the input field take up available space */
+  background-color: transparent;
+  border: none;
+  color: var(--text-primary);
+  font-size: 1rem;
+  padding: 0.5rem;
+  min-width: 200px; /* Prevents it from getting too small */
+}
+/* FIX: Override browser's default autofill style */
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus,
+input:-webkit-autofill:active {
+  -webkit-text-fill-color: var(--text-primary) !important; /* Sets text color */
+  /* This trick uses an inset shadow to "paint" over the browser's background */
+  box-shadow: 0 0 0 30px var(--background-dark) inset !important;
+  -webkit-box-shadow: 0 0 0 30px var(--background-dark) inset !important;
+}
+
+.simple-topic-form input:focus,
+.simple-topic-form select:focus {
+  outline: none;
+}
+
+/* --- Custom Dropdown Styles --- */
+.custom-dropdown {
+  position: relative; /* Anchor for the options menu */
+}
+
+.dropdown-selected {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.5rem;
+  color: var(--text-primary);
+  cursor: pointer;
+  width: 120px; /* Give it a fixed width */
+}
+
+.dropdown-options {
+  display: none; /* Hidden by default */
+  position: absolute;
+  top: 120%; /* Position below the select box */
+  left: 0;
+  width: 100%;
+  background-color: var(--card-dark);
+  border: 1px solid var(--border-color);
+  border-radius: 0.5rem;
+  z-index: 10;
+  overflow: hidden;
+}
+
+.dropdown-options.show {
+  display: block; /* Show with JavaScript */
+}
+
+.dropdown-option {
+  padding: 0.75rem;
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.dropdown-option:hover {
+  background-color: var(--primary-color);
+  color: var(--text-primary);
+}
+
+/* Simplified solid color button */
+.simple-submit-btn {
+  padding: 0.6rem 1.2rem;
+  border: none;
+  border-radius: 0.5rem;
+  background-color: var(--primary-color);
+  color: white;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.simple-submit-btn:hover {
+  background-color: #2563eb;
+}
+
+.simple-submit-btn {
+  padding: 0.6rem 1.2rem;
+  border: none;
+  border-radius: 0.5rem;
+  background-color: var(--primary-color);
+  color: white;
+  font-weight: 500;
+  cursor: pointer;
+  margin-left: auto; /* Pushes the button to the right on wider screens */
+  transition: background-color 0.3s ease;
+}
+
+.simple-submit-btn:hover {
+  background-color: #2563eb;
+}
+/* --- Difficulty Dropdown Styles --- */
+.difficulty-selector-container {
+  margin-top: 20px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 2rem;
+  color: var(--text-secondary);
+}
+
+.difficulty-selector-container select {
+  background-color: var(--background-dark);
+  border: 1px solid var(--border-color);
+  color: var(--text-primary);
+  font-size: 1rem;
+  font-family: "Poppins", sans-serif;
+  padding: 0.5rem 1rem;
+  border-radius: 0.5rem;
+  border: none;
+}
+
+.toast {
+  position: fixed;
+  top: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 15px 25px;
+  color: white;
+  border-radius: 5px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  z-index: 1000;
+}
+/* --- Responsive Styles --- */
+@media (max-width: 600px) {
+  .simple-topic-form {
+    flex-direction: column; /* Stacks items vertically */
+    align-items: stretch; /* Makes items full-width */
+  }
+
+  .simple-topic-form input,
+  .simple-topic-form select,
+  .simple-topic-form button {
+    width: 100%; /* Each item takes the full width of the container */
+  }
+
+  .simple-submit-btn {
+    margin-left: 0; /* Resets the margin for stacked layout */
+  }
+}

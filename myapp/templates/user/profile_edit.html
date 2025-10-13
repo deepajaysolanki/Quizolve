@@ -1,0 +1,198 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Edit Profile</title>
+    <link rel="stylesheet" href="{% static 'css/main.css' %}">
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 1rem;
+        }
+
+        .edit-card {
+            width: 100%;
+            max-width: 550px;
+            background-color: var(--card-dark);
+            border: 1px solid var(--border-color);
+            border-radius: 1.5rem;
+            padding: 2.5rem;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+        }
+
+        .edit-card h1 {
+            text-align: center;
+            font-size: 1.8rem;
+            font-weight: 600;
+            margin-bottom: 2.5rem;
+        }
+
+        .form-container {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .form-group label {
+            font-weight: 500;
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        .form-group input[type="text"],
+        .form-group input[type="date"] {
+            width: 100%;
+            padding: 0.8rem 1rem;
+            background-color: rgba(71, 85, 105, 0.2);
+            border: 1px solid var(--border-color);
+            border-radius: 0.5rem;
+            color: var(--text-primary);
+            font-size: 1rem;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        .profile-photo-group {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+        }
+
+        .current-photo-preview {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid var(--border-color);
+        }
+
+        .file-upload-wrapper input[type="file"] {
+            display: none;
+        }
+
+        .file-upload-label {
+            display: inline-block;
+            padding: 0.6rem 1rem;
+            background-color: var(--background-dark);
+            border: 1px solid var(--border-color);
+            border-radius: 0.5rem;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        .file-upload-label:hover {
+            background-color: rgba(255, 255, 255, 0.05);
+        }
+
+        #file-name {
+            color: var(--text-secondary);
+            font-size: 0.8rem;
+            margin-top: 0.5rem;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1.5rem;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 0.8rem 1.5rem;
+            border-radius: 2rem;
+            font-weight: 500;
+            cursor: pointer;
+            text-decoration: none;
+            text-align: center;
+            flex-grow: 1;
+        }
+
+        .btn-primary {
+            background: var(--text-gradient);
+            color: white;
+            border: none;
+        }
+
+        .btn-secondary {
+            border: 1px solid var(--border-color);
+            color: var(--text-secondary);
+            background: transparent;
+        }
+
+       
+        @media (max-width: 600px) {
+            .edit-card {
+                padding: 1.5rem;
+            }
+
+            .profile-photo-group {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    
+
+    <div class="edit-card">
+        <h1>Edit Your Profile</h1>
+
+        <form class="form-container" method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            <div class="form-group profile-photo-group">
+                {% if user.profile_photo %}
+                <img src="{{ user.profile_photo.url }}" alt="Current profile photo" class="current-photo-preview">
+                {% endif %}
+                <div class="file-upload-wrapper">
+                    <label for="{{ form.profile_photo.id_for_label }}" class="file-upload-label">Change Photo</label>
+                    {{ form.profile_photo }}
+                    <div id="file-name">No file chosen</div>
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="{{ form.first_name.id_for_label }}">First name:</label>
+                {{ form.first_name }}
+            </div>
+            <div class="form-group">
+                <label for="{{ form.last_name.id_for_label }}">Last name:</label>
+                {{ form.last_name }}
+            </div>
+            <div class="form-group">
+                <label for="{{ form.date_of_birth.id_for_label }}">Date of birth:</label>
+                {{ form.date_of_birth }}
+            </div>
+            <a href="{% url 'account_password_change' %}" class="btn btn-secondary">Change Password</a>
+            <div class="button-group">
+                <a href="{% url 'user-profile' %}" class="btn btn-secondary">Cancel</a>
+                <button type="submit" class="btn btn-primary">Save Changes</button>
+            </div>
+        </form>
+
+        <hr style="border-color: var(--border-color); margin: 2rem 0;">
+    </div>
+
+    <script>
+        const fileInput = document.getElementById('{{ form.profile_photo.id_for_label }}');
+        const fileNameDisplay = document.getElementById('file-name');
+        if (fileInput) {
+            fileInput.addEventListener('change', function () {
+                fileNameDisplay.textContent = this.files.length > 0 ? this.files[0].name : 'No file chosen';
+            });
+        }
+    </script>
+    
+</body>
+
+</html>

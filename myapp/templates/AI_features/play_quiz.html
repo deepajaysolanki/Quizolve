@@ -1,0 +1,62 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <title>Quiz Time!</title>
+    <meta name="csrf-token" content="{{ csrf_token }}" />
+    <link rel="stylesheet" href="{% static 'css/main.css' %}" />
+    <link rel="stylesheet" href="{% static 'css/play_quiz.css' %}" />
+    <style></style>
+</head>
+
+<body>
+    <div class="quiz-card">
+        <div class="progress-bar-container">
+            <div class="progress-bar" id="time-progress-bar"></div>
+        </div>
+        <div class="quiz-header">
+            <div class="quiz-meta">
+                <span class="question-counter">
+                    <span id="current-question-num">1</span> / <span id="total-questions">50</span>
+                </span>
+            </div>
+            <div class="quiz-category-title">{{ quizTopic|upper }}</div>
+            <div class="timer-container">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                    <path d="M8 3.5a.5.5 0 0 0-1 0V9a.5.5 0 0 0 .252.434l3.5 2a.5.5 0 0 0 .496-.868L8 8.71V3.5z" />
+                    <path d="M8 16A8 8 0 1 0 8 0a8 8 0 0 0 0 16zm7-8A7 7 0 1 1 1 8a7 7 0 0 1 14 0z" />
+                </svg>
+                <span id="timer">--</span>
+            </div>
+        </div>
+        <div class="quiz-container" id="quiz-container">
+            <!-- <p class="quiz-header" id="quiz-header">Loading first question...</p> -->
+            <h2 class="question-text" id="question-text">Loading first question...</h2>
+            <div class="options-container" id="options-container"></div>
+        </div>
+
+        <div class="button-container">
+            <!-- <a href="{% url 'results-page' %}" id="end-quiz-btn" class="quiz-action-btn">End Quiz ⏹️</a> -->
+            <button id="end-quiz-btn" class="quiz-action-btn secondary">End Quiz</button>
+            <button id="next-question-btn" class="quiz-action-btn" disabled>
+                Next Question
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                    <path fill-rule="evenodd"
+                        d="M4.646 1.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1 0 .708l-6 6a.5.5 0 0 1-.708-.708L10.293 8 4.646 2.354a.5.5 0 0 1 0-.708z" />
+                </svg>
+            </button>
+        </div>
+    </div>
+
+    <!-- <button id="end-quiz-btn" style="display: none;"><a href="{% url 'results-page' %}"  id="end-quiz-btn">End Quiz</a></button> -->
+
+    <div id="quiz-data" data-time-limit="{{ time_limit }}" data-total-questions="{{ total_questions }}"
+        data-get-question-url="{% url 'api-get-question' %}" data-check-answer-url="{% url 'api-check-answer' %}"
+        data-end-exam-early-url="{% url 'end-exam-early' %}" data-results-page-url="{% url 'results-page' %}"
+        data-csrf-token="{{ csrf_token }}"></div>
+    <script src="{% static 'js/play_quiz.js' %}"></script>
+</body>
+
+</html>

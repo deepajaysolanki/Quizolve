@@ -1,0 +1,90 @@
+/* =================================================================
+   Footer
+   ================================================================= */
+.footer {
+    background: #0c1427;
+    padding: 4rem 1rem 2rem 1rem; /* Adjusted padding for better spacing on mobile */
+    border-top: 1px solid var(--border-color);
+}
+.footer-content {
+    display: flex;
+    flex-wrap: wrap; /* Allows items to wrap onto the next line */
+    justify-content: space-between;
+    gap: 3rem;
+    margin-bottom: 3rem;
+}
+.footer-brand {
+    flex-basis: 300px; /* Gives the brand section a base width */
+    flex-grow: 1;
+}
+.footer-brand p {
+    max-width: 300px;
+    color: var(--text-secondary);
+    margin-top: 1rem;
+    line-height: 1.7;
+}
+.footer-links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4rem;
+    flex-grow: 1;
+    justify-content: flex-start; /* Aligns link groups to the start */
+}
+@media (min-width: 768px) {
+    .footer-links {
+        justify-content: flex-end; /* Aligns link groups to the end on larger screens */
+    }
+}
+.footer-links h4 {
+    color: white;
+    margin-bottom: 1rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    font-size: 0.9rem;
+}
+.footer-links ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+.footer-links li {
+    margin-bottom: 0.75rem;
+}
+.footer-links a {
+    color: var(--text-secondary);
+    text-decoration: none;
+    transition: color 0.3s;
+}
+.footer-links a:hover {
+    color: var(--primary-color);
+}
+.footer-bottom {
+    display: flex;
+    flex-wrap: wrap; /* Allows items to wrap */
+    justify-content: center; /* Center items on mobile by default */
+    align-items: center;
+    gap: 1rem; /* Adds space between items when they wrap */
+    padding-top: 2rem;
+    border-top: 1px solid var(--border-color);
+    color: var(--text-secondary);
+    text-align: center;
+}
+@media (min-width: 768px) {
+    .footer-bottom {
+        justify-content: space-between; /* space-between on larger screens */
+        text-align: left;
+    }
+}
+.social-links {
+    display: flex;
+    gap: 1.5rem;
+}
+.social-links a {
+    color: var(--text-secondary);
+    font-size: 1.25rem;
+    transition: all 0.3s;
+}
+.social-links a:hover {
+    color: var(--text-primary);
+    transform: translateY(-3px);
+}

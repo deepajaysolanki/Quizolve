@@ -1,0 +1,56 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <title>Quiz Results</title>
+    <link rel="stylesheet" href="{% static 'css/main.css' %}" />
+    <link rel="stylesheet" href="{% static 'css/quiz_result.css' %}" />
+</head>
+
+<body>
+    <div class="result-card">
+        <div class="result-header">
+            <h1>Quiz Complete!</h1>
+            {% if ended_early %}
+            <p>You ended the exam early. Here's your score for the questions you attempted.</p>
+            {% else %}
+            <p>Here's your performance summary.</p>
+            {% endif %}
+
+        </div>
+
+
+        <div class="score-circle" style="--score-percent: {{ percentage }}%;">
+            <div class="score-text">{{ percentage }}<sup>%</sup></div>
+        </div>
+
+        <div class="stats-breakdown">
+            <div class="stat-item">
+                <h3>{{ total }}</h3>
+                <p>Total</p>
+            </div>
+            <div class="stat-item">
+                <h3>{{ correct }}</h3>
+                <p>Correct</p>
+            </div>
+            <div class="stat-item">
+                <h3>{{ incorrect }}</h3>
+                <p>Incorrect</p>
+            </div>
+        </div>
+
+        <div class="button-container">
+            <a href="{% url 'start-quiz' %}" class="result-btn btn-primary">Play Again?</a>
+
+            {% if quiz_type == 'exam' %}
+            <a href="{% url 'exam-selection' %}" class="result-btn btn-secondary">Start a new quiz</a>
+            {% else %}
+            <a href="{% url 'quiz-page' %}" class="result-btn btn-secondary">Start a new quiz</a>
+            {% endif %}
+        </div>
+    </div>
+</body>
+
+</html>
