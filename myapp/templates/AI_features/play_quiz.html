@@ -52,10 +52,15 @@
 
     <!-- <button id="end-quiz-btn" style="display: none;"><a href="{% url 'results-page' %}"  id="end-quiz-btn">End Quiz</a></button> -->
 
-    <div id="quiz-data" data-time-limit="{{ time_limit }}" data-total-questions="{{ total_questions }}"
-        data-get-question-url="{% url 'api-get-question' %}" data-check-answer-url="{% url 'api-check-answer' %}"
-        data-end-exam-early-url="{% url 'end-exam-early' %}" data-results-page-url="{% url 'results-page' %}"
-        data-csrf-token="{{ csrf_token }}"></div>
+    <div id="quiz-data" 
+        data-time-limit="{{ time_limit }}" 
+        data-total-questions="{{ total_questions }}"
+        data-get-question-url="{% url 'api-get-question' %}" 
+        data-check-answer-url="{% url 'record-answer-api' %}"
+        data-end-exam-early-url="{% url 'end-exam-early' %}" 
+        data-results-page-url="{% url 'results-page' %}"
+        data-csrf-token="{{ csrf_token }}">
+    </div>
     <script src="{% static 'js/play_quiz.js' %}"></script>
 </body>
 

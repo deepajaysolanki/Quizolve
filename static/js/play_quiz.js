@@ -12,7 +12,7 @@ document.addEventListener('DOMContentLoaded', function () {
     
     // --- Get data from Django ---
     const GET_QUESTION_URL = quizData.dataset.getQuestionUrl;
-    const CHECK_ANSWER_URL = quizData.dataset.checkAnswerUrl;
+    const RECORD_ANSWER_URL = quizData.dataset.checkAnswerUrl; // This is your 'record-answer-api'
     const END_EXAM_EARLY_URL = quizData.dataset.endExamEarlyUrl;
     const RESULTS_PAGE_URL = quizData.dataset.resultsPageUrl;
     const CSRF_TOKEN = quizData.dataset.csrfToken;
@@ -21,6 +21,7 @@ document.addEventListener('DOMContentLoaded', function () {
     
     // --- State variables ---
     let correctAnswer = '';
+    let currentQuestionText = ''; // Variable to hold the actual question text
     let timerInterval;
     let timeLeft = initialTimeLimit;
     let questionNumber = 0;
@@ -42,16 +43,23 @@ document.addEventListener('DOMContentLoaded', function () {
         optionsContainer.innerHTML = '';
         nextBtn.disabled = true;
         clearInterval(timerInterval);
+        
         const response = await fetch(GET_QUESTION_URL);
         const data = await response.json();
+        
         if (data.error) {
             questionText.textContent = data.error;
             return;
         }
+        
         questionNumber++;
         currentQuestionNumSpan.textContent = questionNumber;
-        questionText.textContent = data.question;
+
+        // Correctly save and display the new question
+        currentQuestionText = data.question; 
+        questionText.textContent = currentQuestionText;
         correctAnswer = data.answer;
+        
         data.options.forEach(optionText => {
             const optionButton = document.createElement('button');
             optionButton.className = 'option';
@@ -62,19 +70,39 @@ document.addEventListener('DOMContentLoaded', function () {
         startTimer();
     }
 
+    // This function is called when an option is clicked
     function handleOptionClick(event) {
         clearInterval(timerInterval);
-        nextBtn.disabled = false;
         const selectedOption = event.target;
-        const isCorrect = selectedOption.textContent === correctAnswer;
+        const userAnswer = selectedOption.textContent;
+
         document.querySelectorAll('.option').forEach(opt => {
             opt.disabled = true;
-            if (opt.textContent === correctAnswer) opt.classList.add('correct');
-            else if (opt === selectedOption) opt.classList.add('incorrect');
+            if (opt.textContent === userAnswer) {
+                opt.classList.add('selected'); // Highlight the selected answer
+            }
         });
-        updateScore(isCorrect);
+
+        // Record the answer and move to the next question
+        recordAnswer(currentQuestionText, userAnswer, correctAnswer).then(() => {
+            setTimeout(() => {
+                getNextQuestion();
+            }, 1000);
+        });
     }
 
+    // This function is called when the timer runs out
+    async function handleTimeUp() {
+        clearInterval(timerInterval);
+        document.querySelectorAll('.option').forEach(opt => {
+            opt.disabled = true;
+        });
+
+        // Record "Time's Up" as the answer
+        await recordAnswer(currentQuestionText, "Time's Up", correctAnswer);
+        getNextQuestion();
+    }
+    
     function startTimer() {
         timeLeft = initialTimeLimit;
         updateTimerDisplay();
@@ -85,16 +113,6 @@ document.addEventListener('DOMContentLoaded', function () {
             updateProgressBar();
             if (timeLeft <= 0) handleTimeUp();
         }, 1000);
-    }
-
-    async function handleTimeUp() {
-        clearInterval(timerInterval);
-        nextBtn.disabled = false;
-        document.querySelectorAll('.option').forEach(opt => {
-            opt.disabled = true;
-            if (opt.textContent === correctAnswer) opt.classList.add('correct');
-        });
-        await updateScore(false);
     }
     
     function updateTimerDisplay() { timerDisplay.textContent = timeLeft; }
@@ -107,18 +125,25 @@ document.addEventListener('DOMContentLoaded', function () {
         else progressBar.style.backgroundColor = '#ef4444';
     }
 
-    async function updateScore(isCorrect) {
-        await fetch(CHECK_ANSWER_URL, {
+    // This function sends the answer data to the backend
+    async function recordAnswer(question, user_answer, correct_answer) {
+        await fetch(RECORD_ANSWER_URL, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json', 'X-CSRFToken': CSRF_TOKEN },
-            body: JSON.stringify({ is_correct: isCorrect })
+            body: JSON.stringify({
+                'question': question,
+                'user_answer': user_answer,
+                'correct_answer': correct_answer
+            })
         });
     }
 
     // --- Event Listeners ---
     nextBtn.addEventListener('click', getNextQuestion);
     
-    endQuizBtn.addEventListener('click', () => {
+    endQuizBtn.addEventListener('click', (event) => {
+        // This makes your <a> tag work like a button with a confirmation
+        event.preventDefault();
         clearInterval(timerInterval);
         quizIsOver = true;
         const isExam = totalQuestions > 0;

@@ -13,6 +13,7 @@ from .models import ExamQuizAttempt, UserQuizAttempt
 from django.contrib import messages
 from django.views.decorators.http import require_POST
 from datetime import timedelta
+from django.conf import settings
 
 def home_page(request):
     return render(request, 'pages/index.html')
@@ -197,30 +198,33 @@ def profile_view(request):
     else:
         return redirect('login')
     
-@login_required
 def profile_edit_view(request):
-    # The form is instantiated with the current user's data
-    form = UserProfileForm(instance=request.user)
+    if request.user.is_authenticated:
+        # The form is instantiated with the current user's data
+        form = UserProfileForm(instance=request.user)
 
-    if request.method == 'POST':
-        # If the form is submitted, populate it with the POST data and files
-        form = UserProfileForm(request.POST, request.FILES, instance=request.user)
-        if form.is_valid():
-            form.save()
-            messages.success(request, 'Your profile has been updated successfully!')
-            return redirect('user-profile') # Redirect back to the profile page
+        if request.method == 'POST':
+            # If the form is submitted, populate it with the POST data and files
+            form = UserProfileForm(request.POST, request.FILES, instance=request.user)
+            if form.is_valid():
+                form.save()
+                messages.success(request, 'Your profile has been updated successfully!')
+                return redirect('user-profile') # Redirect back to the profile page
 
-    context = {
-        'form': form
-    }
-    return render(request, 'user/profile_edit.html', context)
-
+        context = {
+            'form': form
+        }
+        return render(request, 'user/profile_edit.html', context)
+    else:
+        return redirect('login')
+    
 def start_quiz_view(request):
     if request.user.is_authenticated:
-
+        print(f"--- POST data received in start_quiz_view: {request.POST} ---")
         now = timezone.now()
         twenty_four_hours_ago = now - timedelta(hours=24)
         quiz_type = request.POST.get('quiz_type')
+        # print(f"Quiz type selected: {quiz_type}")
         topic = request.POST.get('topic')
         difficulty = request.POST.get('difficulty', 'medium')
 
@@ -246,7 +250,7 @@ def start_quiz_view(request):
                 messages.error(request, "You have reached your daily limit of 3 custom topic quizzes.")
                 return redirect('quiz-page')
         
-           # If allowed, create a new attempt record
+        # If allowed, create a new attempt record
         UserQuizAttempt.objects.create(user=request.user, quiz_type=quiz_type, quiz_identifier=topic)
     
         # If allowed, create a new attempt record immediately
@@ -257,6 +261,7 @@ def start_quiz_view(request):
         request.session['total_played'] = 0
         request.session['question_batch'] = [] # Important: Clear any leftover questions
         request.session['total_questions'] = 50
+        request.session['quiz_review_data'] = []
         
          # Create an empty list to track asked questions
         request.session['asked_questions'] = []
@@ -266,42 +271,49 @@ def start_quiz_view(request):
     else:
         return redirect('login')
 
-@login_required
 def play_quiz_view(request):
-    difficulty = request.session.get('difficulty', 'medium')
-    topic = request.session.get('topic', 'General Quiz')
-    total_questions = request.session.get('total_questions', 0)
+    if request.user.is_authenticated:
+        difficulty = request.session.get('difficulty', 'medium')
+        topic = request.session.get('topic', 'General Quiz')
+        total_questions = request.session.get('total_questions', 0)
 
-    # --- THIS IS THE FIX ---
-    # Set time limit based on quiz type
-    if difficulty == 'exam':
-        time_limit = 59  # Set to 59 for all exam quizzes
+        # --- THIS IS THE FIX ---
+        # Set time limit based on quiz type
+        if difficulty == 'exam':
+            time_limit = 59  # Set to 59 for all exam quizzes
+        else:
+            # You can keep varied times for regular quizzes
+            if difficulty == 'easy':
+                time_limit = 30
+            elif difficulty == 'hard':
+                time_limit = 15
+            else: # medium
+                time_limit = 20
+        # --- END OF FIX ---
+        
+        context = {
+            'time_limit': time_limit,
+            'quizTopic': topic,
+            'total_questions': total_questions,
+        }
+        
+        return render(request, 'AI_features/play_quiz.html', context)
     else:
-        # You can keep varied times for regular quizzes
-        if difficulty == 'easy':
-            time_limit = 30
-        elif difficulty == 'hard':
-            time_limit = 15
-        else: # medium
-            time_limit = 20
-    # --- END OF FIX ---
+        return redirect('login')
     
-    context = {
-        'time_limit': time_limit,
-        'quizTopic': topic,
-        'total_questions': total_questions,
-    }
-    
-    return render(request, 'AI_features/play_quiz.html', context)
-
 def results_view(request):
     """Displays the final results from the session."""
+   
+    # Get the type of quiz that was just played from the session
+    quiz_type = request.session.get('difficulty', 'regular')
+     
     total_played = request.session.get('total_played', 0)
     correct_answers = request.session.get('correct_answers', 0)
 
-    
-    # Get the type of quiz that was just played from the session
-    quiz_type = request.session.get('difficulty', 'regular')
+    # Get quiz type
+    # quiz_type = request.POST.get('quiz_type')
+    print(f"Quiz type in results_view: {quiz_type}")
+
     
     # Check for the 'ended_early' flag and then remove it
     ended_early = request.session.pop('ended_early', False)
@@ -314,14 +326,18 @@ def results_view(request):
     
     # Get the topic from the session 
     topic = request.session.get('topic')
-     # Create the attempt record if a full 50-question exam was completed
-    if quiz_type == 'exam' and total_played >= 50:
-            UserQuizAttempt.objects.get_or_create(
-                user=request.user,
-                quiz_type='exam',
-                quiz_identifier= topic,
-                created_at__date=timezone.now().date()
-            )
+
+    # Get the review data from the session
+    review_data = request.session.get('quiz_review_data', [])
+
+    # Create the attempt record if a full 50-question exam was completed
+    # if quiz_type == 'exam' and total_played >= 50:
+    #         UserQuizAttempt.objects.get_or_create(
+    #             user=request.user,
+    #             quiz_type='exam',
+    #             quiz_identifier= topic,
+    #             created_at__date=timezone.now().date(),
+    #         )
 
     if total_played > 0:
         percentage = round((correct_answers / total_played) * 100)
@@ -336,6 +352,7 @@ def results_view(request):
         'quiz_type': quiz_type,
         'display_total': display_total, # The total to show (e.g., 50)
         'ended_early': ended_early, # Pass the flag to the template
+        'review_data': review_data,
     }
     return render(request, 'AI_features/result.html', context)
 
@@ -358,22 +375,26 @@ def get_next_question_api(request):
         
         # --- NEW LOGIC: Choose the correct AI function ---
         new_batch = []
-        if difficulty == 'exam':
-            EXAM_FULL_NAMES = {
-                'UPSC': 'UPSC Civil Services Examination',
-                'JEE': 'JEE (Joint Entrance Examination) for engineering',
-                'NEET': 'NEET (National Eligibility cum Entrance Test) for medical students',
-                'CAT': 'CAT (Common Admission Test) for MBA admissions in India',
-                'SSC CGL': 'SSC CGL (Combined Graduate Level) Examination',
-                'GATE': 'GATE (Graduate Aptitude Test in Engineering)',
-            }
-            full_exam_name_for_ai = EXAM_FULL_NAMES.get(topic, topic)
-            # For exams, use the specialized function to get a batch
-            new_batch = ai_services.generate_exam_question_batch(full_exam_name_for_ai, exclude_questions=asked_questions)
+        if settings.DEBUG:
+            # If we are in development, use the fast, free mock data
+            new_batch = ai_services.get_mock_questions(topic, difficulty)
         else:
-            # For regular quizzes, use the general function
-            new_batch = ai_services.generate_question_batch(topic, difficulty, exclude_questions=asked_questions)
-        # --- END OF NEW LOGIC ---
+            if difficulty == 'exam':
+                EXAM_FULL_NAMES = {
+                    'UPSC': 'UPSC Civil Services Examination',
+                    'JEE': 'JEE (Joint Entrance Examination) for engineering',
+                    'NEET': 'NEET (National Eligibility cum Entrance Test) for medical students',
+                    'CAT': 'CAT (Common Admission Test) for MBA admissions in India',
+                    'SSC CGL': 'SSC CGL (Combined Graduate Level) Examination',
+                    'GATE': 'GATE (Graduate Aptitude Test in Engineering)',
+                }
+                full_exam_name_for_ai = EXAM_FULL_NAMES.get(topic, topic)
+                # For exams, use the specialized function to get a batch
+                new_batch = ai_services.generate_exam_question_batch(full_exam_name_for_ai, exclude_questions=asked_questions)
+            else:
+                # For regular quizzes, use the general function
+                new_batch = ai_services.generate_question_batch(topic, difficulty, exclude_questions=asked_questions)
+            # --- END OF NEW LOGIC ---
 
         if not new_batch:
             return JsonResponse({'error': 'Failed to generate new questions from the AI.'}, status=500)
@@ -444,7 +465,8 @@ def start_exam_quiz_view(request, exam_name):
     request.session['correct_answers'] = 0
     request.session['total_played'] = 0
     request.session['asked_questions'] = []
-    
+    request.session['quiz_review_data'] = []
+
     return redirect('play-exam-quiz')
 
 @require_POST
@@ -460,3 +482,27 @@ def end_exam_quiz_early_api(request):
     
     return JsonResponse({'status': 'success'})
 
+# API to record full answer data for review
+@require_POST
+def record_answer_api(request):
+    data = json.loads(request.body)
+    user_answer = data.get('user_answer')
+    correct_answer = data.get('correct_answer')
+    is_correct = (user_answer == correct_answer)
+
+    # Store the full review data
+    review_data = request.session.get('quiz_review_data', [])
+    review_data.append({
+        'question': data.get('question'),
+        'user_answer': user_answer,
+        'correct_answer': correct_answer,
+        'is_correct': is_correct
+    })
+    request.session['quiz_review_data'] = review_data
+
+    # Update session stats (as before)
+    request.session['total_played'] = request.session.get('total_played', 0) + 1
+    if is_correct:
+        request.session['correct_answers'] = request.session.get('correct_answers', 0) + 1
+        
+    return JsonResponse({'status': 'success'})

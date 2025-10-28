@@ -212,3 +212,17 @@ def generate_exam_question_batch(exam_name: str, exclude_questions: list = None)
         print("--------------------------\n")
         print(f"Error generating exam question batch: {e}")
         return []
+    
+# Mock function to avoid hitting API limits during development
+def get_mock_questions(topic, difficulty):
+    """
+    Returns a hardcoded list of questions to avoid hitting the API limit during development.
+    """
+    print("--- USING MOCK DATA (NO API CALL) ---")
+    return [
+        {"question": "This is a fake test question about " + topic, "options": ["Option 1", "Option 2", "Option 3", "Option 4"], "answer": "Option 1"},
+        {"question": "This is a second fake question.", "options": ["A", "B", "C", "D"], "answer": "A"},
+        {"question": "This is a third fake question.", "options": ["10", "20", "30", "40"], "answer": "10"},
+        {"question": "This is a fourth fake question.", "options": ["101", "102", "103", "104"], "answer": "104"},
+        {"question": "This is a fifth fake question.", "options": ["0", "00", "000", "0000"], "answer": "000"},
+    ]

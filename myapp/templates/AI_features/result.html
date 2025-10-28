@@ -7,6 +7,9 @@
     <title>Quiz Results</title>
     <link rel="stylesheet" href="{% static 'css/main.css' %}" />
     <link rel="stylesheet" href="{% static 'css/quiz_result.css' %}" />
+<style>
+   
+</style>
 </head>
 
 <body>
@@ -20,7 +23,32 @@
             {% endif %}
 
         </div>
+        <div class="review-container">
+            <h2>Quiz Review</h2>
 
+            {% if review_data %}
+            {% for item in review_data %}
+            <div class="review-item">
+                <p class="review-question">{{ forloop.counter }}. {{ item.question }}</p>
+
+                {% if item.is_correct %}
+                <p class="review-answer correct">
+                    <i class="fas fa-check-circle"></i> You answered: {{ item.user_answer }}
+                </p>
+                {% else %}
+                <p class="review-answer incorrect">
+                    <i class="fas fa-times-circle"></i> You answered: {{ item.user_answer }}
+                </p>
+                <p class="review-answer correct">
+                    Correct answer: {{ item.correct_answer }}
+                </p>
+                {% endif %}
+            </div>
+            {% endfor %}
+            {% else %}
+            <p style="text-align: center; color: var(--text-secondary);">No review data is available for this quiz.</p>
+            {% endif %}
+        </div>
 
         <div class="score-circle" style="--score-percent: {{ percentage }}%;">
             <div class="score-text">{{ percentage }}<sup>%</sup></div>
@@ -40,8 +68,9 @@
                 <p>Incorrect</p>
             </div>
         </div>
-
+        <!-- <p>DEBUG: The quiz_type is: <strong>{{ quiz_type }}</strong></p> -->
         <div class="button-container">
+
             <a href="{% url 'start-quiz' %}" class="result-btn btn-primary">Play Again?</a>
 
             {% if quiz_type == 'exam' %}

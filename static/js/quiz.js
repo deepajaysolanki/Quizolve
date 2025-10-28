@@ -1,11 +1,11 @@
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', function () {
     // --- STATE MANAGEMENT ---
     let currentQuestions = [];
     let currentQuestionIndex = 0;
     let score = 0;
     let timer;
     const TIME_LIMIT = 15; // Time per question
-    
+
     // --- DOM ELEMENTS ---
     const categorySelectionView = document.getElementById('category-selection');
     const quizInterfaceView = document.getElementById('quiz-interface');
@@ -40,18 +40,18 @@ document.addEventListener('DOMContentLoaded', function() {
         quizCategoryTitleEl.textContent = category;
         currentQuestionIndex = 0;
         score = 0;
-        
+
         categorySelectionView.style.display = 'none';
         resultsView.style.display = 'none';
         quizInterfaceView.style.display = 'block'; // Use block instead of flex
-        
+
         showQuestion();
     }
 
     function showQuestion() {
         resetState();
         const question = currentQuestions[currentQuestionIndex];
-        
+
         questionCounterEl.textContent = `${currentQuestionIndex + 1} / ${currentQuestions.length}`;
         progressBarEl.style.width = `${((currentQuestionIndex) / currentQuestions.length) * 100}%`;
         // Animate the progress bar to its new width
@@ -90,7 +90,7 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         }, 1000);
     }
-    
+
     function handleTimeUp() {
         const correctAnswer = currentQuestions[currentQuestionIndex].answer;
         document.querySelectorAll('.option').forEach(opt => {
@@ -105,7 +105,7 @@ document.addEventListener('DOMContentLoaded', function() {
     function selectAnswer(button, selectedOption, correctAnswer) {
         clearInterval(timer);
         document.querySelectorAll('.option').forEach(opt => opt.disabled = true);
-        
+
         if (selectedOption === correctAnswer) {
             button.classList.add('correct');
             score++;
@@ -117,7 +117,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 }
             });
         }
-        
+
         nextBtn.disabled = false;
     }
 
@@ -139,7 +139,7 @@ document.addEventListener('DOMContentLoaded', function() {
         incorrectAnswersEl.textContent = currentQuestions.length - score;
     }
 
-     const dropdownSelected = document.getElementById('dropdown-selected');
+    const dropdownSelected = document.getElementById('dropdown-selected');
     const dropdownOptions = document.getElementById('dropdown-options');
     const hiddenInput = document.getElementById('difficulty-hidden-input');
 
@@ -170,47 +170,60 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Quiz start with category and difficulty
     // Get the new dropdown element
-        const container = document.querySelector('.quiz-view-container');
-        const START_QUIZ_URL = container.dataset.startQuizUrl;
-        const CSRF_TOKEN = container.dataset.csrfToken;
-        const difficultySelector = document.getElementById('difficulty-selector');
+    const container = document.querySelector('.quiz-view-container');
+    const START_QUIZ_URL = container.dataset.startQuizUrl;
+    const CSRF_TOKEN = container.dataset.csrfToken;
+    const difficultySelector = document.getElementById('difficulty-selector');
 
-        function startQuizWithCategory(topic, difficulty) {
-            const form = document.createElement('form');
-            form.method = 'POST';
-            form.action =  START_QUIZ_URL; 
-            const csrfInput = document.createElement('input');
-            csrfInput.type = 'hidden';
-            csrfInput.name = 'csrfmiddlewaretoken';
-            csrfInput.value = CSRF_TOKEN;
-            const typeInput = document.createElement('input');
-            typeInput.type = 'hidden';
-            typeInput.name = 'quiz_type';
-            typeInput.value = 'category';
-            form.appendChild(typeInput);
+    function startQuizWithCategory(topic, difficulty) {
+        const form = document.createElement('form');
+        form.method = 'POST';
+        form.action = START_QUIZ_URL;
 
-            const difficultyInput = document.createElement('input');
-            difficultyInput.type = 'hidden';
-            difficultyInput.name = 'difficulty';
-            // Use the difficulty passed into the function
-            difficultyInput.value = difficulty; 
+        // CSRF token input
+        const csrfInput = document.createElement('input');
+        csrfInput.type = 'hidden';
+        csrfInput.name = 'csrfmiddlewaretoken';
+        csrfInput.value = CSRF_TOKEN;
+       
+        // Topic input
+        const topicInput = document.createElement('input');
+        topicInput.type = 'hidden';
+        topicInput.name = 'topic';
+        topicInput.value = topic;
+       
+        // Quiz type input
+        const typeInput = document.createElement('input');
+        typeInput.type = 'hidden';
+        typeInput.name = 'quiz_type';
+        typeInput.value = 'category';
+        // form.appendChild(typeInput);
 
-            form.appendChild(csrfInput);
-            form.appendChild(topicInput);
-            form.appendChild(difficultyInput);
-            document.body.appendChild(form);
-            form.submit();
-        }
+        // Difficulty input
+        const difficultyInput = document.createElement('input');
+        difficultyInput.type = 'hidden';
+        difficultyInput.name = 'difficulty';
+        difficultyInput.value = difficulty;
 
-        const categoryButtons = document.querySelectorAll('.category-btn');
-        categoryButtons.forEach(button => {
-            button.addEventListener('click', () => {
-                const category = button.dataset.category;
-                // Read the selected difficulty from the dropdown
-                const selectedDifficulty = difficultySelector.value;
-                // Pass both values to the function
-                startQuizWithCategory(category, selectedDifficulty);
-            });
+        // Add all inputs to the form
+        form.appendChild(csrfInput);
+        form.appendChild(topicInput);
+        form.appendChild(typeInput);
+        form.appendChild(difficultyInput);
+        
+        document.body.appendChild(form);
+        form.submit();
+    }
+
+    const categoryButtons = document.querySelectorAll('.category-btn');
+    categoryButtons.forEach(button => {
+        button.addEventListener('click', () => {
+            const category = button.dataset.category;
+            // Read the selected difficulty from the dropdown
+            const selectedDifficulty = difficultySelector.value;
+            // Pass both values to the function
+            startQuizWithCategory(category, selectedDifficulty);
         });
+    });
 
 });

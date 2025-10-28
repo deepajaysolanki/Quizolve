@@ -9,9 +9,6 @@
     <link rel="stylesheet" href="{% static 'css/main.css' %}" />
     <link rel="stylesheet" href="{% static 'css/quiz.css' %}" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
-    <style>
-        /* --- Simplified Custom Topic Form --- */
-    </style>
 </head>
 
 <body class="quiz-page-body">
@@ -74,7 +71,7 @@
 
                 <div class="custom-dropdown">
                     <div class="dropdown-selected" id="dropdown-selected">
-                        <span>Medium</span> 
+                        <span>Medium</span>
                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 20">
                             <path stroke="#94a3b8" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
                                 d="M6 8l4 4 4-4" />
@@ -122,47 +119,34 @@
                 </div>
             </div>
         </div>
-        <!-- 
-        <div class="quiz-stage" id="results-screen" style="display: none">
-            <div class="results-box">
-                <h2 class="results-title">Quiz Complete!</h2>
-                <div class="results-trophy"><i class="fas fa-trophy"></i></div>
-                <p class="results-score-text">Your Score</p>
-                <p class="results-score" id="final-score">0 / 0</p>
-                <div class="results-summary" id="results-summary">
-                    <div class="summary-item">
-                        Correct Answers<span id="correct-answers">0</span>
-                    </div>
-                    <div class="summary-item">
-                        Incorrect Answers<span id="incorrect-answers">0</span>
-                    </div>
-                </div>
-                <div class="results-buttons">
-                    <button class="btn-primary" onclick="location.reload()">
-                        <span>Play Again</span>
-                        <div class="btn-shine"></div>
-                    </button>
-                </div>
-            </div>
-        </div> -->
     </main>
 
     {% include 'components/footer.html' %}
     <script src="{% static 'js/main.js' %}"></script>
     <script src="{% static 'js/quiz.js' %}"></script>
     <script>
-        const toast = document.getElementById("toast");
-        if (toast) {
-            toast.style.display = "block";
-            toast.style.backgroundColor = toast.querySelector(".success")
-                ? "green"
-                : "#f44336";
-        }
-        setTimeout(() => {
-            const toasts = document.querySelectorAll(".toast-message");
-            toasts.forEach((el) => el.remove());
-            toast.style.display = "none";
-        }, 4000);
+        document.addEventListener('DOMContentLoaded', function () {
+            const toast = document.getElementById("toast");
+            if (toast) {
+                // Show the toast
+                toast.style.display = "flex"; // Use flex to match your other CSS
+                toast.style.opacity = 1;
+
+                // Set the color based on the message type
+                if (toast.querySelector(".success")) {
+                    toast.style.backgroundColor = "green";
+                } else if (toast.querySelector(".error")) {
+                    toast.style.backgroundColor = "#f44336";
+                }
+
+                // Hide it after 4 seconds
+                setTimeout(() => {
+                    toast.style.opacity = 0;
+                    // Wait for fade out to finish before setting display to none
+                    setTimeout(() => { toast.style.display = "none"; }, 500);
+                }, 4000);
+            }
+        });
     </script>
 </body>
 

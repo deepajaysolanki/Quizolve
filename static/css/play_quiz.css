@@ -133,8 +133,7 @@ body {
     color: var(--text-secondary);
 }
 #next-question-btn {
-    background: var(--text-gradient);
-    color: white;
+   display: none;
 }
 #next-question-btn:disabled {
     opacity: 0.4;
@@ -142,6 +141,16 @@ body {
     background: var(--card-dark);
     border-color: var(--border-color);
     color: var(--text-secondary);
+}
+
+/* Center the 'End Quiz' button */
+.quiz-footer {
+    justify-content: center;
+}
+/* Add a style for the option the user clicked */
+.option.selected {
+    border-color: var(--primary-color);
+    color: var(--text-primary);
 }
 
 /* --- Responsive Styles --- */
