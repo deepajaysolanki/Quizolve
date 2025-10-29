@@ -18,7 +18,8 @@ document.addEventListener('DOMContentLoaded', function () {
     const CSRF_TOKEN = quizData.dataset.csrfToken;
     const initialTimeLimit = parseInt(quizData.dataset.timeLimit, 10);
     const totalQuestions = parseInt(quizData.dataset.totalQuestions, 10);
-    
+    const CURRENT_ATTEMPT_ID = quizData.dataset.currentAttemptId;
+
     // --- State variables ---
     let correctAnswer = '';
     let currentQuestionText = ''; // Variable to hold the actual question text
@@ -131,6 +132,7 @@ document.addEventListener('DOMContentLoaded', function () {
             method: 'POST',
             headers: { 'Content-Type': 'application/json', 'X-CSRFToken': CSRF_TOKEN },
             body: JSON.stringify({
+                'attempt_id': CURRENT_ATTEMPT_ID,
                 'question': question,
                 'user_answer': user_answer,
                 'correct_answer': correct_answer

@@ -59,7 +59,8 @@
         data-check-answer-url="{% url 'record-answer-api' %}"
         data-end-exam-early-url="{% url 'end-exam-early' %}" 
         data-results-page-url="{% url 'results-page' %}"
-        data-csrf-token="{{ csrf_token }}">
+        data-csrf-token="{{ csrf_token }}"
+        data-current-attempt-id="{{ current_attempt_id }}">
     </div>
     <script src="{% static 'js/play_quiz.js' %}"></script>
 </body>

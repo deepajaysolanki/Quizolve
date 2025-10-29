@@ -72,8 +72,13 @@ class UserQuizAttempt(models.Model):
     quiz_type = models.CharField(max_length=10, choices=QUIZ_TYPE_CHOICES)
     quiz_identifier = models.CharField(max_length=100) # e.g., 'History', 'UPSC', or '__custom__'
     created_at = models.DateTimeField(default=timezone.now)
+
+    # Score out of 50
+    score = models.IntegerField(default=0)
+    total_questions = models.IntegerField(default=50)
+
     def __str__(self):
-        return f"{self.user.email} - {self.quiz_type}: {self.quiz_identifier}"
+        return f"{self.user.email} - {self.quiz_identifier} ({self.score}/{self.total_questions})"
     
 # Model to track daily exam quiz attempts
 class ExamQuizAttempt(models.Model):
@@ -87,3 +92,14 @@ class ExamQuizAttempt(models.Model):
 
     def __str__(self):
         return f"{self.user.email} - {self.exam_name} on {self.date_played}"
+    
+# Model to store individual question answers for a quiz attempt
+class AnsweredQuestion(models.Model):
+    attempt = models.ForeignKey(UserQuizAttempt, related_name='answers', on_delete=models.CASCADE)
+    question_text = models.TextField()
+    user_answer = models.CharField(max_length=500)
+    correct_answer = models.CharField(max_length=500)
+    is_correct = models.BooleanField()
+
+    def __str__(self):
+        return self.question_text

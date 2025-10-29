@@ -37,7 +37,7 @@
           <img src="{{ request.user.profile_photo.url }}" alt="Profile" class="profile-photo"
             id="profile-photo-desktop" />
           <div class="profile-dropdown" id="profile-dropdown-desktop">
-            <a href="#">Settings</a>
+            <a href="{% url 'quiz-history' %}">My Quiz History</a>
             <a href="{% url 'user-profile' %}">My Profile</a>
             <a href="{% url 'logout' %}">Logout</a>
           </div>
@@ -69,7 +69,7 @@
           <img src="{{ request.user.profile_photo.url }}" alt="Profile" class="profile-photo"
             id="profile-photo-mobile" />
           <div class="profile-dropdown" id="profile-dropdown-mobile">
-            <a href="#">Settings</a>
+            <a href="{% url 'quiz-history' %}">My Quiz History</a>
             <a href="{% url 'user-profile' %}">My Profile</a>
             <a href="{% url 'logout' %}">Logout</a>
           </div>

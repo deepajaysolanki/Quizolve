@@ -23,7 +23,8 @@ urlpatterns = [
     path('logout/', views.logout_view, name='logout'),
     path('profile/', views.profile_view, name='user-profile'),
     path('profile/edit/', views.profile_edit_view, name='profile-edit'),
-
+    path('profile/history/', views.quiz_history_view, name='quiz-history'),
+    
     # --- Allauth & Password Reset ---
     # These must come BEFORE the main 'accounts/' include
     path('accounts/password_reset/', auth_views.PasswordResetView.as_view(), name='password_reset'),

@@ -1,0 +1,139 @@
+{% load static %}
+{% load tz %}
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Quiz History</title>
+    <link rel="stylesheet" href="{% static 'css/main.css' %}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+    <style>
+        body {
+            background-color: var(--background-dark);
+            font-family: 'Poppins', sans-serif;
+            color: var(--text-primary);
+        }
+
+        .history-container {
+            width: 100%;
+            max-width: 900px;
+            margin: 7rem auto 2rem auto;
+            /* 7rem top margin to clear navbar */
+            padding: 2rem;
+            background-color: var(--card-dark);
+            border: 1px solid var(--border-color);
+            border-radius: 1.5rem;
+        }
+
+        .history-container h1 {
+            text-align: center;
+            font-weight: 600;
+            margin-bottom: 2rem;
+        }
+
+        .history-item {
+            display: flex;
+            flex-direction: column;
+            padding: 1.5rem 0;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .history-item:last-child {
+            border-bottom: none;
+        }
+
+        .history-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.5rem;
+        }
+
+        .history-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .history-score {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--primary-color);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .score-details {
+            font-size: 0.9rem;
+            font-weight: 400;
+            color: var(--text-secondary);
+        }
+
+        .history-meta {
+            display: flex;
+            gap: 1.5rem;
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+        }
+
+        .tag-exam {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 0.1rem 0.5rem;
+            border-radius: 1rem;
+            font-size: 0.8rem;
+        }
+    </style>
+</head>
+
+<body class="quiz-page-body">
+
+    {% include 'components/navbar.html' %}
+
+    <main class="history-container">
+        <h1>My Quiz History</h1>
+
+        {% if attempts_with_percentage %}
+        {% for item in attempts_with_percentage %}
+        <div class="history-item">
+            <div class="history-header">
+                <span class="history-title">{{ item.attempt.quiz_identifier }}</span>
+                <span class="history-score">
+                    {{ item.percentage }}%
+                    <span class="score-details">
+                        ({{ item.attempt.score }} / {{ item.attempt.total_questions }})
+                    </span>
+                </span>
+            </div>
+            <div class="history-meta">
+                <span>
+                    <i class="far fa-calendar-alt"></i>
+                    Played on: {{ item.attempt.created_at|localtime|date:"F d, Y" }}
+                </span>
+                <span>
+                    <i class="far fa-clock"></i>
+                    Time: {{ item.attempt.created_at|localtime|time:"P" }}
+                </span>
+                {% if item.attempt.quiz_type == 'custom' %}
+                    <span class="tag-exam">Custome  </span>
+                {% endif %}
+
+                {% if item.attempt.quiz_type == 'exam' %}
+                    <span class="tag-exam">Exam</span>
+                {% endif %}
+            </div>
+        </div>
+        {% endfor %}
+        {% else %}
+        <p style="text-align: center; color: var(--text-secondary);">You have not played any quizzes yet.</p>
+        {% endif %}
+    </main>
+
+    {% include 'components/footer.html' %}
+</body>
+
+</html>

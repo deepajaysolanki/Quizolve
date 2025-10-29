@@ -29,7 +29,7 @@
             {% if review_data %}
             {% for item in review_data %}
             <div class="review-item">
-                <p class="review-question">{{ forloop.counter }}. {{ item.question }}</p>
+                <p class="review-question">{{ forloop.counter }}. {{ item.question_text }}</p>
 
                 {% if item.is_correct %}
                 <p class="review-answer correct">
@@ -56,7 +56,7 @@
 
         <div class="stats-breakdown">
             <div class="stat-item">
-                <h3>{{ total }}</h3>
+                <h3>{{ total_played }}</h3>
                 <p>Total</p>
             </div>
             <div class="stat-item">

@@ -9,7 +9,7 @@ from django.contrib.auth.decorators import login_required
 from .forms import UserProfileForm
 import re, json
 from django.utils import timezone   
-from .models import ExamQuizAttempt, UserQuizAttempt
+from .models import ExamQuizAttempt, UserQuizAttempt, AnsweredQuestion
 from django.contrib import messages
 from django.views.decorators.http import require_POST
 from datetime import timedelta
@@ -223,11 +223,36 @@ def start_quiz_view(request):
         print(f"--- POST data received in start_quiz_view: {request.POST} ---")
         now = timezone.now()
         twenty_four_hours_ago = now - timedelta(hours=24)
-        quiz_type = request.POST.get('quiz_type')
-        # print(f"Quiz type selected: {quiz_type}")
-        topic = request.POST.get('topic')
-        difficulty = request.POST.get('difficulty', 'medium')
+        quiz_type = None
+        topic = None
+        difficulty = None
 
+        # Case 1: Starting a new quiz from a form
+        if request.method == 'POST':
+            print(f"--- POST data received: {request.POST} ---")
+            quiz_type = request.POST.get('quiz_type')
+            topic = request.POST.get('topic')
+            difficulty = request.POST.get('difficulty', 'medium')
+        
+        # Case 2: Clicking "Play Again" from the results page
+        elif request.method == 'GET':
+            print("--- GET request received (Play Again) ---")
+            # Get the previous quiz settings from the session
+            topic = request.session.get('topic')
+            difficulty = request.session.get('difficulty')
+            
+            # Determine the quiz_type from the saved session data
+            if difficulty == 'exam':
+               return redirect('exam-selection')
+            
+            if topic in ['General Knowledge', 'Science', 'History', 'Geography', 'Math', 'Literature']:
+                quiz_type = 'category'
+            else:   
+                quiz_type = 'custom'
+        # If there is no topic, we can't start a quiz
+        if not topic:
+            return redirect('quiz-page')
+        
         if quiz_type == 'category':
             # Per-category limit check
             attempt_count = UserQuizAttempt.objects.filter(
@@ -239,6 +264,7 @@ def start_quiz_view(request):
             if attempt_count >= 3:
                 messages.error(request, f"You have reached your daily limit of 3 quizzes for the '{topic}' category.")
                 return redirect('quiz-page')
+            
         elif quiz_type == 'custom':
             # Global limit check for all custom topic quizzes
             attempt_count = UserQuizAttempt.objects.filter(
@@ -249,24 +275,30 @@ def start_quiz_view(request):
             if attempt_count >= 3:
                 messages.error(request, "You have reached your daily limit of 3 custom topic quizzes.")
                 return redirect('quiz-page')
-        
+            
         # If allowed, create a new attempt record
-        UserQuizAttempt.objects.create(user=request.user, quiz_type=quiz_type, quiz_identifier=topic)
-    
-        # If allowed, create a new attempt record immediately
-        UserQuizAttempt.objects.create(user=request.user)
+            # UserQuizAttempt.objects.create(user=request.user, quiz_type=quiz_type, quiz_identifier=topic)
+        
+        attempt = UserQuizAttempt.objects.create(
+            user=request.user,
+            quiz_type=request.POST.get('quiz_type'),
+            quiz_identifier=request.POST.get('topic'),
+            total_questions=50
+        )
+        # UserQuizAttempt.objects.create(user=request.user)
 
         # setup the session variables
+        request.session['current_attempt_id'] = attempt.id
+        request.session['topic'] = topic
+        request.session['difficulty'] = difficulty
+        request.session['total_questions'] = 50
         request.session['correct_answers'] = 0
         request.session['total_played'] = 0
         request.session['question_batch'] = [] # Important: Clear any leftover questions
-        request.session['total_questions'] = 50
-        request.session['quiz_review_data'] = []
-        
-         # Create an empty list to track asked questions
+        request.session['quiz_review_data'] = [] 
         request.session['asked_questions'] = []
-
-        # The second, incorrect redirect has been removed.
+        
+        request.session.save()
         return redirect('play-quiz')
     else:
         return redirect('login')
@@ -295,6 +327,7 @@ def play_quiz_view(request):
             'time_limit': time_limit,
             'quizTopic': topic,
             'total_questions': total_questions,
+            'current_attempt_id': request.session.get('current_attempt_id')
         }
         
         return render(request, 'AI_features/play_quiz.html', context)
@@ -303,63 +336,52 @@ def play_quiz_view(request):
     
 def results_view(request):
     """Displays the final results from the session."""
-   
+    attempt_id = request.session.get('current_attempt_id')
+    if not attempt_id:
+        return redirect('home-page') # Or some error page
     # Get the type of quiz that was just played from the session
     quiz_type = request.session.get('difficulty', 'regular')
      
-    total_played = request.session.get('total_played', 0)
-    correct_answers = request.session.get('correct_answers', 0)
-
-    # Get quiz type
-    # quiz_type = request.POST.get('quiz_type')
-    print(f"Quiz type in results_view: {quiz_type}")
-
-    
-    # Check for the 'ended_early' flag and then remove it
+    # 2. Get the quiz attempt from the database
+    attempt = UserQuizAttempt.objects.get(id=attempt_id)
+        
+    # 3. Get all the saved answers for that quiz
+    review_data = attempt.answers.all().order_by('id')
+        
+    # 4. Get all stats directly from the database record
+    total_played = review_data.count()
+    correct_answers = attempt.score
+    display_total = attempt.total_questions
+    quiz_type = attempt.quiz_type
+        
+    # 5. Check if the quiz was ended early (this flag is still useful)
     ended_early = request.session.pop('ended_early', False)
 
-    # For exams, the total score is always out of 50
-    display_total = 50 if quiz_type == 'exam' else total_played
+    # 6. Calculate percentage
+    percentage = 0
+    if display_total > 0:
+        percentage = round((correct_answers / display_total) * 100)
 
-    # Calculate incorrect answers here in the view
-    incorrect_answers = total_played - correct_answers
-    
-    # Get the topic from the session 
-    topic = request.session.get('topic')
-
-    # Get the review data from the session
-    review_data = request.session.get('quiz_review_data', [])
-
-    # Create the attempt record if a full 50-question exam was completed
-    # if quiz_type == 'exam' and total_played >= 50:
-    #         UserQuizAttempt.objects.get_or_create(
-    #             user=request.user,
-    #             quiz_type='exam',
-    #             quiz_identifier= topic,
-    #             created_at__date=timezone.now().date(),
-    #         )
-
-    if total_played > 0:
-        percentage = round((correct_answers / total_played) * 100)
-    else:
-        percentage = 0
+    # 7. Clean up the session so the next quiz is fresh
+    request.session.pop('current_attempt_id', None)
+    request.session.pop('topic', None)
+    request.session.pop('difficulty', None)
+    request.session.pop('total_questions', None)
+    request.session.pop('asked_questions', None)
+    # Note: We no longer need to clean up session scores, as they aren't stored there.
 
     context = {
-        'total': total_played,
-        'correct': correct_answers,
-        'incorrect': incorrect_answers, # Pass the result to the template
-        'percentage': percentage,
-        'quiz_type': quiz_type,
-        'display_total': display_total, # The total to show (e.g., 50)
-        'ended_early': ended_early, # Pass the flag to the template
-        'review_data': review_data,
-    }
-    return render(request, 'AI_features/result.html', context)
-
-
+            'total_played': total_played,
+            'correct': correct_answers,
+            'incorrect': total_played - correct_answers,
+            'display_total': display_total,
+            'ended_early': ended_early,
+            'quiz_type': quiz_type,
+            'percentage': percentage,
+            'review_data': review_data,
+        }
+    return render(request, 'AI_features/result.html', context)    
 # --- API Views (Called by JavaScript) ---
-
-# myapp/views.py
 
 # myapp/views.py
 
@@ -455,7 +477,7 @@ def start_exam_quiz_view(request, exam_name):
         return redirect('exam-selection')
     
     # If allowed, create a new attempt record
-    UserQuizAttempt.objects.create(user=request.user, quiz_type='exam', quiz_identifier=exam_name)
+    attemp = UserQuizAttempt.objects.create(user=request.user, quiz_type='exam', quiz_identifier=exam_name)
 
     # Set up the session rules for the exam quiz
     request.session['question_batch'] = [] # Start with an empty batch
@@ -467,6 +489,7 @@ def start_exam_quiz_view(request, exam_name):
     request.session['asked_questions'] = []
     request.session['quiz_review_data'] = []
 
+    request.session.save()
     return redirect('play-exam-quiz')
 
 @require_POST
@@ -482,27 +505,58 @@ def end_exam_quiz_early_api(request):
     
     return JsonResponse({'status': 'success'})
 
-# API to record full answer data for review
+# API to record individual question answers in the database
 @require_POST
 def record_answer_api(request):
-    data = json.loads(request.body)
-    user_answer = data.get('user_answer')
-    correct_answer = data.get('correct_answer')
-    is_correct = (user_answer == correct_answer)
-
-    # Store the full review data
-    review_data = request.session.get('quiz_review_data', [])
-    review_data.append({
-        'question': data.get('question'),
-        'user_answer': user_answer,
-        'correct_answer': correct_answer,
-        'is_correct': is_correct
-    })
-    request.session['quiz_review_data'] = review_data
-
-    # Update session stats (as before)
-    request.session['total_played'] = request.session.get('total_played', 0) + 1
-    if is_correct:
-        request.session['correct_answers'] = request.session.get('correct_answers', 0) + 1
+    try:
+        data = json.loads(request.body)
+        attempt_id = request.session.get('current_attempt_id')
         
-    return JsonResponse({'status': 'success'})
+        if not attempt_id:
+            return JsonResponse({'status': 'error', 'message': 'No attempt ID in session.'}, status=400)
+        
+        attempt = UserQuizAttempt.objects.get(id=attempt_id)
+        is_correct = (data.get('user_answer') == data.get('correct_answer'))
+
+        # Save the question and answer to the database
+        AnsweredQuestion.objects.create(
+            attempt=attempt,
+            question_text=data.get('question'),
+            user_answer=data.get('user_answer'),
+            correct_answer=data.get('correct_answer'),
+            is_correct=is_correct
+        )
+
+        # Update the score on the main attempt object
+        if is_correct:
+            attempt.score = attempt.score + 1
+            attempt.save()
+        
+        return JsonResponse({'status': 'success'})
+    except Exception as e:
+        return JsonResponse({'status': 'error', 'message': str(e)}, status=500)
+    
+def quiz_history_view(request):
+    if request.user.is_authenticated:
+       # Get all attempts for the current user
+        attempts = UserQuizAttempt.objects.filter(user=request.user).order_by('-created_at')
+
+        # Create a new list to hold the attempts with their percentages
+        attempts_with_percentage = []
+        for attempt in attempts:
+                percentage = 0
+                if attempt.total_questions > 0:
+                    percentage = round((attempt.score / attempt.total_questions) * 100)
+                
+                # Add the calculated percentage to the attempt object (or a new dict)
+                attempts_with_percentage.append({
+                    'attempt': attempt,
+                    'percentage': percentage
+                })
+
+        context = {
+                'attempts_with_percentage': attempts_with_percentage
+            }
+        return render(request, 'user/quiz_history.html', context)    
+    else:
+        return redirect('login')
