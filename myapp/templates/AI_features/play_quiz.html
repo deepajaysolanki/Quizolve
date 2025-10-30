@@ -60,7 +60,9 @@
         data-end-exam-early-url="{% url 'end-exam-early' %}" 
         data-results-page-url="{% url 'results-page' %}"
         data-csrf-token="{{ csrf_token }}"
-        data-current-attempt-id="{{ current_attempt_id }}">
+        data-current-attempt-id="{{ current_attempt_id }}"
+        data-record-attempt-url="{% url 'record-attempt-on-leave' %}"
+        data-total-played="{{ total_played }}">
     </div>
     <script src="{% static 'js/play_quiz.js' %}"></script>
 </body>

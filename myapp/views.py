@@ -323,11 +323,15 @@ def play_quiz_view(request):
                 time_limit = 20
         # --- END OF FIX ---
         
+        # Get the number of questions the user has already played in this quiz
+        total_played = request.session.get('total_played', 0)
+        
         context = {
             'time_limit': time_limit,
             'quizTopic': topic,
             'total_questions': total_questions,
-            'current_attempt_id': request.session.get('current_attempt_id')
+            'current_attempt_id': request.session.get('current_attempt_id'),
+            'total_played': total_played,
         }
         
         return render(request, 'AI_features/play_quiz.html', context)
@@ -336,51 +340,64 @@ def play_quiz_view(request):
     
 def results_view(request):
     """Displays the final results from the session."""
-    attempt_id = request.session.get('current_attempt_id')
-    if not attempt_id:
-        return redirect('home-page') # Or some error page
-    # Get the type of quiz that was just played from the session
-    quiz_type = request.session.get('difficulty', 'regular')
-     
-    # 2. Get the quiz attempt from the database
-    attempt = UserQuizAttempt.objects.get(id=attempt_id)
+
+    attempt = None
+    attempt_id = request.session.get('current_attempt_id')  
+
+    if attempt_id:
+        try:
+            attempt = UserQuizAttempt.objects.get(id=attempt_id, user=request.user)
+        except UserQuizAttempt.DoesNotExist:
+            attempt = None
         
-    # 3. Get all the saved answers for that quiz
+    # User refreshed the page or is visiting directly.
+    if not attempt:
+        # find their most recent quiz attempt from the database.
+        attempt = UserQuizAttempt.objects.filter(user=request.user).order_by('-created_at').first()
+
+    # User has never played a quiz. Redirect them.
+    if not attempt:
+        return redirect('home-page')
+    
+    # # Get the type of quiz that was just played from the session
+    # quiz_type = request.session.get('difficulty', 'regular')
+        
+    # Get all the saved answers for that quiz
     review_data = attempt.answers.all().order_by('id')
         
-    # 4. Get all stats directly from the database record
+    # Get all stats directly from the database record
     total_played = review_data.count()
     correct_answers = attempt.score
     display_total = attempt.total_questions
     quiz_type = attempt.quiz_type
         
-    # 5. Check if the quiz was ended early (this flag is still useful)
+    #  Check if the quiz was ended early (this flag is still useful)
     ended_early = request.session.pop('ended_early', False)
 
-    # 6. Calculate percentage
+    # Calculate percentage
     percentage = 0
     if display_total > 0:
         percentage = round((correct_answers / display_total) * 100)
 
-    # 7. Clean up the session so the next quiz is fresh
+    # Clean up the session so the next quiz is fresh
     request.session.pop('current_attempt_id', None)
     request.session.pop('topic', None)
     request.session.pop('difficulty', None)
     request.session.pop('total_questions', None)
     request.session.pop('asked_questions', None)
-    # Note: We no longer need to clean up session scores, as they aren't stored there.
 
     context = {
-            'total_played': total_played,
-            'correct': correct_answers,
-            'incorrect': total_played - correct_answers,
-            'display_total': display_total,
-            'ended_early': ended_early,
-            'quiz_type': quiz_type,
-            'percentage': percentage,
-            'review_data': review_data,
-        }
+        'total_played': total_played,
+        'correct': correct_answers,
+        'incorrect': total_played - correct_answers,
+        'display_total': display_total,
+        'ended_early': ended_early,
+        'quiz_type': quiz_type,
+        'percentage': percentage,
+        'review_data': review_data,
+    }
     return render(request, 'AI_features/result.html', context)    
+
 # --- API Views (Called by JavaScript) ---
 
 # myapp/views.py
@@ -558,5 +575,21 @@ def quiz_history_view(request):
                 'attempts_with_percentage': attempts_with_percentage
             }
         return render(request, 'user/quiz_history.html', context)    
+    else:
+        return redirect('login')
+
+@require_POST
+def record_attempt_on_leave_api(request):
+    if request.user.is_authenticated:
+        # Only record an attempt if it's an exam quiz in progress
+        if request.session.get('difficulty') == 'exam':
+            # Use get_or_create to avoid duplicate entries
+            UserQuizAttempt.objects.get_or_create(
+                user=request.user,
+                quiz_type='exam',
+                quiz_identifier=request.session.get('topic'),
+                created_at__date=timezone.now().date()
+            )
+        return JsonResponse({'status': 'ok'})
     else:
         return redirect('login')

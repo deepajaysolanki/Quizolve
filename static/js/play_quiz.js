@@ -3,7 +3,6 @@ document.addEventListener('DOMContentLoaded', function () {
     const quizData = document.getElementById('quiz-data');
     const questionText = document.getElementById('question-text');
     const optionsContainer = document.getElementById('options-container');
-    const nextBtn = document.getElementById('next-question-btn');
     const endQuizBtn = document.getElementById('end-quiz-btn');
     const currentQuestionNumSpan = document.getElementById('current-question-num');
     const totalQuestionsSpan = document.getElementById('total-questions');
@@ -25,12 +24,14 @@ document.addEventListener('DOMContentLoaded', function () {
     let currentQuestionText = ''; // Variable to hold the actual question text
     let timerInterval;
     let timeLeft = initialTimeLimit;
-    let questionNumber = 0;
+    let questionNumber = parseInt(quizData.dataset.totalPlayed, 10) || 0; 
     let quizIsOver = false;
 
     // --- Initialize Display ---
     totalQuestionsSpan.textContent = totalQuestions > 0 ? totalQuestions : '?';
-    currentQuestionNumSpan.textContent = 0;
+    
+    // Set the initial number to the correct value
+    currentQuestionNumSpan.textContent = questionNumber;
 
     // --- Main Functions ---
     async function getNextQuestion() {
@@ -42,9 +43,7 @@ document.addEventListener('DOMContentLoaded', function () {
         }
         questionText.textContent = questionNumber === 0 ? 'Starting your quiz...' : 'Loading next question...';
         optionsContainer.innerHTML = '';
-        nextBtn.disabled = true;
         clearInterval(timerInterval);
-        
         const response = await fetch(GET_QUESTION_URL);
         const data = await response.json();
         
@@ -139,9 +138,6 @@ document.addEventListener('DOMContentLoaded', function () {
             })
         });
     }
-
-    // --- Event Listeners ---
-    nextBtn.addEventListener('click', getNextQuestion);
     
     endQuizBtn.addEventListener('click', (event) => {
         // This makes your <a> tag work like a button with a confirmation
@@ -160,6 +156,19 @@ document.addEventListener('DOMContentLoaded', function () {
             }
         } else {
             window.location.href = RESULTS_PAGE_URL;
+        }
+    });
+
+    window.addEventListener('beforeunload', (event) => {
+        if (!quizIsOver) {
+            event.preventDefault();
+        }
+    });
+
+    document.addEventListener('visibilitychange', () => {
+        const isExam = totalQuestions > 0;
+        if (document.visibilityState === 'hidden' && isExam && !quizIsOver) {
+            navigator.sendBeacon(RECORD_ATTEMPT_URL, new Blob([JSON.stringify({})], { type: 'application/json' }));
         }
     });
 
