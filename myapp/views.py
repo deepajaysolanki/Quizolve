@@ -305,11 +305,22 @@ def start_quiz_view(request):
 
 def play_quiz_view(request):
     if request.user.is_authenticated:
+
+        # Get the current quiz attempt ID from the session
+        attempt_id = request.session.get('current_attempt_id')
+        total_played = 0
+
+        if attempt_id:
+            try:
+                # Count how many questions have already been answered for this attempt
+                total_played = AnsweredQuestion.objects.filter(attempt__id=attempt_id).count()
+            except AnsweredQuestion.DoesNotExist:
+                total_played = 0
+
         difficulty = request.session.get('difficulty', 'medium')
         topic = request.session.get('topic', 'General Quiz')
         total_questions = request.session.get('total_questions', 0)
 
-        # --- THIS IS THE FIX ---
         # Set time limit based on quiz type
         if difficulty == 'exam':
             time_limit = 59  # Set to 59 for all exam quizzes
@@ -321,10 +332,9 @@ def play_quiz_view(request):
                 time_limit = 15
             else: # medium
                 time_limit = 20
-        # --- END OF FIX ---
         
         # Get the number of questions the user has already played in this quiz
-        total_played = request.session.get('total_played', 0)
+        # total_played = request.session.get('total_played', 0)
         
         context = {
             'time_limit': time_limit,
@@ -352,7 +362,7 @@ def results_view(request):
         
     # User refreshed the page or is visiting directly.
     if not attempt:
-        # find their most recent quiz attempt from the database.
+        # find most recent quiz attempt from the database.
         attempt = UserQuizAttempt.objects.filter(user=request.user).order_by('-created_at').first()
 
     # User has never played a quiz. Redirect them.
@@ -373,7 +383,7 @@ def results_view(request):
         
     #  Check if the quiz was ended early (this flag is still useful)
     ended_early = request.session.pop('ended_early', False)
-
+    print("End Exam on results view:",ended_early)
     # Calculate percentage
     percentage = 0
     if display_total > 0:
@@ -494,9 +504,10 @@ def start_exam_quiz_view(request, exam_name):
         return redirect('exam-selection')
     
     # If allowed, create a new attempt record
-    attemp = UserQuizAttempt.objects.create(user=request.user, quiz_type='exam', quiz_identifier=exam_name)
+    attemp = UserQuizAttempt.objects.create(user=request.user, quiz_type='exam', quiz_identifier=exam_name, total_questions=50)
 
     # Set up the session rules for the exam quiz
+    request.session['current_attempt_id'] = attemp.id
     request.session['question_batch'] = [] # Start with an empty batch
     request.session['topic'] = exam_name
     request.session['difficulty'] = 'exam' # Set the difficulty to 'exam'
@@ -509,17 +520,11 @@ def start_exam_quiz_view(request, exam_name):
     request.session.save()
     return redirect('play-exam-quiz')
 
+@login_required
 @require_POST
-def end_exam_quiz_early_api(request):
-    # Create an attempt record to lock the user out for the day
-    ExamQuizAttempt.objects.create(
-        user=request.user,
-        exam_name=request.session.get('topic'),
-        date_played=timezone.now().date()
-    )
-    # ADD THIS LINE: Set a flag in the session
+def set_ended_early_view(request):
     request.session['ended_early'] = True
-    
+    request.session.save()
     return JsonResponse({'status': 'success'})
 
 # API to record individual question answers in the database
@@ -548,7 +553,7 @@ def record_answer_api(request):
         if is_correct:
             attempt.score = attempt.score + 1
             attempt.save()
-        
+
         return JsonResponse({'status': 'success'})
     except Exception as e:
         return JsonResponse({'status': 'error', 'message': str(e)}, status=500)

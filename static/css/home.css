@@ -35,7 +35,8 @@
 
 /* --- AI-Powered Features Section --- */
 .features { padding: 6rem 0; background: #0c1427; }
-.features-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 2rem; }
+/* if Next-Gen Learning Intelligence is having 6 cards then change grid-template-columns: repeat(2, 1fr); into repeat(auto-fit, minmax(300px, 1fr)); */
+.features-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 2rem; }
 .feature-card { background: var(--card-dark); border-radius: 1.5rem; position: relative; overflow: hidden; padding: 2px; transition: transform 0.4s ease, box-shadow 0.4s ease; }
 .feature-card:hover { transform: translateY(-10px); box-shadow: 0 20px 40px rgba(0,0,0,0.2); }
 .feature-card::before { content: ''; position: absolute; inset: -200%; z-index: 1; background-image: conic-gradient(from 180deg at 50% 50%, var(--secondary-color), #ff75c3 30%, #43a1ff 70%, var(--secondary-color) 100%); animation: aurora-sweep 6s linear infinite; opacity: 0; transition: opacity 0.4s ease; }
@@ -224,4 +225,10 @@ body {
     .how-it-works {
         padding: 60px 0;
     }
+
+  @media (max-width: 768px) {
+    .features-grid {
+        grid-template-columns: 1fr;
+    }
+}
 }

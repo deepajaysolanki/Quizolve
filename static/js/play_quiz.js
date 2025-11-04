@@ -8,7 +8,7 @@ document.addEventListener('DOMContentLoaded', function () {
     const totalQuestionsSpan = document.getElementById('total-questions');
     const timerDisplay = document.getElementById('timer');
     const progressBar = document.getElementById('time-progress-bar');
-    
+
     // --- Get data from Django ---
     const GET_QUESTION_URL = quizData.dataset.getQuestionUrl;
     const RECORD_ANSWER_URL = quizData.dataset.checkAnswerUrl; // This is your 'record-answer-api'
@@ -18,18 +18,19 @@ document.addEventListener('DOMContentLoaded', function () {
     const initialTimeLimit = parseInt(quizData.dataset.timeLimit, 10);
     const totalQuestions = parseInt(quizData.dataset.totalQuestions, 10);
     const CURRENT_ATTEMPT_ID = quizData.dataset.currentAttemptId;
+    const SET_ENDED_EARLY_URL = quizData.dataset.setEndedEarlyUrl;
 
     // --- State variables ---
     let correctAnswer = '';
     let currentQuestionText = ''; // Variable to hold the actual question text
     let timerInterval;
     let timeLeft = initialTimeLimit;
-    let questionNumber = parseInt(quizData.dataset.totalPlayed, 10) || 0; 
+    let questionNumber = parseInt(quizData.dataset.totalPlayed, 10) || 0;
     let quizIsOver = false;
 
     // --- Initialize Display ---
     totalQuestionsSpan.textContent = totalQuestions > 0 ? totalQuestions : '?';
-    
+
     // Set the initial number to the correct value
     currentQuestionNumSpan.textContent = questionNumber;
 
@@ -46,20 +47,20 @@ document.addEventListener('DOMContentLoaded', function () {
         clearInterval(timerInterval);
         const response = await fetch(GET_QUESTION_URL);
         const data = await response.json();
-        
+
         if (data.error) {
             questionText.textContent = data.error;
             return;
         }
-        
+
         questionNumber++;
         currentQuestionNumSpan.textContent = questionNumber;
 
         // Correctly save and display the new question
-        currentQuestionText = data.question; 
+        currentQuestionText = data.question;
         questionText.textContent = currentQuestionText;
         correctAnswer = data.answer;
-        
+
         data.options.forEach(optionText => {
             const optionButton = document.createElement('button');
             optionButton.className = 'option';
@@ -102,7 +103,7 @@ document.addEventListener('DOMContentLoaded', function () {
         await recordAnswer(currentQuestionText, "Time's Up", correctAnswer);
         getNextQuestion();
     }
-    
+
     function startTimer() {
         timeLeft = initialTimeLimit;
         updateTimerDisplay();
@@ -114,9 +115,9 @@ document.addEventListener('DOMContentLoaded', function () {
             if (timeLeft <= 0) handleTimeUp();
         }, 1000);
     }
-    
+
     function updateTimerDisplay() { timerDisplay.textContent = timeLeft; }
-    
+
     function updateProgressBar() {
         const progressPercent = (timeLeft / initialTimeLimit) * 100;
         progressBar.style.width = `${progressPercent}%`;
@@ -138,21 +139,21 @@ document.addEventListener('DOMContentLoaded', function () {
             })
         });
     }
-    
+
     endQuizBtn.addEventListener('click', (event) => {
         // This makes your <a> tag work like a button with a confirmation
         event.preventDefault();
         clearInterval(timerInterval);
         quizIsOver = true;
         const isExam = totalQuestions > 0;
-        
+
         if (isExam) {
             const confirmMsg = "Are you sure you want to end the exam? This will count as your attempt for the day.";
             if (confirm(confirmMsg)) {
-                fetch(END_EXAM_EARLY_URL, {
-                    method: 'POST',
-                    headers: { 'X-CSRFToken': CSRF_TOKEN, 'Content-Type': 'application/json' }
-                }).then(() => window.location.href = RESULTS_PAGE_URL);
+                fetch(SET_ENDED_EARLY_URL, { method: 'POST', headers: { 'X-CSRFToken': CSRF_TOKEN } })
+                    .then(() => {
+                        window.location.href = RESULTS_PAGE_URL;
+                    });
             }
         } else {
             window.location.href = RESULTS_PAGE_URL;

@@ -47,9 +47,8 @@ urlpatterns = [
     # API URLs
     # These should be in app's urls.py, but for now this works.
     path('api/record-answer/', views.record_answer_api, name='record-answer-api'),
-    path('api/end-exam-early/', views.end_exam_quiz_early_api, name='end-exam-early'),
+    path('api/set-ended-early/', views.set_ended_early_view, name='set-ended-early'),
     path('api/record-attempt-on-leave/', views.record_attempt_on_leave_api, name='record-attempt-on-leave'),
 ] 
-
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

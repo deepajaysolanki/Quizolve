@@ -1,0 +1,61 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Page Not Found - QuizForge</title>
+    <link rel="stylesheet" href="{% static 'css/main.css' %}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+    <style>
+        .error-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            min-height: 100vh;
+            padding: 2rem;
+            padding-top: 10rem; /* Account for navbar */
+        }
+        .error-code {
+            font-size: 10rem;
+            font-weight: 700;
+            color: var(--primary-color);
+            line-height: 1;
+        }
+        .error-title {
+            font-size: 2.5rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-top: 1rem;
+        }
+        .error-message {
+            font-size: 1.1rem;
+            color: var(--text-secondary);
+            margin-top: 1rem;
+            max-width: 450px;
+        }
+        .error-button {
+            margin-top: 2rem;
+        }
+    </style>
+</head>
+<body class="quiz-page-body">
+    
+  
+
+    <main class="error-container">
+        <span class="error-code">404</span>
+        <h1 class="error-title">Page Not Found</h1>
+        <p class="error-message">
+            Sorry, we couldn't find the page you were looking for. It might have been moved or deleted.
+        </p>
+        <div class="error-button">
+            <a href="{% url 'home-page' %}" class="btn-primary">Go Back Home</a>
+        </div>
+    </main>
+ 
+    <script src="{% static 'js/main.js' %}"></script>
+</body>
+</html>

@@ -17,7 +17,6 @@ document.addEventListener('DOMContentLoaded', function () {
     const progressBarEl = document.getElementById('progress-bar');
     const questionTextEl = document.getElementById('question-text');
     const optionsContainerEl = document.getElementById('options-container');
-    const nextBtn = document.getElementById('next-btn');
     const timerEl = document.getElementById('time');
 
     const finalScoreEl = document.getElementById('final-score');
@@ -31,8 +30,6 @@ document.addEventListener('DOMContentLoaded', function () {
             startQuiz(category);
         });
     });
-
-    nextBtn.addEventListener('click', handleNextQuestion);
 
     // --- FUNCTIONS ---
     function startQuiz(category) {
@@ -75,7 +72,6 @@ document.addEventListener('DOMContentLoaded', function () {
     function resetState() {
         clearInterval(timer);
         optionsContainerEl.innerHTML = '';
-        nextBtn.disabled = true;
     }
 
     function startTimer() {
@@ -99,7 +95,6 @@ document.addEventListener('DOMContentLoaded', function () {
             }
             opt.disabled = true;
         });
-        nextBtn.disabled = false;
     }
 
     function selectAnswer(button, selectedOption, correctAnswer) {
@@ -117,8 +112,6 @@ document.addEventListener('DOMContentLoaded', function () {
                 }
             });
         }
-
-        nextBtn.disabled = false;
     }
 
     function handleNextQuestion() {

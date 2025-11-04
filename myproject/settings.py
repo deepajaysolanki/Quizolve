@@ -14,9 +14,9 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-$$wraba!qqpc-5wf88uq1tny+j04y@6htu2uywr0f6_r=m)e29'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['127.0.0.1', 'localhost']
 
 
 # Application definition
@@ -58,7 +58,7 @@ ROOT_URLCONF = 'myproject.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [BASE_DIR / 'myapp' / 'templates'],
+        'DIRS': [os.path.join(BASE_DIR, 'templates')],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -127,9 +127,12 @@ USE_TZ = True
 
 STATIC_URL = 'static/'
 STATICFILES_DIRS = [
-    BASE_DIR / "static",
+    # BASE_DIR / "static",
     os.path.join(BASE_DIR, 'static'),
 ]
+
+# This is for production (but good to have)
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
 # signup with google functionality
 SOCIALACCOUNT_ADAPTER = 'myapp.adapters.MySocialAccountAdapter'
@@ -201,8 +204,9 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+
+# API key for AI models
 GOOGLE_API_KEY = config('GOOGLE_API_KEY')
-# GOOGLE_API_KEY = config('GOOGLE_API_KEY2')
 
 # forget password functionality
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
