@@ -18,21 +18,21 @@ urlpatterns = [
     path('contact/', views.contact_page, name='contact-page'), 
 
     # --- User Authentication ---
-    path('login/', views.login_form, name='login'),
+    path('login/', views.login_view, name='login'),
+    path('login/verify/', views.verify_login_otp_view, name='verify-login-otp'),
     path('registration/', views.registration_form, name='registration'),
     path('logout/', views.logout_view, name='logout'),
     path('profile/', views.profile_view, name='user-profile'),
     path('profile/edit/', views.profile_edit_view, name='profile-edit'),
     path('profile/history/', views.quiz_history_view, name='quiz-history'),
     
+    # FORGOT PASSWORD (OTP FLOW)
+    path('forgot-password/', views.forgot_password_view, name='forgot-password'),
+    path('forgot-password/verify/', views.verify_reset_otp_view, name='verify-reset-otp'),
+    path('reset-password/new/', views.reset_new_password_view, name='reset-new-password'),
+    
     # --- Allauth & Password Reset ---
     # These must come BEFORE the main 'accounts/' include
-    path('accounts/password_reset/', auth_views.PasswordResetView.as_view(), name='password_reset'),
-    path('accounts/password_reset/done/', auth_views.PasswordResetDoneView.as_view(), name='password_reset_done'),
-    path('accounts/reset/<uidb64>/<token>/', auth_views.PasswordResetConfirmView.as_view(), name='password_reset_confirm'),
-    path('accounts/reset/done/', auth_views.PasswordResetCompleteView.as_view(), name='password_reset_complete'),
-    path('accounts/3rdparty/login/cancelled/', RedirectView.as_view(url=reverse_lazy('login')), name='socialaccount_login_cancelled'),
-    path('accounts/password/change/', allauth_views.PasswordChangeView.as_view(template_name='user/password_change_form.html', form_class=CustomPasswordChangeForm, success_url=reverse_lazy('user-profile')), name='account_password_change'),
     path('accounts/', include('allauth.urls')),
 
     # --- App URLs ---

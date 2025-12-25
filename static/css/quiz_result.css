@@ -196,3 +196,84 @@ body {
     /* Make stat numbers smaller */
   }
 }
+.btn-share {
+  padding: 0.8rem 1.5rem;
+  border-radius: 0.5rem;
+  border: none;
+  color: white;
+  font-weight: bold;
+  cursor: pointer;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  transition: transform 0.2s;
+}
+.btn-share:hover {
+  transform: translateY(-2px);
+}
+
+.main-share {
+  background: linear-gradient(135deg, #6366f1, #a855f7);
+  width: 100%;
+  justify-content: center;
+  max-width: 300px;
+}
+.whatsapp {
+  background-color: #25d366;
+}
+.email {
+  background-color: #4b5563;
+}
+.badge-container {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+  margin: 1.5rem 0;
+}
+.badge {
+  background: #374151;
+  padding: 0.5rem 1rem;
+  border-radius: 2rem;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.9rem;
+  color: #e5e7eb;
+}
+.btn-share {
+  padding: 0.8rem 1.5rem;
+  border-radius: 0.5rem;
+  border: none;
+  color: white;
+  font-weight: bold;
+  cursor: pointer;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  transition: transform 0.2s;
+}
+.btn-share:hover {
+  transform: translateY(-2px);
+  opacity: 0.9;
+}
+.main-share {
+  background: linear-gradient(135deg, #6366f1, #a855f7);
+  width: 100%;
+  justify-content: center;
+  max-width: 300px;
+}
+.whatsapp {
+  background-color: #25d366;
+}
+.email {
+  background-color: #4b5563;
+}
+
+/* Ensure the capture area has a solid background for the image */
+#capture-area {
+  background-color: #1f2937; /* Match your card dark color */
+  padding: 20px;
+  border-radius: 15px;
+}

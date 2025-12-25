@@ -14,7 +14,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-$$wraba!qqpc-5wf88uq1tny+j04y@6htu2uywr0f6_r=m)e29'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = True
 
 ALLOWED_HOSTS = ['127.0.0.1', 'localhost']
 
@@ -208,10 +208,15 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 # API key for AI models
 GOOGLE_API_KEY = config('GOOGLE_API_KEY')
 
-# forget password functionality
-EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-EMAIL_HOST = 'smtp.gmail.com' 
-EMAIL_PORT = 587
-EMAIL_USE_TLS = True
-EMAIL_HOST_USER = config('EMAIL_HOST_USER')
-EMAIL_HOST_PASSWORD = config('EMAIL_HOST_PASSWORD')
+# 1. DEVELOPMENT MODE 
+# This prints the OTP to your black terminal screen instead of sending it to Google.
+EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+
+# 2. PRODUCTION MODE (Google)
+# EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+# EMAIL_HOST = 'smtp.gmail.com' 
+# EMAIL_PORT = 587
+# EMAIL_USE_TLS = True
+# EMAIL_HOST_USER = config('EMAIL_HOST_USER')
+# EMAIL_HOST_PASSWORD = config('EMAIL_HOST_PASSWORD')
+                                                                                                                                                            

@@ -1,0 +1,80 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Verify Code - QuizForge</title>
+    <style>
+        body {
+            background-color: #111827; /* Dark background */
+            color: #ffffff;
+            font-family: 'Poppins', sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+        .auth-container {
+            background: #1f2937; /* Card color */
+            padding: 2.5rem;
+            border-radius: 1rem;
+            width: 100%;
+            max-width: 400px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+            text-align: center;
+        }
+        h2 { margin-bottom: 1.5rem; color: #a78bfa; }
+        input[type="text"] {
+            width: 90%;
+            padding: 1rem;
+            margin: 1rem 0;
+            background: #374151;
+            border: 1px solid #4b5563;
+            border-radius: 0.5rem;
+            color: white;
+            font-size: 1.5rem;
+            text-align: center;
+            letter-spacing: 0.5rem;
+        }
+        button {
+            width: 100%;
+            padding: 1rem;
+            background: linear-gradient(135deg, #6366f1, #a855f7);
+            color: white;
+            border: none;
+            border-radius: 0.5rem;
+            font-size: 1rem;
+            cursor: pointer;
+            font-weight: bold;
+            margin-top: 1rem;
+        }
+        button:hover { opacity: 0.9; }
+        .error-msg { color: #ef4444; margin-bottom: 1rem; }
+    </style>
+</head>
+<body>
+
+    <div class="auth-container">
+        <h2>Verify {{ action }}</h2>
+        
+        {% if messages %}
+            {% for message in messages %}
+                <p class="error-msg">{{ message }}</p>
+            {% endfor %}
+        {% endif %}
+
+        <p style="color: #9ca3af; margin-bottom: 1rem;">
+            Please enter the 6-digit code sent to your email.
+        </p>
+
+        <form method="POST">
+            {% csrf_token %}
+            <input type="text" name="otp" maxlength="6" required placeholder="000000" autofocus>
+            <button type="submit">Verify Code</button>
+        </form>
+    </div>
+
+</body>
+</html>

@@ -2,6 +2,7 @@ from django.shortcuts import render, redirect
 from django.contrib import messages
 from .models import AppUsers
 from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth import authenticate, login as auth_login
 from django.contrib.auth.hashers import make_password
 from django.http import JsonResponse
 from . import ai_services # importing module
@@ -9,11 +10,13 @@ from django.contrib.auth.decorators import login_required
 from .forms import UserProfileForm
 import re, json
 from django.utils import timezone   
-from .models import ExamQuizAttempt, UserQuizAttempt, AnsweredQuestion
+from .models import ExamQuizAttempt, UserQuizAttempt, AnsweredQuestion, AppUsers
 from django.contrib import messages
 from django.views.decorators.http import require_POST
-from datetime import timedelta
+from datetime import timedelta, datetime
 from django.conf import settings
+from django.core.cache import cache
+from .utils import generate_otp, send_otp_email
 
 def home_page(request):
     return render(request, 'pages/index.html')
@@ -220,7 +223,6 @@ def profile_edit_view(request):
     
 def start_quiz_view(request):
     if request.user.is_authenticated:
-        print(f"--- POST data received in start_quiz_view: {request.POST} ---")
         now = timezone.now()
         twenty_four_hours_ago = now - timedelta(hours=24)
         quiz_type = None
@@ -297,7 +299,7 @@ def start_quiz_view(request):
         request.session['question_batch'] = [] # Important: Clear any leftover questions
         request.session['quiz_review_data'] = [] 
         request.session['asked_questions'] = []
-        
+        request.session['quiz_start_time'] = str(datetime.now())
         request.session.save()
         return redirect('play-quiz')
     else:
@@ -376,11 +378,36 @@ def results_view(request):
     review_data = attempt.answers.all().order_by('id')
         
     # Get all stats directly from the database record
+    score = request.session.get('score', 0)
     total_played = review_data.count()
     correct_answers = attempt.score
     display_total = attempt.total_questions
     quiz_type = attempt.quiz_type
-        
+    total_questions = request.session.get('total_questions', 0)
+    quiz_topic = request.session.get('topic', 'General Knowledge') 
+
+    # Calculate Time Taken
+    start_time_str = request.session.get('quiz_start_time')
+    time_taken_display = "00:00"
+
+    if start_time_str:
+        try:
+            # Parse the string back to a datetime object
+            start_time = parse_datetime(start_time_str)
+            # Simple approach for display:
+            end_time = datetime.now() 
+
+            # Calculate difference
+            duration = end_time - start_time 
+            total_seconds = int(duration.total_seconds())
+            
+            # Math for Minutes and Seconds
+            minutes = total_seconds // 60
+            seconds = total_seconds % 60
+            time_taken_display = f"{minutes:02d}m {seconds:02d}s"
+        except:
+            time_taken_display = "N/A"
+            
     #  Check if the quiz was ended early (this flag is still useful)
     ended_early = request.session.pop('ended_early', False)
     print("End Exam on results view:",ended_early)
@@ -395,6 +422,7 @@ def results_view(request):
     request.session.pop('difficulty', None)
     request.session.pop('total_questions', None)
     request.session.pop('asked_questions', None)
+    request.session.pop('quiz_start_time', None)
 
     context = {
         'total_played': total_played,
@@ -405,6 +433,10 @@ def results_view(request):
         'quiz_type': quiz_type,
         'percentage': percentage,
         'review_data': review_data,
+        'score': score,
+        'total_questions': total_questions,
+        'quiz_topic': quiz_topic,       
+        'time_taken': time_taken_display
     }
     return render(request, 'AI_features/result.html', context)    
 
@@ -598,3 +630,133 @@ def record_attempt_on_leave_api(request):
         return JsonResponse({'status': 'ok'})
     else:
         return redirect('login')
+    
+# OTP Email Functionalities
+# --- 1. CUSTOM LOGIN WITH OTP ---
+def login_view(request):
+    if request.method == 'POST':
+        email = request.POST.get('email')
+        password = request.POST.get('password')
+        
+        # Check credentials but DO NOT login yet
+        user = authenticate(request, email=email, password=password)
+        
+        if user is not None:
+            if not user.is_active:
+                messages.error(request, "This account is inactive.")
+                return redirect('login')
+
+            # Generate and Send OTP
+            otp = generate_otp()
+            send_otp_email(user.email, otp)
+            
+            # Save the user ID and OTP in the cache for 5 minutes (300 seconds)
+            # We use the key 'otp_login_{user_id}' to make it unique
+            cache.set(f'otp_login_{user.id}', otp, 300)
+            
+            # Save user ID in session temporarily to know who we are verifying
+            request.session['auth_user_id'] = user.id
+            
+            messages.success(request, f"OTP sent to {user.email}")
+            return redirect('verify-login-otp')
+        else:
+            messages.error(request, "Invalid email or password.")
+            
+    return render(request, 'user/login.html')
+
+def verify_login_otp_view(request):
+    user_id = request.session.get('auth_user_id')
+    if not user_id:
+        return redirect('login')
+
+    if request.method == 'POST':
+        entered_otp = request.POST.get('otp')
+        cached_otp = cache.get(f'otp_login_{user_id}')
+        
+        if cached_otp and str(entered_otp) == str(cached_otp):
+            # OTP Matches! Now we actually log the user in.
+            user = AppUsers.objects.get(id=user_id)
+            auth_login(request, user, backend='django.contrib.auth.backends.ModelBackend')
+            
+            # Cleanup
+            del request.session['auth_user_id']
+            cache.delete(f'otp_login_{user_id}')
+            
+            return redirect('home-page')
+        else:
+            messages.error(request, "Invalid or expired OTP.")
+
+    return render(request, 'user/Forget Password/verify_otp.html', {'action': 'Login'})
+
+
+# --- 2. FORGOT PASSWORD WITH OTP ---
+def forgot_password_view(request):
+    if request.method == 'POST':
+        email = request.POST.get('email')
+        
+        try:
+            user = AppUsers.objects.get(email=email)
+            
+            # Generate and Send OTP
+            otp = generate_otp()
+            send_otp_email(user.email, otp)
+            
+            # Store in cache
+            cache.set(f'otp_reset_{user.id}', otp, 300)
+            request.session['reset_user_id'] = user.id
+            
+            messages.success(request, "OTP sent to your email.")
+            return redirect('verify-reset-otp')
+            
+        except AppUsers.DoesNotExist:
+            # For security, don't reveal if the email doesn't exist
+            messages.error(request, "If an account exists with this email, an OTP has been sent.")
+            
+    return render(request, 'user/forgot_password.html')
+
+def verify_reset_otp_view(request):
+    user_id = request.session.get('reset_user_id')
+    if not user_id:
+        return redirect('forgot-password')
+
+    if request.method == 'POST':
+        entered_otp = request.POST.get('otp')
+        cached_otp = cache.get(f'otp_reset_{user_id}')
+        
+        if cached_otp and str(entered_otp) == str(cached_otp):
+            # OTP Verified. Allow them to reset password.
+            # We set a flag in session to verify they passed this step
+            request.session['reset_verified'] = True
+            return redirect('reset-new-password')
+        else:
+            messages.error(request, "Invalid or expired OTP.")
+            
+    return render(request, 'user/Forget Password/verify_otp.html', {'action': 'Reset Password'})
+
+def reset_new_password_view(request):
+    user_id = request.session.get('reset_user_id')
+    is_verified = request.session.get('reset_verified')
+    
+    if not user_id or not is_verified:
+        return redirect('login')
+
+    if request.method == 'POST':
+        password = request.POST.get('password')
+        confirm_password = request.POST.get('confirm_password')
+        
+        if password == confirm_password:
+            user = AppUsers.objects.get(id=user_id)
+            user.set_password(password)
+            user.save()
+            
+            # Cleanup
+            del request.session['reset_user_id']
+            del request.session['reset_verified']
+            cache.delete(f'otp_reset_{user_id}')
+            
+            messages.success(request, "Password reset successfully! Please login.")
+            return redirect('login')
+        else:
+            messages.error(request, "Passwords do not match.")
+
+    return render(request, 'user/reset_new_password.html')

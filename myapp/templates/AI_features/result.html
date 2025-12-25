@@ -7,40 +7,57 @@
     <title>Quiz Results</title>
     <link rel="stylesheet" href="{% static 'css/main.css' %}" />
     <link rel="stylesheet" href="{% static 'css/quiz_result.css' %}" />
-<style>
-   
-</style>
 </head>
 
 <body>
     <div class="result-card">
-        <div class="result-header">
-            <h1>Quiz Complete!</h1>
-            {% if ended_early %}
-            <p>You ended the quiz early. Here's your score for the questions you attempted.</p>
-            {% else %}
-            <p>Here's your performance summary.</p>
-            {% endif %}
+        <div id="capture-area">
+            <div class="result-header">
+                <h1>Quiz Complete!</h1>
+                {% if ended_early %}
+                <p>You ended the quiz early. Here's your score for the questions you attempted.</p>
+                {% else %}
+                <p>Here's your performance summary.</p>
+                {% endif %}
+            </div>
+            <div class="score-circle" style="--score-percent: {{ percentage }}%;">
+                <div class="score-text">{{ percentage }}<sup>%</sup></div>
+            </div>
+            <div class="badge-container">
+                <div class="badge">
+                    Quiz : {{ quiz_topic }}
+                </div>
+            </div>
+
+            <div class="stats-breakdown">
+                <div class="stat-item">
+                    <h3>{{ total_played }}</h3>
+                    <p>Total</p>
+                </div>
+                <div class="stat-item">
+                    <h3>{{ correct }}</h3>
+                    <p>Correct</p>
+                </div>
+                <div class="stat-item">
+                    <h3>{{ incorrect }}</h3>
+                    <p>Incorrect</p>
+                </div>
+            </div>
+            <p style="text-align: center; font-size: 0.8rem; color: #6b7280; margin-top: 1rem;">
+                Played on Quizolve
+            </p>
         </div>
-        <div class="score-circle" style="--score-percent: {{ percentage }}%;">
-            <div class="score-text">{{ percentage }}<sup>%</sup></div>
+        <div class="share-container"
+            style="text-align: center; margin-top: 2rem; padding-top: 1rem; border-top: 1px solid #374151;">
+            <h3 style="color: #a78bfa; margin-bottom: 1rem;">Share your Achievement! 🏆</h3>
+
+            <button onclick="shareScreenshot()" class="btn-share main-share">
+                <i class="fas fa-camera"></i> Share Image Result
+            </button>
+            <p id="loading-text" style="display:none; color: #9ca3af; margin-top: 0.5rem; font-size: 0.9rem;">Generatimg
+                image...</p>
         </div>
 
-        <div class="stats-breakdown">
-            <div class="stat-item">
-                <h3>{{ total_played }}</h3>
-                <p>Total</p>
-            </div>
-            <div class="stat-item">
-                <h3>{{ correct }}</h3>
-                <p>Correct</p>
-            </div>
-            <div class="stat-item">
-                <h3>{{ incorrect }}</h3>
-                <p>Incorrect</p>
-            </div>
-        </div>
-        
         <div class="review-container">
             <h2>Quiz Review</h2>
 
@@ -81,5 +98,62 @@
         </div>
     </div>
 </body>
+<script>
+    const score = "{{ score }}";
+    const total = "{{ total_questions }}";
+    const topic = "{{ quiz_topic }}";
+    const time = "{{ time_taken }}";
+
+    // Note: Gmail often ignores this 'text' if a file is attached.
+    // WhatsApp handles both perfectly.
+    const shareText = `🔥 I just scored ${score}/${total} on the ${topic} Quiz in ${time}!`;
+    const shareTitle = "My Quiz Score";
+
+    async function shareScreenshot() {
+        const captureElement = document.getElementById('capture-area');
+        const loadingText = document.getElementById('loading-text');
+        loadingText.style.display = 'block';
+
+        try {
+            // Generate Image
+            const canvas = await html2canvas(captureElement, {
+                scale: 2,
+                backgroundColor: "#1f2937",
+                useCORS: true
+            });
+
+            canvas.toBlob(async (blob) => {
+                const file = new File([blob], "quiz-result.png", { type: "image/png" });
+
+                // Check for Native Share Support
+                if (navigator.share && navigator.canShare({ files: [file] })) {
+                    try {
+                        await navigator.share({
+                            title: shareTitle,
+                            text: shareText, // Some apps (like Gmail) might drop this
+                            files: [file]
+                        });
+                    } catch (err) {
+                        console.log("Share cancelled/failed", err);
+                    }
+                } else {
+                    // Desktop Fallback
+                    const link = document.createElement('a');
+                    link.download = 'quiz-result.png';
+                    link.href = canvas.toDataURL();
+                    link.click();
+                    alert("Image downloaded! You can attach it to any email manually.");
+                }
+                loadingText.style.display = 'none';
+            }, 'image/png');
+
+        } catch (error) {
+            console.error("Screenshot failed:", error);
+            loadingText.style.display = 'none';
+            alert("Could not generate image.");
+        }
+    }
+</script>
+<script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
 
 </html>
