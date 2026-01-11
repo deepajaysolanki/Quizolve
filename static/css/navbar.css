@@ -20,7 +20,8 @@ body { font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif; background-
 .mobile-link { color: var(--text-secondary); text-decoration: none; padding: 0.75rem; border-radius: 0.5rem; transition: all 0.3s; }
 .mobile-link.active, .mobile-link:hover { color: var(--text-primary); background: rgba(255, 255, 255, 0.1); }
 .mobile-auth { display: flex; flex-direction: column; gap: 1rem; margin-top: 1rem; padding-top: 1rem; border-top: 1px solid var(--border-color); }
- /* .dropdown-menu-desktop a {
+.btn-ghost { text-decoration: none; color: #000;} 
+/* .dropdown-menu-desktop a {
     color: #333;
     padding: 10px 15px;
     display: block;
@@ -218,7 +219,7 @@ body { font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif; background-
 .nav-link.admin-link:hover {
     background-color: var(--primary-color);
     border-color: var(--primary-color);
-    color: white;
+    color: rgb(11, 0, 0);
 }
 
 /* --- Style for the Admin link on Mobile --- */

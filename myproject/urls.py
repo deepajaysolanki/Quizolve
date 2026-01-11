@@ -35,6 +35,15 @@ urlpatterns = [
     # These must come BEFORE the main 'accounts/' include
     path('accounts/', include('allauth.urls')),
 
+    # Password reset views
+    path('accounts/password_reset/', auth_views.PasswordResetView.as_view(), name='password_reset'),
+    path('accounts/password_reset/done/', auth_views.PasswordResetDoneView.as_view(), name='password_reset_done'),
+    path('accounts/reset/<uidb64>/<token>/', auth_views.PasswordResetConfirmView.as_view(), name='password_reset_confirm'),
+    path('accounts/reset/done/', auth_views.PasswordResetCompleteView.as_view(), name='password_reset_complete'),
+    path('accounts/3rdparty/login/cancelled/', RedirectView.as_view(url=reverse_lazy('login')), name='socialaccount_login_cancelled'),
+    path('accounts/password/change/', allauth_views.PasswordChangeView.as_view(template_name='user/password_change_form.html', form_class=CustomPasswordChangeForm, success_url=reverse_lazy('user-profile')), name='account_password_change'),
+    path('accounts/', include('allauth.urls')),
+
     # --- App URLs ---
     # All regular quiz URLs are now correctly prefixed with 'quiz/'
     path('quiz/', include('myapp.urls')), 
@@ -49,6 +58,10 @@ urlpatterns = [
     path('api/record-answer/', views.record_answer_api, name='record-answer-api'),
     path('api/set-ended-early/', views.set_ended_early_view, name='set-ended-early'),
     path('api/record-attempt-on-leave/', views.record_attempt_on_leave_api, name='record-attempt-on-leave'),
+
+    # Subscription & Payment
+    path('subscription/', views.subscription_plans, name='subscription'),
+    path('checkout/', views.checkout_view, name='checkout'),
 ] 
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

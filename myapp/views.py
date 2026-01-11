@@ -1,6 +1,6 @@
 from django.shortcuts import render, redirect
 from django.contrib import messages
-from .models import AppUsers
+from .models import AppUsers, PaymentRequest, ContactMessage
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth import authenticate, login as auth_login
 from django.contrib.auth.hashers import make_password
@@ -9,11 +9,12 @@ from . import ai_services # importing module
 from django.contrib.auth.decorators import login_required
 from .forms import UserProfileForm
 import re, json
-from django.utils import timezone   
+from django.utils import timezone
+from django.utils.dateparse import parse_datetime   
 from .models import ExamQuizAttempt, UserQuizAttempt, AnsweredQuestion, AppUsers
 from django.contrib import messages
 from django.views.decorators.http import require_POST
-from datetime import timedelta, datetime
+from datetime import timedelta, datetime, date
 from django.conf import settings
 from django.core.cache import cache
 from .utils import generate_otp, send_otp_email
@@ -25,6 +26,25 @@ def about_page(request):
 def quiz_page(request):
     return render(request, 'pages/quiz.html')
 def contact_page(request):
+    if request.method == 'POST':
+        # 1. Get data from the form (using the 'name' attributes from your HTML)
+        name_input = request.POST.get('name') 
+        email_input = request.POST.get('email')
+        message_input = request.POST.get('message')
+        
+        # 2. Save to Database
+        if name_input and email_input and message_input:
+            ContactMessage.objects.create(
+                full_name=name_input,
+                email=email_input,
+                message=message_input
+            )
+            # 3. Trigger Success Toast
+            messages.success(request, "Message sent successfully! We will contact you soon.")
+            return redirect('contact-page')
+        else:
+            messages.error(request, "Please fill in all fields.")
+
     return render(request, 'pages/contact.html')
 
 def registration_form(request):
@@ -228,15 +248,24 @@ def start_quiz_view(request):
         quiz_type = None
         topic = None
         difficulty = None
+        DAILY_LIMIT = 3 # Default for free users
 
-        # Case 1: Starting a new quiz from a form
+        # Check if user is premium AND subscription hasn't expired
+        if request.user.is_premium and request.user.subscription_expiry:
+            if request.user.subscription_expiry >= date.today():
+                DAILY_LIMIT = 10
+            else:
+                # Subscription expired, revert to free
+                DAILY_LIMIT = 3
+
+        # Starting a new quiz from a form
         if request.method == 'POST':
             print(f"--- POST data received: {request.POST} ---")
             quiz_type = request.POST.get('quiz_type')
             topic = request.POST.get('topic')
             difficulty = request.POST.get('difficulty', 'medium')
         
-        # Case 2: Clicking "Play Again" from the results page
+        # Clicking "Play Again" from the results page
         elif request.method == 'GET':
             print("--- GET request received (Play Again) ---")
             # Get the previous quiz settings from the session
@@ -263,7 +292,7 @@ def start_quiz_view(request):
                 quiz_identifier=topic,
                 created_at__gte=twenty_four_hours_ago
             ).count()
-            if attempt_count >= 3:
+            if attempt_count >= DAILY_LIMIT:
                 messages.error(request, f"You have reached your daily limit of 3 quizzes for the '{topic}' category.")
                 return redirect('quiz-page')
             
@@ -274,7 +303,7 @@ def start_quiz_view(request):
                 quiz_type='custom',
                 created_at__gte=twenty_four_hours_ago
             ).count()
-            if attempt_count >= 3:
+            if attempt_count >= DAILY_LIMIT:
                 messages.error(request, "You have reached your daily limit of 3 custom topic quizzes.")
                 return redirect('quiz-page')
             
@@ -285,7 +314,7 @@ def start_quiz_view(request):
             user=request.user,
             quiz_type=request.POST.get('quiz_type'),
             quiz_identifier=request.POST.get('topic'),
-            total_questions=50
+            total_questions=request.POST.get('total_played', 50)
         )
         # UserQuizAttempt.objects.create(user=request.user)
 
@@ -296,11 +325,12 @@ def start_quiz_view(request):
         request.session['total_questions'] = 50
         request.session['correct_answers'] = 0
         request.session['total_played'] = 0
-        request.session['question_batch'] = [] # Important: Clear any leftover questions
+        request.session['question_batch'] = [] 
         request.session['quiz_review_data'] = [] 
         request.session['asked_questions'] = []
         request.session['quiz_start_time'] = str(datetime.now())
         request.session.save()
+
         return redirect('play-quiz')
     else:
         return redirect('login')
@@ -336,8 +366,9 @@ def play_quiz_view(request):
                 time_limit = 20
         
         # Get the number of questions the user has already played in this quiz
-        # total_played = request.session.get('total_played', 0)
-        
+        total_played = request.session.get('total_played', 0)
+        print("Total played from play_quiz view:", total_played)
+
         context = {
             'time_limit': time_limit,
             'quizTopic': topic,
@@ -410,12 +441,21 @@ def results_view(request):
             
     #  Check if the quiz was ended early (this flag is still useful)
     ended_early = request.session.pop('ended_early', False)
-    print("End Exam on results view:",ended_early)
+  
+    
     # Calculate percentage
     percentage = 0
     if display_total > 0:
-        percentage = round((correct_answers / display_total) * 100)
+        percentage = round((correct_answers / total_played) * 100)
 
+    UserQuizAttempt.objects.create(
+            user=request.user,
+            quiz_type=quiz_type,
+            quiz_identifier=quiz_topic,
+            score=correct_answers,
+            total_questions=total_played
+    )
+    
     # Clean up the session so the next quiz is fresh
     request.session.pop('current_attempt_id', None)
     request.session.pop('topic', None)
@@ -454,7 +494,7 @@ def get_next_question_api(request):
         if not topic:
             return JsonResponse({'error': 'Quiz not started or session expired.'}, status=400)
         
-        # --- NEW LOGIC: Choose the correct AI function ---
+        # --- Choose the correct AI function ---
         new_batch = []
         if settings.DEBUG:
             # If we are in development, use the fast, free mock data
@@ -760,3 +800,45 @@ def reset_new_password_view(request):
             messages.error(request, "Passwords do not match.")
 
     return render(request, 'user/reset_new_password.html')
+
+# ------ Subscription Plans View ------
+# 1. The Pricing Page (Purple Cards)
+def subscription_plans(request):
+    return render(request, 'pages/checkout.html')
+
+
+# 2. The Checkout Page (Simulated Payment Gateway)
+@login_required
+def checkout_view(request):
+    my_upi_id = "your-upi-id@okicici"
+
+    if request.method == 'POST':
+        # Get data from the form
+        plan_type = request.POST.get('plan_type') # Now coming from the form
+        user_upi = request.POST.get('upi_id')
+        txn_id = request.POST.get('transaction_id')
+        name = request.POST.get('name')
+
+        # Determine amount based on plan (Security check)
+        if plan_type == 'yearly':
+            amount = "1299"
+        else:
+            plan_type = 'monthly' # Fallback
+            amount = "149"
+            
+        
+        # Save request to DB
+        PaymentRequest.objects.create(
+            user=request.user,
+            plan_type=plan_type,
+            amount=amount,
+            transaction_id=txn_id
+        )
+        
+        messages.success(request, "Payment submitted! We will verify and upgrade your account shortly.")
+        return redirect('quiz-page')
+
+    context = {
+        'my_upi_id': my_upi_id
+    }
+    return render(request, 'pages/checkout.html', context)

@@ -9,7 +9,6 @@ body {
     align-items: center;
     min-height: 100vh;
     padding: 2rem;
-    background-color: var(--background-dark);
     font-family: 'Poppins', sans-serif;
 }
 
@@ -17,7 +16,6 @@ body {
 .quiz-card {
     width: 100%;
     max-width: 800px;
-    background-color: var(--card-dark);
     border: 1px solid var(--border-color);
     border-radius: 1.5rem;
     box-shadow: 0 20px 50px rgba(0, 0, 0, 0.3);
@@ -86,6 +84,7 @@ body {
     text-align: left;
     cursor: pointer;
     transition: all 0.2s ease;
+    border: 1px solid #979797;
 }
 .option:hover:not(:disabled) {
     border-color: var(--primary-color);
@@ -131,6 +130,7 @@ body {
     background-color: transparent;
     border-color: var(--border-color);
     color: var(--text-secondary);
+    border: 1px solid #979797;
 }
 #next-question-btn {
    display: none;

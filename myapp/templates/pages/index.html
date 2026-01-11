@@ -13,76 +13,78 @@
 </head>
 
 <body>
-    <div class="loader" id="loader">
-      <div class="loader-logo">
-        <div class="logo-icon"><i class="fas fa-brain"></i></div>
-      </div>
-      <div class="loader-text">Initializing AI Core...</div>
+  <div class="loader" id="loader">
+    <div class="loader-logo">
+      <div class="logo-icon"><i class="fas fa-brain"></i></div>
     </div>
-    {% include 'components/navbar.html' %}
-    <section class="hero">
-      <div class="hero-background">
-        <div class="grid-pattern"></div>
-        <div class="floating-orbs">
-          <div class="orb orb-1"></div>
-          <div class="orb orb-2"></div>
-          <div class="orb orb-3"></div>
-        </div>
-        <div class="particles" id="particles"></div>
+    <div class="loader-text">Initializing AI Core...</div>
+  </div>
+  {% include 'components/navbar.html' %}
+  <section class="hero">
+    <div class="hero-background">
+      <div class="grid-pattern"></div>
+      <div class="floating-orbs">
+        <div class="orb orb-1"></div>
+        <div class="orb orb-2"></div>
+        <div class="orb orb-3"></div>
       </div>
-      <div class="hero-content">
-        <div class="ai-badge animate-on-load" data-animation="fade-in-up" style="animation-delay: 0ms">
-          <i class="fas fa-sparkles"></i>
-          <span>Next-Generation AI Quiz Platform</span>
-        </div>
-        <h1 class="hero-title animate-on-load" data-animation="fade-in-up" style="animation-delay: 100ms">
-          <span class="title-line">Master Knowledge with</span>
-          <span class="title-highlight">AI-Powered Quizzes</span>
-        </h1>
-        <p class="hero-subtitle animate-on-load" data-animation="fade-in-up" style="animation-delay: 200ms">
-          Experience the future of learning with
-          <span class="gradient-text">personalized AI-generated quizzes</span>, instant feedback, and comprehensive
-          analytics.
-        </p><br><br><br>
-        <div class="hero-buttons animate-on-load" data-animation="fade-in-up" style="animation-delay: 300ms">
-          <a href="{% url 'quiz-page' %}" class="btn-hero-primary">
-            <i class="fas fa-play"></i>
-            <span>Launch AI Quiz</span>
-            <div class="btn-shine"></div>
-          </a>
-          <a href="#features" class="btn-hero-secondary">
+      <div class="particles" id="particles"></div>
+    </div>
+
+    <div class="hero-content">
+      <div class="ai-badge animate-on-load" data-animation="fade-in-up" style="animation-delay: 0ms;">
+        <i class="fas fa-sparkles"></i>
+        <span>Next-Generation AI Quiz Platform</span>
+      </div>
+      <h1 class="hero-title animate-on-load" data-animation="fade-in-up" style="animation-delay: 100ms">
+        <span class="title-line">Master Knowledge with</span>
+        <span class="title-highlight">AI-Powered Quizzes</span>
+      </h1>
+      <p class="hero-subtitle animate-on-load" data-animation="fade-in-up" style="animation-delay: 200ms">
+        Experience the future of learning with
+        <span class="gradient-text">personalized AI-generated quizzes</span>, instant feedback, and comprehensive
+        analytics.
+      </p><br><br><br>
+      <div class="hero-buttons animate-on-load" data-animation="fade-in-up" style="animation-delay: 300ms">
+        <a href="{% url 'quiz-page' %}" class="btn-hero-primary">
+          <i class="fas fa-play"></i>
+          <span>Launch AI Quiz</span>
+          <div class="btn-shine"></div>
+        </a>
+        <!-- <a href="#features" class="btn-hero-secondary">
             <i class="fas fa-bolt"></i>
             <span>Learn More</span>
-          </a>
+          </a> -->
+      </div>
+      <div class="hero-stats animate-on-load" data-animation="fade-in-up" style="animation-delay: 400ms">
+        <div class="stat-item">
+          <div class="stat-emoji">👥</div>
+          <div class="stat-value" data-target="50000">1K+</div>
+          <div class="stat-label">Active Users</div>
         </div>
-        <div class="hero-stats animate-on-load" data-animation="fade-in-up" style="animation-delay: 400ms">
-          <div class="stat-item">
-            <div class="stat-emoji">👥</div>
-            <div class="stat-value" data-target="50000">1K+</div>
-            <div class="stat-label">Active Users</div>
-          </div>
-          <div class="stat-item">
-            <div class="stat-emoji">🧠</div>
-            <div class="stat-value" data-target="1000000">5M+</div>
-            <div class="stat-label">AI Quizzes Generated</div>
-          </div>
-          <div class="stat-item">
-            <div class="stat-emoji">📚</div>
-            <div class="stat-value" data-target="100">20+</div>
-            <div class="stat-label">Categories</div>
-          </div>
-          <div class="stat-item">
-            <div class="stat-emoji">🎯</div>
-            <div class="stat-value" data-target="95">95%</div>
-            <div class="stat-label">Success Rate</div>
-          </div>
+        <div class="stat-item">
+          <div class="stat-emoji">🧠</div>
+          <div class="stat-value" data-target="1000000">5M+</div>
+          <div class="stat-label">AI Quizzes Generated</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-emoji">📚</div>
+          <div class="stat-value" data-target="100">20+</div>
+          <div class="stat-label">Categories</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-emoji">🎯</div>
+          <div class="stat-value" data-target="95">95%</div>
+          <div class="stat-label">Success Rate</div>
         </div>
       </div>
-    </section>
+    </div>
+  </section>
 
-    <section class="features" id="features">
-      <div class="container">
-        <div class="section-header" data-animation-container>
+  <section class="features" id="features">
+    <div class="container">
+      <div class="section-header" data-animation-container>
+        <center>
           <div class="section-badge animate-on-scroll" data-animation="fade-in-up">
             <i class="fas fa-sparkles"></i>
             <span>AI-Powered Features</span>
@@ -91,37 +93,37 @@
             Next-Gen Learning
             <span class="title-highlight">Intelligence</span>
           </h2>
-          <p class="section-subtitle animate-on-scroll" data-animation="fade-in-up">
-            Harness the power of advanced AI to transform your learning
-            experience with intelligent question generation, adaptive learning
-            paths, and real-time insights.
-          </p>
+            <p class="section-subtitle animate-on-scroll" data-animation="fade-in-up">
+              Harness the power of advanced AI to transform your learning
+              experience with intelligent question generation, adaptive learning
+              paths, and real-time insights.
+            </p>
+        </center>
+      </div>
+      <div class="features-grid" data-animation-container>
+        <div class="feature-card animate-on-scroll" data-animation="zoom-in">
+          <div class="aurora-border"></div>
+          <div class="feature-content">
+            <div class="feature-icon"><i class="fas fa-book-open"></i></div>
+            <h3>Smart Category Selection</h3>
+            <p>
+              Choose from 20+ AI-curated categories with adaptive
+              difficulty matching.
+            </p>
+          </div>
         </div>
-
-        <div class="features-grid" data-animation-container>
-          <div class="feature-card animate-on-scroll" data-animation="zoom-in">
-            <div class="aurora-border"></div>
-            <div class="feature-content">
-              <div class="feature-icon"><i class="fas fa-book-open"></i></div>
-              <h3>Smart Category Selection</h3>
-              <p>
-                Choose from 20+ AI-curated categories with adaptive
-                difficulty matching.
-              </p>
-            </div>
+        <div class="feature-card animate-on-scroll" data-animation="zoom-in">
+          <div class="aurora-border"></div>
+          <div class="feature-content">
+            <div class="feature-icon"><i class="fas fa-brain"></i></div>
+            <h3>Neural Topic Generation</h3>
+            <p>
+              Advanced AI models create contextually relevant questions from
+              any topic instantly.
+            </p>
           </div>
-          <div class="feature-card animate-on-scroll" data-animation="zoom-in">
-            <div class="aurora-border"></div>
-            <div class="feature-content">
-              <div class="feature-icon"><i class="fas fa-brain"></i></div>
-              <h3>Neural Topic Generation</h3>
-              <p>
-                Advanced AI models create contextually relevant questions from
-                any topic instantly.
-              </p>
-            </div>
-          </div>
-          <!-- <div class="feature-card animate-on-scroll" data-animation="zoom-in">
+        </div>
+        <!-- <div class="feature-card animate-on-scroll" data-animation="zoom-in">
             <div class="aurora-border"></div>
             <div class="feature-content">
               <div class="feature-icon"><i class="fas fa-upload"></i></div>
@@ -132,26 +134,27 @@
               </p>
             </div>
           </div> -->
-          <div class="feature-card animate-on-scroll" data-animation="zoom-in">
-            <div class="aurora-border"></div>
-            <div class="feature-content">
-              <div class="feature-icon"><i class="fas fa-bullseye"></i></div>
-              <h3>Adaptive Difficulty</h3>
-              <p>
-                Dynamic difficulty adjustment based on your performance and
-                learning patterns.
-              </p>
-            </div>
+        <div class="feature-card animate-on-scroll" data-animation="zoom-in">
+          <div class="aurora-border"></div>
+          <div class="feature-content">
+            <div class="feature-icon"><i class="fas fa-bullseye"></i></div>
+            <h3>Adaptive Difficulty</h3>
+            <p>
+              Dynamic difficulty adjustment based on your performance and
+              learning patterns.
+            </p>
           </div>
-          <div class="feature-card animate-on-scroll" data-animation="zoom-in">
-            <div class="aurora-border"></div>
-            <div class="feature-content">
-              <div class="feature-icon"><i class="fas fa-graduation-cap"></i></div>
-              <h3>Exam Practice Mode</h3>
-              <p>Prepare for exams like UPSC, JEE, and NEET with 50-question quizzes designed to simulate the real test.</p>
-            </div>
+        </div>
+        <div class="feature-card animate-on-scroll" data-animation="zoom-in">
+          <div class="aurora-border"></div>
+          <div class="feature-content">
+            <div class="feature-icon"><i class="fas fa-graduation-cap"></i></div>
+            <h3>Exam Practice Mode</h3>
+            <p>Prepare for exams like UPSC, JEE, and NEET with 50-question quizzes designed to simulate the real test.
+            </p>
           </div>
-          <!-- <div class="feature-card animate-on-scroll" data-animation="zoom-in">
+        </div>
+        <!-- <div class="feature-card animate-on-scroll" data-animation="zoom-in">
             <div class="aurora-border"></div>
             <div class="feature-content">
               <div class="feature-icon"><i class="fas fa-chart-bar"></i></div>
@@ -162,167 +165,167 @@
               </p>
             </div>
           </div> -->
-        </div>
       </div>
-    </section>
+    </div>
+  </section>
 
-    <section class="how-it-works">
-      <div class="container">
-        <div class="section-header" data-animation-container>
-          <div class="section-badge animate-on-scroll" data-animation="fade-in-up">
-            <i class="fas fa-cogs"></i>
-            <span>How It Works</span>
-          </div>
-          <h2 class="section-title animate-on-scroll" data-animation="fade-in-up">
-            Simple Steps to
-            <span class="title-highlight">AI Learning</span>
-          </h2>
+  <section class="how-it-works">
+    <div class="container">
+      <div class="section-header" data-animation-container>
+        <div class="section-badge animate-on-scroll" data-animation="fade-in-up">
+          <i class="fas fa-cogs"></i>
+          <span>How It Works</span>
         </div>
-        <div class="steps-grid" data-animation-container>
-          <div class="step-card animate-on-scroll" data-animation="fade-in-left">
-            <div class="step-number">1</div>
-            <div class="step-icon"><i class="fas fa-search"></i></div>
-            <h3>Discover Topic</h3>
-            <p>Choose a category or describe any topic.</p>
-          </div>
-          <div class="step-card animate-on-scroll" data-animation="fade-in-left">
-            <div class="step-number">2</div>
-            <div class="step-icon"><i class="fas fa-cogs"></i></div>
-            <h3>Customize Quiz</h3>
-            <p>Our AI adjusts difficulty and mode for you.</p>
-          </div>
-          <div class="step-card animate-on-scroll" data-animation="fade-in-left">
-            <div class="step-number">3</div>
-            <div class="step-icon"><i class="fas fa-play-circle"></i></div>
-            <h3>Start Assessment</h3>
-            <p>Engage with dynamically generated questions.</p>
-          </div>
-          <div class="step-card animate-on-scroll" data-animation="fade-in-left">
-            <div class="step-number">4</div>
-            <div class="step-icon"><i class="fas fa-trophy"></i></div>
-            <h3>Get Insights</h3>
-            <p>Receive AI-powered feedback and analytics.</p>
-          </div>
+        <h2 class="section-title animate-on-scroll" data-animation="fade-in-up">
+          Simple Steps to
+          <span class="title-highlight">AI Learning</span>
+        </h2>
+      </div>
+      <div class="steps-grid" data-animation-container>
+        <div class="step-card animate-on-scroll" data-animation="fade-in-left">
+          <div class="step-number">1</div>
+          <div class="step-icon"><i class="fas fa-search"></i></div>
+          <h3>Discover Topic</h3>
+          <p>Choose a category or describe any topic.</p>
+        </div>
+        <div class="step-card animate-on-scroll" data-animation="fade-in-left">
+          <div class="step-number">2</div>
+          <div class="step-icon"><i class="fas fa-cogs"></i></div>
+          <h3>Customize Quiz</h3>
+          <p>Our AI adjusts difficulty and mode for you.</p>
+        </div>
+        <div class="step-card animate-on-scroll" data-animation="fade-in-left">
+          <div class="step-number">3</div>
+          <div class="step-icon"><i class="fas fa-play-circle"></i></div>
+          <h3>Start Assessment</h3>
+          <p>Engage with dynamically generated questions.</p>
+        </div>
+        <div class="step-card animate-on-scroll" data-animation="fade-in-left">
+          <div class="step-number">4</div>
+          <div class="step-icon"><i class="fas fa-trophy"></i></div>
+          <h3>Get Insights</h3>
+          <p>Receive AI-powered feedback and analytics.</p>
         </div>
       </div>
-    </section>
+    </div>
+  </section>
 
-    <section class="how-it-works" id="how-it-works">
-      <div class="container">
-        <div class="section-header" data-animation-container>
-          <h2 class="section-title animate-on-scroll" data-animation="fade-in-up">
-            How AI Transforms Learning
-          </h2>
-          <p class="section-subtitle animate-on-scroll" data-animation="fade-in-up">
-            Experience the seamless integration of artificial intelligence
-            that adapts to your learning style, creates personalized content,
-            and provides intelligent insights for optimal knowledge retention.
-          </p>
+  <section class="how-it-works" id="how-it-works">
+    <div class="container">
+      <div class="section-header" data-animation-container>
+        <h2 class="section-title animate-on-scroll" data-animation="fade-in-up">
+          How AI Transforms Learning
+        </h2>
+        <p class="section-subtitle animate-on-scroll" data-animation="fade-in-up">
+          Experience the seamless integration of artificial intelligence
+          that adapts to your learning style, creates personalized content,
+          and provides intelligent insights for optimal knowledge retention.
+        </p>
+      </div>
+      <div class="steps-grid-new" data-animation-container>
+        <div class="step-card-new animate-on-scroll" data-animation="zoom-in">
+          <div class="step-card-new-content">
+            <div class="step-header">
+              <div class="step-number-new">1</div>
+              <div class="step-icon-new"><i class="fas fa-search"></i></div>
+            </div>
+            <h3>AI Topic Discovery</h3>
+            <p>
+              Choose categories, describe any topic, or upload documents for
+              instant AI analysis.
+            </p>
+            <ul class="step-features">
+              <li>
+                <i class="fas fa-check-circle"></i>100+ AI-curated
+                categories
+              </li>
+              <li>
+                <i class="fas fa-check-circle"></i>Natural language
+                processing
+              </li>
+              <li>
+                <i class="fas fa-check-circle"></i>Document intelligence
+              </li>
+            </ul>
+          </div>
         </div>
-        <div class="steps-grid-new" data-animation-container>
-          <div class="step-card-new animate-on-scroll" data-animation="zoom-in">
-            <div class="step-card-new-content">
-              <div class="step-header">
-                <div class="step-number-new">1</div>
-                <div class="step-icon-new"><i class="fas fa-search"></i></div>
-              </div>
-              <h3>AI Topic Discovery</h3>
-              <p>
-                Choose categories, describe any topic, or upload documents for
-                instant AI analysis.
-              </p>
-              <ul class="step-features">
-                <li>
-                  <i class="fas fa-check-circle"></i>100+ AI-curated
-                  categories
-                </li>
-                <li>
-                  <i class="fas fa-check-circle"></i>Natural language
-                  processing
-                </li>
-                <li>
-                  <i class="fas fa-check-circle"></i>Document intelligence
-                </li>
-              </ul>
+        <div class="step-card-new animate-on-scroll" data-animation="zoom-in">
+          <div class="step-card-new-content">
+            <div class="step-header">
+              <div class="step-number-new">2</div>
+              <div class="step-icon-new"><i class="fas fa-cogs"></i></div>
             </div>
+            <h3>Smart Customization</h3>
+            <p>
+              AI automatically adjusts difficulty, mode, and question types
+              based on your goals.
+            </p>
+            <ul class="step-features">
+              <li>
+                <i class="fas fa-check-circle"></i>Adaptive difficulty
+                engine
+              </li>
+              <li>
+                <i class="fas fa-check-circle"></i>Learning style analysis
+              </li>
+              <li>
+                <i class="fas fa-check-circle"></i>Performance optimization
+              </li>
+            </ul>
           </div>
-          <div class="step-card-new animate-on-scroll" data-animation="zoom-in">
-            <div class="step-card-new-content">
-              <div class="step-header">
-                <div class="step-number-new">2</div>
-                <div class="step-icon-new"><i class="fas fa-cogs"></i></div>
-              </div>
-              <h3>Smart Customization</h3>
-              <p>
-                AI automatically adjusts difficulty, mode, and question types
-                based on your goals.
-              </p>
-              <ul class="step-features">
-                <li>
-                  <i class="fas fa-check-circle"></i>Adaptive difficulty
-                  engine
-                </li>
-                <li>
-                  <i class="fas fa-check-circle"></i>Learning style analysis
-                </li>
-                <li>
-                  <i class="fas fa-check-circle"></i>Performance optimization
-                </li>
-              </ul>
+        </div>
+        <div class="step-card-new animate-on-scroll" data-animation="zoom-in">
+          <div class="step-card-new-content">
+            <div class="step-header">
+              <div class="step-number-new">3</div>
+              <div class="step-icon-new"><i class="fas fa-tasks"></i></div>
             </div>
+            <h3>Intelligent Assessment</h3>
+            <p>
+              Experience AI-generated questions that adapt in real-time to
+              your responses.
+            </p>
+            <ul class="step-features">
+              <li>
+                <i class="fas fa-check-circle"></i>Dynamic question
+                generation
+              </li>
+              <li>
+                <i class="fas fa-check-circle"></i>Real-time adaptation
+              </li>
+              <li>
+                <i class="fas fa-check-circle"></i>Contextual learning
+              </li>
+            </ul>
           </div>
-          <div class="step-card-new animate-on-scroll" data-animation="zoom-in">
-            <div class="step-card-new-content">
-              <div class="step-header">
-                <div class="step-number-new">3</div>
-                <div class="step-icon-new"><i class="fas fa-tasks"></i></div>
+        </div>
+        <div class="step-card-new animate-on-scroll" data-animation="zoom-in">
+          <div class="step-card-new-content">
+            <div class="step-header">
+              <div class="step-number-new">4</div>
+              <div class="step-icon-new">
+                <i class="fas fa-chart-line"></i>
               </div>
-              <h3>Intelligent Assessment</h3>
-              <p>
-                Experience AI-generated questions that adapt in real-time to
-                your responses.
-              </p>
-              <ul class="step-features">
-                <li>
-                  <i class="fas fa-check-circle"></i>Dynamic question
-                  generation
-                </li>
-                <li>
-                  <i class="fas fa-check-circle"></i>Real-time adaptation
-                </li>
-                <li>
-                  <i class="fas fa-check-circle"></i>Contextual learning
-                </li>
-              </ul>
             </div>
-          </div>
-          <div class="step-card-new animate-on-scroll" data-animation="zoom-in">
-            <div class="step-card-new-content">
-              <div class="step-header">
-                <div class="step-number-new">4</div>
-                <div class="step-icon-new">
-                  <i class="fas fa-chart-line"></i>
-                </div>
-              </div>
-              <h3>AI-Powered Insights</h3>
-              <p>
-                Receive comprehensive analytics, personalized feedback, and
-                learning recommendations.
-              </p>
-              <ul class="step-features">
-                <li>
-                  <i class="fas fa-check-circle"></i>Deep learning analysis
-                </li>
-                <li>
-                  <i class="fas fa-check-circle"></i>Personalized insights
-                </li>
-                <li><i class="fas fa-check-circle"></i>Growth tracking</li>
-              </ul>
-            </div>
+            <h3>AI-Powered Insights</h3>
+            <p>
+              Receive comprehensive analytics, personalized feedback, and
+              learning recommendations.
+            </p>
+            <ul class="step-features">
+              <li>
+                <i class="fas fa-check-circle"></i>Deep learning analysis
+              </li>
+              <li>
+                <i class="fas fa-check-circle"></i>Personalized insights
+              </li>
+              <li><i class="fas fa-check-circle"></i>Growth tracking</li>
+            </ul>
           </div>
         </div>
       </div>
-    </section>
+    </div>
+  </section>
   </div>
   {% include 'components/footer.html' %}
   <script src="{% static 'js/main.js' %}"></script>

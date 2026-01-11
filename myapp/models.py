@@ -41,7 +41,9 @@ class AppUsers(AbstractBaseUser, PermissionsMixin):
 
     is_staff = models.BooleanField(default=False)
     is_active = models.BooleanField(default=True)
-
+    is_premium = models.BooleanField(default=False)
+    subscription_expiry = models.DateField(null=True, blank=True)
+    
     role = models.CharField(max_length=10, default='user')
     objects = AppUsersManager()
 
@@ -103,3 +105,26 @@ class AnsweredQuestion(models.Model):
 
     def __str__(self):
         return self.question_text
+
+# Model to handle contact messages from users
+class ContactMessage(models.Model):
+    full_name = models.CharField(max_length=100)
+    email = models.EmailField()
+    message = models.TextField()
+    created_at = models.DateTimeField(auto_now_add=True)
+    is_replied = models.BooleanField(default=False)
+
+    def __str__(self):
+        return f"Message from {self.full_name}"
+
+# Model to handle payment requests for subscriptions
+class PaymentRequest(models.Model):
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    plan_type = models.CharField(max_length=20)  # 'monthly' or 'yearly'
+    amount = models.CharField(max_length=10)
+    transaction_id = models.CharField(max_length=50, unique=True)
+    is_approved = models.BooleanField(default=False)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.user.email} - {self.transaction_id}"

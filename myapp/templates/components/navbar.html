@@ -24,13 +24,14 @@
         <a href="{% url 'home-page' %}" class="nav-link {% if page == 'home-page' %}active{% endif %}">Home</a>
         <a href="{% url 'about-page' %}" class="nav-link {% if page == 'about-page' %}active{% endif %}">About</a>
         <a href="{% url 'quiz-page' %}" class="nav-link {% if page == 'quiz-page' %}active{% endif %}">Quiz</a>
-        <a href="{% url 'exam-selection' %}" class="nav-link {% if page == 'exam-selection' %}active{% endif %}">Exam</a>
+        <a href="{% url 'exam-selection' %}"
+          class="nav-link {% if page == 'exam-selection' %}active{% endif %}">Exam</a>
         <a href="{% url 'contact-page' %}" class="nav-link {% if page == 'contact-page' %}active{% endif %}">Contact</a>
       </div>
 
       <div class="nav-auth">
         {% if request.user.is_staff %}
-        <a href="{% url 'admin:index' %}"  class="nav-link admin-link">Admin</a>
+        <a href="{% url 'admin:index' %}" class="nav-link admin-link">Admin</a>
         {% endif %}
         {% if request.user.is_authenticated %}
         <div class="profile-menu">
@@ -39,11 +40,12 @@
           <div class="profile-dropdown" id="profile-dropdown-desktop">
             <a href="{% url 'quiz-history' %}">My Quiz History</a>
             <a href="{% url 'user-profile' %}">My Profile</a>
+            <a href="{% url 'checkout' %}">Subscription</a>
             <a href="{% url 'logout' %}">Logout</a>
           </div>
         </div>
         {% else %}
-        <a href="{% url 'login' %}" class="btn-ghost">Login</a>
+        <a href="{% url 'login' %}" class="btn-ghost">Login</a>&nbsp;&nbsp;&nbsp;
         <a href="{% url 'registration' %}" class="btn-primary"><span>Join AI</span></a>
         {% endif %}
 
@@ -58,19 +60,22 @@
       <a href="{% url 'home-page' %}" class="mobile-link {% if page == 'home-page' %}active{% endif %}">Home</a>
       <a href="{% url 'about-page' %}" class="mobile-link {% if page == 'about-page' %}active{% endif %}">About</a>
       <a href="{% url 'quiz-page' %}" class="mobile-link {% if page == 'quiz-page' %}active{% endif %}">Quiz</a>
-      <a href="{% url 'exam-selection' %}" class="mobile-link {% if page == 'exam-selection' %}active{% endif %}">Exam</a>
-      <a href="{% url 'contact-page' %}" class="mobile-link {% if page == 'contact-page' %}active{% endif %}">Contact</a>
+      <a href="{% url 'exam-selection' %}"
+        class="mobile-link {% if page == 'exam-selection' %}active{% endif %}">Exam</a>
+      <a href="{% url 'contact-page' %}"
+        class="mobile-link {% if page == 'contact-page' %}active{% endif %}">Contact</a>
       <div class="mobile-auth">
         {% if request.user.is_authenticated %}
         <div class="profile-menu">
           {% if request.user.is_staff %}
-          <a href="{% url 'admin:index' %}"  class="mobile-link admin-link">Admin</a>
+          <a href="{% url 'admin:index' %}" class="mobile-link admin-link">Admin</a>
           {% endif %}
           <img src="{{ request.user.profile_photo.url }}" alt="Profile" class="profile-photo"
             id="profile-photo-mobile" />
           <div class="profile-dropdown" id="profile-dropdown-mobile">
             <a href="{% url 'quiz-history' %}">My Quiz History</a>
             <a href="{% url 'user-profile' %}">My Profile</a>
+            <a href="{% url 'checkout' %}">Subscription</a>
             <a href="{% url 'logout' %}">Logout</a>
           </div>
         </div>
@@ -81,6 +86,7 @@
       </div>
     </div>
   </nav>
+  <hr>
 </body>
 <script src="{% static 'js/main.js' %}"></script>
 <script>

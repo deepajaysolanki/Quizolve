@@ -42,7 +42,6 @@
 
 /* --- Styling for each Exam Button --- */
 .exam-btn {
-  background-color: #0d2a4c;
   border: 1px solid var(--border-color);
   color: var(--text-primary);
   padding: 1.25rem;
@@ -53,6 +52,7 @@
   cursor: pointer;
   text-decoration: none;
   transition: all 0.2s ease;
+  border: 1px solid #979797;
 }
 .exam-btn:hover {
   background-color: var(--primary-color);

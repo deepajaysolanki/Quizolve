@@ -21,7 +21,7 @@
                 {% endif %}
             </div>
             <div class="score-circle" style="--score-percent: {{ percentage }}%;">
-                <div class="score-text">{{ percentage }}<sup>%</sup></div>
+                <div class="score-text"><h3>{{ percentage }}%</h3></div>
             </div>
             <div class="badge-container">
                 <div class="badge">
@@ -118,7 +118,6 @@
             // Generate Image
             const canvas = await html2canvas(captureElement, {
                 scale: 2,
-                backgroundColor: "#1f2937",
                 useCORS: true
             });
 

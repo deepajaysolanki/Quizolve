@@ -2,7 +2,6 @@
    Footer
    ================================================================= */
 .footer {
-    background: #0c1427;
     padding: 4rem 1rem 2rem 1rem; /* Adjusted padding for better spacing on mobile */
     border-top: 1px solid var(--border-color);
 }

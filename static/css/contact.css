@@ -55,7 +55,7 @@
 .info-icon {
     width: 45px;
     height: 45px;
-    background: rgba(59, 130, 246, 0.1);
+   
     border-radius: 50%;
     display: flex;
     align-items: center;
@@ -74,7 +74,6 @@
 
 /* --- Contact Form Column (Right Side) --- */
 .contact-form-wrapper {
-    background: var(--card-dark);
     padding: 3rem;
     border-radius: 1.5rem;
     border: 1px solid var(--border-color);
@@ -95,11 +94,11 @@
 .form-input {
     width: 100%;
     padding: 1rem;
-    background: #0f172a; /* Darker input background */
     border: 1px solid var(--border-color);
     border-radius: 0.5rem;
     color: var(--text-primary);
     font-size: 1rem;
+    border: 1px solid #979797;
     font-family: 'Poppins', sans-serif;
     transition: border-color 0.3s ease, box-shadow 0.3s ease;
 }

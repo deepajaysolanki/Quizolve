@@ -1,40 +1,127 @@
-/* =================================================================
-   MAIN.CSS - SHARED STYLES (CORRECTED)
-   ================================================================= */
-@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap');
+@import url("https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap");
+
 :root {
-    --primary-color: #3b82f6; --secondary-color: #8b5cf6; --accent-color: #ec4899;
-    --background-dark: #0f172a; --card-dark: #1e293b; --border-color: rgba(71, 85, 105, 0.3);
-    --text-primary: #f8fafc; --text-secondary: #94a3b8;
-    --text-gradient: linear-gradient(135deg, #3b82f6, #8b5cf6, #ec4899);
-}
-* { margin: 0; padding: 0; box-sizing: border-box; }
-html { scroll-behavior: smooth; }
-body { font-family: 'Poppins', sans-serif; background: var(--background-dark); color: var(--text-primary);}
-.container { max-width: 1200px; margin: 0 auto; padding: 0 1rem; }
+  /* DEFAULT (LIGHT THEME) */
+  --bg-primary: #f3f4f6; /* Light Gray Background */
+  --bg-card: #ffffff; /* White Card */
+  --text-main: #111827; /* Dark Text */
+  --text-secondary: #4b5563; /* Gray Text */
+  --border-color: #e5e7eb; /* Light Border */
+  --accent-color: #6366f1; /* Purple/Blue Brand Color */
+  --input-bg: #ffffff;
 
-/* --- Page Loader --- */
-.loader { position: fixed; inset: 0; z-index: 9999; background: var(--background-dark); display: flex; flex-direction: column; align-items: center; justify-content: center; transition: opacity 0.6s ease, visibility 0.6s ease; }
-.loader-logo { display: flex; align-items: center; justify-content: center; width: 6rem; height: 6rem; background: var(--text-gradient); border-radius: 1.5rem; animation: pulse 1.5s infinite ease-in-out; }
-.loader-text { margin-top: 1.5rem; color: var(--text-secondary); font-size: 1rem; }
-body.loaded .loader { opacity: 0; visibility: hidden; }
-
-/* --- NEW, SIMPLIFIED ANIMATION STYLES --- */
-.animate-on-load, .animate-on-scroll {
-    opacity: 0;
-    transform: translateY(20px);
-    transition: opacity 0.6s ease-out, transform 0.6s ease-out;
-}
-.is-visible {
-    opacity: 1;
-    transform: translateY(0);
+  /* Missing variables you used in your CSS */
+  --text-gradient: linear-gradient(135deg, #6366f1, #a855f7);
+  --background-dark: #111827; /* For loader background */
 }
 
-/* --- Reusable Components & Sections --- */
-.btn-primary { display: inline-flex; align-items: center; gap: 0.5rem; background: var(--text-gradient); color: white; padding: 0.75rem 1.5rem; border-radius: 2rem; text-decoration: none; font-weight: 500; border: none; }
-.btn-ghost { color: var(--text-secondary); text-decoration: none; padding: 0.75rem 1.5rem; border-radius: 2rem; }
-.section-header { text-align: center; margin-bottom: 4rem; }
-.section-title { font-size: clamp(2.2rem, 5vw, 3rem); font-weight: 700; margin-bottom: 1rem; }
-.section-subtitle { font-size: 1.1rem; color: var(--text-secondary); max-width: 52rem; margin: 0 auto; line-height: 1.7; }
-.section-badge { display: inline-flex; align-items: center; gap: 0.5rem; background: rgba(59, 130, 246, 0.1); border: 1px solid rgba(59, 130, 246, 0.3); border-radius: 2rem; padding: 0.5rem 1rem; margin-bottom: 1rem; color: #bfdbfe; font-weight: 500; }
-@keyframes pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.05); } }
+/* DARK THEME OVERRIDES */
+[data-theme="dark"] {
+  --bg-primary: #111827; /* Dark Navy Background */
+  --bg-card: #1f2937; /* Darker Card */
+  --text-main: #f9fafb; /* White Text */
+  --text-secondary: #9ca3af; /* Light Gray Text */
+  --border-color: #374151; /* Dark Border */
+  --accent-color: #818cf8; /* Lighter Purple for contrast */
+  --input-bg: #374151;
+}
+
+/* Global Resets */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background-color: var(--bg-primary);
+  color: var(--text-main);
+  font-family: "Poppins", sans-serif;
+  transition: background-color 0.3s, color 0.3s; /* Smooth theme switch */
+}
+
+/* Utility Classes */
+.bg-default {
+  background-color: var(--bg-primary) !important;
+}
+.bg-card {
+  background-color: var(--bg-card) !important;
+}
+.text-main {
+  color: var(--text-main) !important;
+}
+.text-sec {
+  color: var(--text-secondary) !important;
+}
+.border-std {
+  border-color: var(--border-color) !important;
+}
+
+/* Components */
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 1rem;
+}
+.btn-primary {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: var(--text-gradient);
+  color: white;
+  padding: 0.75rem 1.5rem;
+  border-radius: 2rem;
+  text-decoration: none;
+  font-weight: 500;
+  border: none;
+  cursor: pointer;
+  transition: opacity 0.2s;
+}
+.btn-primary:hover {
+  opacity: 0.9;
+}
+
+/* Loader */
+.loader {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  background: var(--bg-primary);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  transition: opacity 0.6s ease, visibility 0.6s ease;
+}
+.loader-logo {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 6rem;
+  height: 6rem;
+  background: var(--text-gradient);
+  border-radius: 1.5rem;
+  animation: pulse 1.5s infinite ease-in-out;
+}
+.loader-text {
+  margin-top: 1.5rem;
+  color: var(--text-secondary);
+  font-size: 1rem;
+}
+body.loaded .loader {
+  opacity: 0;
+  visibility: hidden;
+}
+
+@keyframes pulse {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.05);
+  }
+}

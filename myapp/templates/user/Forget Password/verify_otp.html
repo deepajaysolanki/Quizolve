@@ -4,10 +4,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Verify Code - QuizForge</title>
+    <title>Verify Code - Quizolve</title>
+    <link rel="stylesheet" href="{% static 'css/main.css' %}" />
+    <link rel="stylesheet" href="{% static 'css/login.css' %}" />
     <style>
         body {
-            background-color: #111827; /* Dark background */
             color: #ffffff;
             font-family: 'Poppins', sans-serif;
             display: flex;
@@ -17,7 +18,7 @@
             margin: 0;
         }
         .auth-container {
-            background: #1f2937; /* Card color */
+            border: 1px solid #979797;
             padding: 2.5rem;
             border-radius: 1rem;
             width: 100%;
@@ -25,15 +26,14 @@
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
             text-align: center;
         }
-        h2 { margin-bottom: 1.5rem; color: #a78bfa; }
+        h2 { margin-bottom: 1.5rem; color: #040306; }
         input[type="text"] {
             width: 90%;
             padding: 1rem;
             margin: 1rem 0;
-            background: #374151;
             border: 1px solid #4b5563;
             border-radius: 0.5rem;
-            color: white;
+            color: rgb(0, 0, 0);
             font-size: 1.5rem;
             text-align: center;
             letter-spacing: 0.5rem;
@@ -65,7 +65,7 @@
             {% endfor %}
         {% endif %}
 
-        <p style="color: #9ca3af; margin-bottom: 1rem;">
+        <p style="color: #000000; margin-bottom: 1rem;">
             Please enter the 6-digit code sent to your email.
         </p>
 
@@ -75,6 +75,6 @@
             <button type="submit">Verify Code</button>
         </form>
     </div>
-
+     <script src="{% static 'js/main.js' %}"></script>
 </body>
 </html>

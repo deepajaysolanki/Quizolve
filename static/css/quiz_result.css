@@ -5,7 +5,6 @@ body {
   align-items: center;
   min-height: 100vh;
   padding: 1rem;
-  background-color: var(--background-dark);
   color: var(--text-primary);
   font-family: "Poppins", sans-serif;
 }
@@ -13,7 +12,6 @@ body {
 .result-card {
   width: 100%;
   max-width: 450px;
-  background-color: var(--card-dark);
   border: 1px solid var(--border-color);
   border-radius: 1.5rem;
   padding: 2.5rem;
@@ -43,12 +41,13 @@ body {
   display: flex;
   justify-content: center;
   align-items: center;
-  background: conic-gradient(
-    var(--primary-color) var(--score-percent, 0%),
-    rgba(71, 85, 105, 0.2) 0
-  );
-  position: relative;
-  transition: all 0.3s ease;
+  border: 10px solid transparent;
+  background: 
+    linear-gradient(#fff, #fff) padding-box,
+    conic-gradient(red, orange, yellow, green, blue, indigo, violet, red) border-box;
+  font-family: sans-serif;
+  font-weight: bold;
+  color: #333;
 }
 
 .score-circle::before {
@@ -65,6 +64,7 @@ body {
   font-size: 2.5rem;
   font-weight: 700;
   transition: all 0.3s ease;
+  color: #000;
 }
 
 .score-text sup {
@@ -273,7 +273,7 @@ body {
 
 /* Ensure the capture area has a solid background for the image */
 #capture-area {
-  background-color: #1f2937; /* Match your card dark color */
+ border: 1px solid #979797;
   padding: 20px;
   border-radius: 15px;
 }
