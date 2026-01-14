@@ -314,7 +314,7 @@ def start_quiz_view(request):
             user=request.user,
             quiz_type=request.POST.get('quiz_type'),
             quiz_identifier=request.POST.get('topic'),
-            total_questions=request.POST.get('total_played', 50)
+            total_questions = 0
         )
         # UserQuizAttempt.objects.create(user=request.user)
 
@@ -380,12 +380,13 @@ def play_quiz_view(request):
         return render(request, 'AI_features/play_quiz.html', context)
     else:
         return redirect('login')
-    
+
+# Final Results View
 def results_view(request):
     """Displays the final results from the session."""
 
-    attempt = None
     attempt_id = request.session.get('current_attempt_id')  
+    attempt = None
 
     if attempt_id:
         try:
@@ -393,29 +394,50 @@ def results_view(request):
         except UserQuizAttempt.DoesNotExist:
             attempt = None
         
-    # User refreshed the page or is visiting directly.
+    # User has never played a quiz or session expired.
     if not attempt:
-        # find most recent quiz attempt from the database.
+        # Fallback to the latest attempt
         attempt = UserQuizAttempt.objects.filter(user=request.user).order_by('-created_at').first()
-
-    # User has never played a quiz. Redirect them.
+        
     if not attempt:
         return redirect('home-page')
     
-    # # Get the type of quiz that was just played from the session
-    # quiz_type = request.session.get('difficulty', 'regular')
-        
-    # Get all the saved answers for that quiz
+    # Get Saved Answers & Score
     review_data = attempt.answers.all().order_by('id')
-        
-    # Get all stats directly from the database record
-    score = request.session.get('score', 0)
-    total_played = review_data.count()
-    correct_answers = attempt.score
-    display_total = attempt.total_questions
-    quiz_type = attempt.quiz_type
-    total_questions = request.session.get('total_questions', 0)
-    quiz_topic = request.session.get('topic', 'General Knowledge') 
+    correct_answers = attempt.score  
+    
+    # Get the Real Count 
+    real_question_count = review_data.count()
+
+    #  If DB has a score but 0 questions, force the count to match the score.
+    if real_question_count < correct_answers:
+        real_question_count = correct_answers
+
+    # calculate incorrect 
+    incorrect_answers = real_question_count - correct_answers
+
+    #  Update the Database with the REAL count
+    if attempt.total_questions != real_question_count:
+        attempt.total_questions = real_question_count
+        attempt.save()
+
+    # Calculate Percentage & Skipped Logic
+    # We use the session variable for the "Denominator" (Max Questions).
+    session_total = request.session.get('total_questions', 0)
+    
+    # If it's an exam, strictly enforce 50.
+    quiz_max_questions = 50 if attempt.quiz_type == 'exam' else session_total
+
+    # Calculate Percentage
+    denominator = real_question_count if real_question_count > 0 else 1
+    percentage = round((correct_answers / denominator) * 100)
+    # percentage = 0
+    # if quiz_max_questions > 0:
+    #     percentage = round((correct_answers / quiz_max_questions) * 100)
+
+    # Calculate skipped
+    skipped_questions = quiz_max_questions - real_question_count
+    if skipped_questions < 0: skipped_questions = 0
 
     # Calculate Time Taken
     start_time_str = request.session.get('quiz_start_time')
@@ -423,40 +445,20 @@ def results_view(request):
 
     if start_time_str:
         try:
-            # Parse the string back to a datetime object
             start_time = parse_datetime(start_time_str)
-            # Simple approach for display:
-            end_time = datetime.now() 
-
-            # Calculate difference
-            duration = end_time - start_time 
-            total_seconds = int(duration.total_seconds())
-            
-            # Math for Minutes and Seconds
+            end_time = datetime.now()
+            duration = end_time - start_time
+            total_seconds = int(duration.total_seconds())  
             minutes = total_seconds // 60
             seconds = total_seconds % 60
             time_taken_display = f"{minutes:02d}m {seconds:02d}s"
         except:
             time_taken_display = "N/A"
             
-    #  Check if the quiz was ended early (this flag is still useful)
+    # Check if ended early flag exists
     ended_early = request.session.pop('ended_early', False)
-  
-    
-    # Calculate percentage
-    percentage = 0
-    if display_total > 0:
-        percentage = round((correct_answers / total_played) * 100)
 
-    UserQuizAttempt.objects.create(
-            user=request.user,
-            quiz_type=quiz_type,
-            quiz_identifier=quiz_topic,
-            score=correct_answers,
-            total_questions=total_played
-    )
-    
-    # Clean up the session so the next quiz is fresh
+    # Clean up Session
     request.session.pop('current_attempt_id', None)
     request.session.pop('topic', None)
     request.session.pop('difficulty', None)
@@ -465,20 +467,20 @@ def results_view(request):
     request.session.pop('quiz_start_time', None)
 
     context = {
-        'total_played': total_played,
+        'total_played': real_question_count,  # Used for "Attempted" count
+        'display_total': quiz_max_questions,  # Used for "Out of X" (e.g. 50)
         'correct': correct_answers,
-        'incorrect': total_played - correct_answers,
-        'display_total': display_total,
+        'incorrect': incorrect_answers,
+        'skipped': skipped_questions,
         'ended_early': ended_early,
-        'quiz_type': quiz_type,
+        'quiz_type': attempt.quiz_type,
         'percentage': percentage,
         'review_data': review_data,
-        'score': score,
-        'total_questions': total_questions,
-        'quiz_topic': quiz_topic,       
-        'time_taken': time_taken_display
+        'score': correct_answers,
+        'quiz_topic': request.session.get('topic', 'General Knowledge'),      
+        'time_taken': time_taken_display,
     }
-    return render(request, 'AI_features/result.html', context)    
+    return render(request, 'AI_features/result.html', context)
 
 # --- API Views (Called by JavaScript) ---
 

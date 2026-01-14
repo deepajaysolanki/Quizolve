@@ -183,6 +183,7 @@ SOCIALACCOUNT_PROVIDERS = {
         ],
         'AUTH_PARAMS': {
             'access_type': 'online',
+            'prompt': 'select_account',
         }
     }
 }
@@ -209,7 +210,7 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 GOOGLE_API_KEY = config('GOOGLE_API_KEY')
 
 # 1. DEVELOPMENT MODE 
-# This prints the OTP to your black terminal screen instead of sending it to Google.
+# This prints the OTP to your black terminal screen instead of sending it to fGoogle.
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 
 # 2. PRODUCTION MODE (Google)

@@ -41,7 +41,7 @@ urlpatterns = [
     path('accounts/reset/<uidb64>/<token>/', auth_views.PasswordResetConfirmView.as_view(), name='password_reset_confirm'),
     path('accounts/reset/done/', auth_views.PasswordResetCompleteView.as_view(), name='password_reset_complete'),
     path('accounts/3rdparty/login/cancelled/', RedirectView.as_view(url=reverse_lazy('login')), name='socialaccount_login_cancelled'),
-    path('accounts/password/change/', allauth_views.PasswordChangeView.as_view(template_name='user/password_change_form.html', form_class=CustomPasswordChangeForm, success_url=reverse_lazy('user-profile')), name='account_password_change'),
+    path('test-password-change/', allauth_views.PasswordChangeView.as_view(template_name='user/password_change_form.html', form_class=CustomPasswordChangeForm, success_url=reverse_lazy('user-profile')), name='account_password_change'),
     path('accounts/', include('allauth.urls')),
 
     # --- App URLs ---
