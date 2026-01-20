@@ -5,10 +5,10 @@ from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth import authenticate, login as auth_login
 from django.contrib.auth.hashers import make_password
 from django.http import JsonResponse
-from . import ai_services # importing module
+from . import ai_services 
 from django.contrib.auth.decorators import login_required
 from .forms import UserProfileForm
-import re, json
+import re, json, random
 from django.utils import timezone
 from django.utils.dateparse import parse_datetime   
 from .models import ExamQuizAttempt, UserQuizAttempt, AnsweredQuestion, AppUsers
@@ -18,6 +18,8 @@ from datetime import timedelta, datetime, date
 from django.conf import settings
 from django.core.cache import cache
 from .utils import generate_otp, send_otp_email
+from django.core.mail import send_mail
+from django.contrib.auth import get_user_model
 
 def home_page(request):
     return render(request, 'pages/index.html')
@@ -26,24 +28,27 @@ def about_page(request):
 def quiz_page(request):
     return render(request, 'pages/quiz.html')
 def contact_page(request):
-    if request.method == 'POST':
-        # 1. Get data from the form (using the 'name' attributes from your HTML)
-        name_input = request.POST.get('name') 
-        email_input = request.POST.get('email')
-        message_input = request.POST.get('message')
-        
-        # 2. Save to Database
-        if name_input and email_input and message_input:
-            ContactMessage.objects.create(
-                full_name=name_input,
-                email=email_input,
-                message=message_input
-            )
-            # 3. Trigger Success Toast
-            messages.success(request, "Message sent successfully! We will contact you soon.")
-            return redirect('contact-page')
-        else:
-            messages.error(request, "Please fill in all fields.")
+    if request.user.is_authenticated:
+        if request.method == 'POST':
+            # 1. Get data from the form (using the 'name' attributes from your HTML)
+            name_input = request.POST.get('name') 
+            email_input = request.POST.get('email')
+            message_input = request.POST.get('message')
+            
+            # 2. Save to Database
+            if name_input and email_input and message_input:
+                ContactMessage.objects.create(
+                    full_name=name_input,
+                    email=email_input,
+                    message=message_input
+                )
+                # 3. Trigger Success Toast
+                messages.success(request, "Message sent successfully! We will contact you soon.")
+                return redirect('contact-page')
+            else:
+                messages.error(request, "Please fill in all fields.")
+    else:
+        messages.error(request, "You must be logged in to send a message.")
 
     return render(request, 'pages/contact.html')
 
@@ -177,9 +182,8 @@ def login_form(request):
             login(request, user)
             return redirect('home-page')
         
-
         request.session['field_errors'] = field_errors
-        return redirect('login')  # URL name in urls.py
+        return redirect('login') 
 
     else:
         # On GET or refresh, clean up session data
@@ -728,7 +732,7 @@ def verify_login_otp_view(request):
         else:
             messages.error(request, "Invalid or expired OTP.")
 
-    return render(request, 'user/Forget Password/verify_otp.html', {'action': 'Login'})
+    return render(request, 'user/ForgetPassword/verify_otp.html', {'action': 'Login'})
 
 
 # --- 2. FORGOT PASSWORD WITH OTP ---
@@ -773,7 +777,7 @@ def verify_reset_otp_view(request):
         else:
             messages.error(request, "Invalid or expired OTP.")
             
-    return render(request, 'user/Forget Password/verify_otp.html', {'action': 'Reset Password'})
+    return render(request, 'user/ForgetPassword/verify_otp.html', {'action': 'Reset Password'})
 
 def reset_new_password_view(request):
     user_id = request.session.get('reset_user_id')
@@ -844,3 +848,93 @@ def checkout_view(request):
         'my_upi_id': my_upi_id
     }
     return render(request, 'pages/checkout.html', context)
+
+# Forgot password view with OTP verification
+def forgot_password_view(request):
+    if request.method == 'POST':
+        email = request.POST.get('email')
+        
+        # Check if user exists
+        try:
+            user = AppUsers.objects.get(email=email)
+        except AppUsers.DoesNotExist:
+            # As requested: Explicitly tell them user is not found
+            messages.error(request, "User with this email not found.")
+            return redirect('forgot-password')
+
+        # Generate 6-digit OTP
+        otp = str(random.randint(100000, 999999))
+        
+        # Save OTP and Email in Session (Temporary)
+        request.session['reset_email'] = email
+        request.session['reset_otp'] = otp
+        
+        # Send Email
+        subject = "Reset Your Password"
+        message = f"Hi {user.first_name},\n\nYour OTP for password reset is: {otp}\n\nValid for this session only."
+        from_email = settings.DEFAULT_FROM_EMAIL
+        
+        try:
+            send_mail(subject, message, from_email, [email], fail_silently=False)
+            messages.success(request, f"OTP sent successfully to {email}")
+            return redirect('verify-reset-otp')
+        except Exception as e:
+            messages.error(request, "Error sending email. Please try again later.")
+            
+    return render(request, 'user/ForgetPassword/forgot_password.html')
+
+
+# --- 2. VERIFY OTP PAGE ---
+def verify_reset_otp_view(request):
+    # Security: If no email in session, they skipped step 1
+    if 'reset_email' not in request.session:
+        messages.error(request, "Session expired. Please start again.")
+        return redirect('forgot-password')
+
+    if request.method == 'POST':
+        entered_otp = request.POST.get('otp')
+        stored_otp = request.session.get('reset_otp')
+        
+        if entered_otp == stored_otp:
+            # Mark verified so they can access the next page
+            request.session['reset_verified'] = True
+            messages.success(request, "OTP Verified! Please set your new password.")
+            return redirect('reset-new-password')
+        else:
+            messages.error(request, "Invalid OTP. Please try again.")
+
+    return render(request, 'user/ForgetPassword/verify_otp.html')
+
+
+# --- 3. SET NEW PASSWORD PAGE ---
+def reset_new_password_view(request):
+    # Security: Ensure they verified OTP before accessing this page
+    if not request.session.get('reset_verified'):
+        return redirect('user/ForgetPassword/forgot-password')
+    
+    email = request.session.get('reset_email')
+    
+    if request.method == 'POST':
+        new_pass = request.POST.get('new_password')
+        confirm_pass = request.POST.get('confirm_password')
+        
+        if new_pass == confirm_pass:
+            try:
+                user = AppUsers.objects.get(email=email)
+                user.set_password(new_pass)
+                user.save()
+                
+                # Cleanup: Remove session data
+                del request.session['reset_email']
+                del request.session['reset_otp']
+                del request.session['reset_verified']
+                
+                messages.success(request, "Password reset successful! You can now login.")
+                return redirect('login')
+                
+            except AppUsers.DoesNotExist:
+                messages.error(request, "An error occurred. User not found.")
+        else:
+            messages.error(request, "Passwords do not match.")
+
+    return render(request, 'user/ForgetPassword/reset_new_password.html')

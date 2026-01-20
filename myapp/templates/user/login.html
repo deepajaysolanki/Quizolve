@@ -25,12 +25,16 @@
     {% for message in messages %}
     <span class="{{ message.tags }}">{{ message }}</span>
     {% endfor %}
-  </div {% endif %} {% with field_errors=field_errors old_data=old_data %} <div class="auth-background">
-  <div class="floating-orbs">
-    <div class="orb orb-1"></div>
-    <div class="orb orb-2"></div>
   </div>
-  <div class="grid-pattern"></div>
+  {% endif %}
+
+  {% with field_errors=field_errors old_data=old_data %}
+  <div class="auth-background">
+    <div class="floating-orbs">
+      <div class="orb orb-1"></div>
+      <div class="orb orb-2"></div>
+    </div>
+    <div class="grid-pattern"></div>
   </div>
 
   <div class="auth-form-box">

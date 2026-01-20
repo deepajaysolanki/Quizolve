@@ -26,11 +26,11 @@ urlpatterns = [
     path('profile/edit/', views.profile_edit_view, name='profile-edit'),
     path('profile/history/', views.quiz_history_view, name='quiz-history'),
     
-    # FORGOT PASSWORD (OTP FLOW)
+    # forgot password
     path('forgot-password/', views.forgot_password_view, name='forgot-password'),
     path('forgot-password/verify/', views.verify_reset_otp_view, name='verify-reset-otp'),
     path('reset-password/new/', views.reset_new_password_view, name='reset-new-password'),
-    
+
     # --- Allauth & Password Reset ---
     # These must come BEFORE the main 'accounts/' include
     path('accounts/', include('allauth.urls')),
