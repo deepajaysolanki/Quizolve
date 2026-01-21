@@ -44,7 +44,6 @@ class AppUsers(AbstractBaseUser, PermissionsMixin):
     is_premium = models.BooleanField(default=False)
     subscription_expiry = models.DateField(null=True, blank=True)
     
-    role = models.CharField(max_length=10, default='user')
     objects = AppUsersManager()
 
     USERNAME_FIELD = 'email'  
@@ -82,18 +81,6 @@ class UserQuizAttempt(models.Model):
     def __str__(self):
         return f"{self.user.email} - {self.quiz_identifier} ({self.score}/{self.total_questions})"
     
-# Model to track daily exam quiz attempts
-class ExamQuizAttempt(models.Model):
-    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
-    exam_name = models.CharField(max_length=100)
-    date_played = models.DateField(default=date.today)
-
-    class Meta:
-        # Ensures a user can only have one attempt per day
-        unique_together = ('user', 'exam_name', 'date_played')
-
-    def __str__(self):
-        return f"{self.user.email} - {self.exam_name} on {self.date_played}"
     
 # Model to store individual question answers for a quiz attempt
 class AnsweredQuestion(models.Model):

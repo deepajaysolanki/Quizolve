@@ -4,21 +4,33 @@ from allauth.account.models import EmailAddress
 from django.shortcuts import redirect
 from allauth.exceptions import ImmediateHttpResponse
 from django.contrib import messages
+from django.contrib.auth import get_user_model
+
+User = get_user_model()
 
 class MySocialAccountAdapter(DefaultSocialAccountAdapter):
     def pre_social_login(self, request, sociallogin):
-        # Get the process from the sociallogin state, which is passed from the button.
-        process = sociallogin.state.get('process')
+
+        # If the user is already logged in, let Allauth handle it.
+        if request.user.is_authenticated:
+            return
+        
+        # If this Google account is already linked, let Allauth log them in.
+        if sociallogin.is_existing:
+            return
+
+        # Check if a user with this email ALREADY exists in the database
         email = sociallogin.user.email
 
-        # This is the main logic
-        if process == 'signup':
-            # If the user's intent was to 'signup' and an email already exists...
-            if EmailAddress.objects.filter(email__iexact=email).exists():
-                # ...then block the signup and show an error.
-                messages.error(request, f"A user with the email '{email}' already exists")
-                raise ImmediateHttpResponse(redirect('registration')) # Redirect to your signup page
-
-        # For all other cases (e.g., the process is 'login'),
-        # allow the default allauth behavior to proceed, which will log the user in.
-        return
+        if email:
+            try:
+                # Find the existing user by email
+                existing_user = User.objects.get(email=email)
+                
+                # --- THE MAGIC FIX ---
+                # Connect this new Google account to the existing user automatically
+                sociallogin.connect(request, existing_user)
+                
+            except User.DoesNotExist:
+                # If user doesn't exist, let Allauth create a new one (Auto Signup)
+                pass

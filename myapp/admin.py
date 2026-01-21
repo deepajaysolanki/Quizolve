@@ -15,7 +15,7 @@ class CustomUserAdmin(UserAdmin):
     search_fields = ('email',)
     fieldsets = (
         (None, {'fields': ('email', 'password')}),
-        ('Permissions', {'fields': ('is_staff', 'is_active', 'is_superuser')}),
+        ('Permissions', {'fields': ('is_staff', 'is_active', 'is_superuser', 'groups')}),
         ('Important dates', {'fields': ('last_login', 'date_of_birth')}),
     )
     add_fieldsets = (
@@ -24,11 +24,11 @@ class CustomUserAdmin(UserAdmin):
             'fields': ('email', 'password', 'password2'),
         }),
     )
-    def get_queryset(self, request):
-        # Get the original list of all users
-        qs = super().get_queryset(request)
-        # Return a new, filtered list that ONLY includes users with the role 'user'
-        return qs.filter(role='user')
+    # def get_queryset(self, request):
+    #     # Get the original list of all users
+    #     qs = super().get_queryset(request)
+    #     # Return a new, filtered list that ONLY includes users with the role 'user'
+    #     return qs.filter(role='user')
     
 # --- 2. Admin Configuration for Quiz Attempts ---
 @admin.register(UserQuizAttempt)

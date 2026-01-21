@@ -11,7 +11,7 @@ from .forms import UserProfileForm
 import re, json, random
 from django.utils import timezone
 from django.utils.dateparse import parse_datetime   
-from .models import ExamQuizAttempt, UserQuizAttempt, AnsweredQuestion, AppUsers
+from .models import UserQuizAttempt, AnsweredQuestion, AppUsers
 from django.contrib import messages
 from django.views.decorators.http import require_POST
 from datetime import timedelta, datetime, date
@@ -221,7 +221,7 @@ def profile_view(request):
         }
         
         # Render the profile page with the context data
-        return render(request, 'pages/user-profile.html', context)
+        return render(request, 'user/user-profile.html', context)
     else:
         return redirect('login')
     

@@ -18,6 +18,9 @@
       <a href="#" class="nav-logo">
         <div class="logo-icon"><i class="fas fa-brain"></i></div>
         <span class="logo-text">Quizolve</span>
+        {% if user.is_authenticated and user.is_premium %}
+          <span class="premium-badge">PREMIUM</span>
+        {% endif %}
       </a>
 
       <div class="nav-links">

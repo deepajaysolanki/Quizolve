@@ -134,8 +134,11 @@ STATICFILES_DIRS = [
 # This is for production (but good to have)
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
-# signup with google functionality
+# Signup with google functionality
 SOCIALACCOUNT_ADAPTER = 'myapp.adapters.MySocialAccountAdapter'
+SOCIALACCOUNT_EMAIL_VERIFICATION = "none" # Trust emails from Google (and other social logins) automatically
+ACCOUNT_EMAIL_VERIFICATION = "none" # Skip verification for normal signups:
+SOCIALACCOUNT_AUTO_SIGNUP = True # Ensure the user is logged in immediately after signing up via Google
 LOGIN_REDIRECT_URL = '/'
 LOGOUT_REDIRECT_URL = '/'
 SOCIALACCOUNT_LOGIN_ON_GET = True
@@ -144,6 +147,7 @@ AUTHENTICATION_BACKENDS = [
     'allauth.account.auth_backends.AuthenticationBackend',
 ]
 SITE_ID = 1
+
 # New setting to fix the admin error
 ACCOUNT_USER_DISPLAY = lambda user: user.email
 
@@ -165,9 +169,6 @@ SOCIALACCOUNT_PROVIDERS = {
     }
 }
 
-# Email verification setting
-ACCOUNT_EMAIL_VERIFICATION = 'mandatory'
-
 # Setting to skip the intermediate "Continue" page
 SOCIALACCOUNT_LOGIN_ON_GET = True
 
@@ -188,12 +189,7 @@ SOCIALACCOUNT_PROVIDERS = {
     }
 }
 
-# forget password funcionality
-# EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
-# ACCOUNT_USER_MODEL_USERNAME_FIELD = None
-
 # allauth specific settings
-ACCOUNT_EMAIL_VERIFICATION = 'mandatory'
 ACCOUNT_EMAIL_REQUIRED = True
 ACCOUNT_AUTHENTICATION_METHOD = 'email'
 ACCOUNT_USERNAME_REQUIRED = False
@@ -210,7 +206,7 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 GOOGLE_API_KEY = config('GOOGLE_API_KEY')
 
 # 1. DEVELOPMENT MODE 
-# This prints the OTP to your black terminal screen instead of sending it to fGoogle.
+# This prints the OTP to black terminal screen instead of sending it to fGoogle.
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 
 # 2. PRODUCTION MODE (Google)
