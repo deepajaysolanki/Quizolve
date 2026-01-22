@@ -255,9 +255,9 @@ def start_quiz_view(request):
         DAILY_LIMIT = 3 # Default for free users
 
         # Check if user is premium AND subscription hasn't expired
-        if request.user.is_premium and request.user.subscription_expiry:
-            if request.user.subscription_expiry >= date.today():
-                DAILY_LIMIT = 10
+        if request.user.is_premium:
+            if request.user.subscription_expiry and request.user.subscription_expiry >= date.today():
+                 DAILY_LIMIT = 12
             else:
                 # Subscription expired, revert to free
                 DAILY_LIMIT = 3
@@ -278,12 +278,13 @@ def start_quiz_view(request):
             
             # Determine the quiz_type from the saved session data
             if difficulty == 'exam':
-               return redirect('exam-selection')
+               return redirect('start-exam-quiz', exam_name=topic)
             
             if topic in ['General Knowledge', 'Science', 'History', 'Geography', 'Math', 'Literature']:
                 quiz_type = 'category'
             else:   
                 quiz_type = 'custom'
+
         # If there is no topic, we can't start a quiz
         if not topic:
             return redirect('quiz-page')
@@ -297,7 +298,7 @@ def start_quiz_view(request):
                 created_at__gte=twenty_four_hours_ago
             ).count()
             if attempt_count >= DAILY_LIMIT:
-                messages.error(request, f"You have reached your daily limit of 3 quizzes for the '{topic}' category.")
+                messages.error(request, f"You have reached your daily limit of {DAILY_LIMIT} quizzes for the '{topic}' category.")
                 return redirect('quiz-page')
             
         elif quiz_type == 'custom':
@@ -308,16 +309,16 @@ def start_quiz_view(request):
                 created_at__gte=twenty_four_hours_ago
             ).count()
             if attempt_count >= DAILY_LIMIT:
-                messages.error(request, "You have reached your daily limit of 3 custom topic quizzes.")
+                messages.error(request, "You have reached your daily limit of {DAILY_LIMIT} custom topic quizzes.")
                 return redirect('quiz-page')
             
         # If allowed, create a new attempt record
             # UserQuizAttempt.objects.create(user=request.user, quiz_type=quiz_type, quiz_identifier=topic)
         
         attempt = UserQuizAttempt.objects.create(
-            user=request.user,
-            quiz_type=request.POST.get('quiz_type'),
-            quiz_identifier=request.POST.get('topic'),
+            user = request.user,
+            quiz_type = quiz_type,
+            quiz_identifier = topic,
             total_questions = 0
         )
         # UserQuizAttempt.objects.create(user=request.user)
@@ -464,8 +465,8 @@ def results_view(request):
 
     # Clean up Session
     request.session.pop('current_attempt_id', None)
-    request.session.pop('topic', None)
-    request.session.pop('difficulty', None)
+    # request.session.pop('topic', None)
+    # request.session.pop('difficulty', None)
     request.session.pop('total_questions', None)
     request.session.pop('asked_questions', None)
     request.session.pop('quiz_start_time', None)
@@ -481,7 +482,7 @@ def results_view(request):
         'percentage': percentage,
         'review_data': review_data,
         'score': correct_answers,
-        'quiz_topic': request.session.get('topic', 'General Knowledge'),      
+        'quiz_topic': attempt.quiz_identifier or request.session.get('topic', 'General Knowledge'),      
         'time_taken': time_taken_display,
     }
     return render(request, 'AI_features/result.html', context)
@@ -567,6 +568,14 @@ def exam_selection_view(request):
 def start_exam_quiz_view(request, exam_name):
     now = timezone.now()
     twenty_four_hours_ago = now - timedelta(days=1)
+    DAILY_LIMIT = 3
+
+    # Check if user is premium AND subscription hasn't expired
+    if request.user.is_premium:
+        if request.user.subscription_expiry and request.user.subscription_expiry >= date.today():
+            DAILY_LIMIT = 12  # ✅ Premium Limit
+        else:
+            DAILY_LIMIT = 3
 
      # Per-exam limit check
     attempt_count = UserQuizAttempt.objects.filter(
@@ -577,8 +586,8 @@ def start_exam_quiz_view(request, exam_name):
     ).count()
 
     # CHANGE THIS LINE from >= 1 to >= 3
-    if attempt_count >= 3:
-        messages.error(request, f"You have reached your daily limit of 3 quizzes for the {exam_name} exam.")
+    if attempt_count >= DAILY_LIMIT:
+        messages.error(request, f"You have reached your daily limit of {DAILY_LIMIT} quizzes for the {exam_name} exam.")
         return redirect('exam-selection')
     
     # If allowed, create a new attempt record
@@ -592,7 +601,7 @@ def start_exam_quiz_view(request, exam_name):
     request.session['total_questions'] = 50 
     request.session['correct_answers'] = 0
     request.session['total_played'] = 0
-    request.session['asked_questions'] = []
+    request.session['asked_questions'] = [] 
     request.session['quiz_review_data'] = []
 
     request.session.save()
@@ -816,8 +825,13 @@ def subscription_plans(request):
 # 2. The Checkout Page (Simulated Payment Gateway)
 @login_required
 def checkout_view(request):
+    # If already premium, show status page instead of payment page
+    if request.user.is_premium and request.user.subscription_expiry:
+        if request.user.subscription_expiry >= date.today():
+            return render(request, 'pages/subscription-status.html')
+        
     my_upi_id = "your-upi-id@okicici"
-
+    
     if request.method == 'POST':
         # Get data from the form
         plan_type = request.POST.get('plan_type') # Now coming from the form

@@ -1,0 +1,84 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>My Subscription</title>
+    <link rel="stylesheet" href="{% static 'css/main.css' %}" />
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background-color: #f3f4f6;
+            font-family: 'Poppins', sans-serif;
+        }
+        .status-card {
+            background: white;
+            padding: 3rem;
+            border-radius: 1.5rem;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            text-align: center;
+            max-width: 500px;
+            width: 100%;
+            border: 2px solid #FFD700;
+        }
+        .crown-icon {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+        }
+        h1 {
+            color: #1f2937;
+            margin-bottom: 0.5rem;
+        }
+        p {
+            color: #6b7280;
+            margin-bottom: 2rem;
+            line-height: 1.6;
+        }
+        .validity-box {
+            background: #fffbeb;
+            color: #b45309;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            font-weight: 600;
+            margin-bottom: 2rem;
+            display: inline-block;
+        }
+        .home-btn {
+            background: #4f46e5;
+            color: white;
+            padding: 0.75rem 2rem;
+            border-radius: 2rem;
+            text-decoration: none;
+            font-weight: 500;
+            transition: 0.3s;
+        }
+        .home-btn:hover {
+            background: #4338ca;
+            box-shadow: 0 5px 15px rgba(79, 70, 229, 0.3);
+        }
+    </style>
+</head>
+<body>
+
+    <div class="status-card">
+        <div class="crown-icon">👑</div>
+        <h1>You are a Premium Member</h1>
+        
+        <p>
+            You have successfully unlocked Premium access.<br>
+            Enjoy <strong>12 quizzes per topic</strong> every day!
+        </p>
+
+        <div class="validity-box">
+            Plan Valid Until: {{ user.subscription_expiry|date:"F d, Y" }}
+        </div>
+
+        <br>
+        <a href="{% url 'home-page' %}" class="home-btn">Go to Dashboard</a>
+    </div>
+
+</body>
+</html>
