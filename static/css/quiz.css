@@ -298,7 +298,6 @@ a {
 .separator::after {
   right: 0;
 }
-
 .simple-topic-form {
   margin-top: 10px;
   display: flex;

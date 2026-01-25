@@ -55,22 +55,28 @@
 
                 <div
                     style="background: var(--bg-primary); border: 1px solid var(--border-color); border-radius: 12px; padding: 20px; text-align: center; margin-bottom: 30px;">
-                    <p style="color: var(--accent-color); font-weight: bold; margin-bottom: 15px;">Scan QR or Click to
-                        Pay</p>
+
+                    <p style="color: var(--accent-color); font-weight: bold; margin-bottom: 15px;">
+                        Scan QR or Click to Pay
+                    </p>
+
                     <div
-                        style="display: flex; gap: 20px; justify-content: center; align-items: center; flex-wrap: wrap;">
-                        <div style="background: white; padding: 10px; border-radius: 8px;">
-                            <img id="qr-image" src="" alt="QR Code" width="130" height="130">
+                        style="display: flex; flex-direction: column; gap: 15px; justify-content: center; align-items: center;">
+
+                        <div
+                            style="background: white; padding: 10px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.05);">
+                            <img id="qr-image" src="" alt="QR Code" width="150" height="150" style="display: block;">
                         </div>
-                        <div>
+
+                        <div style="display: flex;">
                             <a id="pay-link" href="#"
-                                style="display: inline-block; background: #25D366; color: white; padding: 12px 25px; border-radius: 8px; text-decoration: none; font-weight: bold;">
+                                style="display: inline-flex; align-items: center; background-color: #10b981; color: white; padding: 10px 20px; border-radius: 50px; text-decoration: none; font-weight: bold; font-size: 0.9rem; transition: transform 0.2s;">
                                 <i class="fas fa-mobile-alt" style="margin-right: 8px;"></i> Open UPI App
                             </a>
                         </div>
+
                     </div>
                 </div>
-
                 <h3 style="font-size: 1.1rem; color: var(--text-main); margin-bottom: 15px;">Confirm Payment</h3>
 
                 <form method="POST">

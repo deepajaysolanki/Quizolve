@@ -15,6 +15,21 @@
   --background-dark: #111827; /* For loader background */
 }
 
+/* Override browser default autofill background */
+input:-webkit-autofill,
+input:-webkit-autofill:hover, 
+input:-webkit-autofill:focus, 
+input:-webkit-autofill:active {
+    /* Replace #1f2937 with your actual dark input background color */
+    -webkit-box-shadow: 0 0 0 30px #ffffff inset !important;
+    
+    /* Force the text color to be white (or your text variable) */
+    -webkit-text-fill-color: rgb(0, 0, 0) !important;
+    
+    /* Optional: Ensure the transition doesn't flash the wrong color */
+    transition: background-color 5000s ease-in-out 0s;
+}
+
 /* DARK THEME OVERRIDES */
 [data-theme="dark"] {
   --bg-primary: #111827; /* Dark Navy Background */
