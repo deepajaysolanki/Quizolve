@@ -99,18 +99,6 @@
             text-decoration: none;
         }
 
-        .toast {
-            position: fixed;
-            top: 20px;
-            left: 50%;
-            transform: translateX(-50%);
-            padding: 15px 25px;
-            color: white;
-            border-radius: 5px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-            z-index: 1000;
-        }
-
         /* Responsive styles for mobile */
         @media (max-width: 600px) {
             .profile-card {
@@ -128,13 +116,25 @@
 </head>
 
 <body>
-    {% if messages %}
-    <div id="toast" class="toast">
-        {% for message in messages %}
-        <span class="{{ message.tags }}">{{ message }}</span>
-        {% endfor %}
+       {% if messages %}
+    <div id="toast-box" class="toast-message">
+        <div class="toast-content">
+            {% for message in messages %}
+            <span class="{{ message.tags }}">
+                {% if 'success' in message.tags %}
+                <i class="fas fa-check-circle" style="color: #4CAF50; margin-right: 8px;"></i>
+                {% elif 'error' in message.tags %}
+                <i class="fas fa-exclamation-circle" style="color: #f44336; margin-right: 8px;"></i>
+                {% endif %}
+                {{ message }}
+            </span>
+            {% endfor %}
+
+            <i class="fas fa-times close-toast" onclick="document.getElementById('toast-box').style.display='none'"></i>
+        </div>
     </div>
     {% endif %}
+
     <div class="profile-card">
         <div class="profile-picture-container">
             <img src="/media/{{ user.profile_photo }}" alt="Profile Photo" class="profile-picture">
@@ -164,20 +164,6 @@
 
         <a href="{% url 'profile-edit' %}" class="edit-profile-btn">Edit Profile</a>
     </div>
-    <script>
-        const toast = document.getElementById("toast");
-        if (toast) {
-            toast.style.display = "block";
-            toast.style.backgroundColor = toast.querySelector(".success")
-                ? "green"
-                : "#f44336";
-        }
-        setTimeout(() => {
-            const toasts = document.querySelectorAll(".toast-message");
-            toasts.forEach((el) => el.remove());
-            toast.style.display = "none";
-        }, 4000);
-    </script>
 </body>
 
 </html>

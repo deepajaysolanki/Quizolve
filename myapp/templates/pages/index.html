@@ -58,24 +58,24 @@
       </div>
       <div class="hero-stats animate-on-load" data-animation="fade-in-up" style="animation-delay: 400ms">
         <div class="stat-item">
-          <div class="stat-emoji">👥</div>
-          <div class="stat-value" data-target="50000">1K+</div>
-          <div class="stat-label">Active Users</div>
+          <div class="stat-emoji" style="font-size: 3rem; margin-bottom: 15px;">🧠</div>
+          <div class="stat-value" data-target="50000">0</div>
+          <div class="stat-label">Knowledge Concepts</div>
         </div>
         <div class="stat-item">
-          <div class="stat-emoji">🧠</div>
-          <div class="stat-value" data-target="1000000">5M+</div>
-          <div class="stat-label">AI Quizzes Generated</div>
+          <div class="stat-emoji" style="font-size: 3rem; margin-bottom: 15px;">⚡</div>
+          <div class="stat-value" data-target="10000">0</div>
+          <div class="stat-label">Questions Generated</div>
         </div>
         <div class="stat-item">
-          <div class="stat-emoji">📚</div>
-          <div class="stat-value" data-target="100">20+</div>
-          <div class="stat-label">Categories</div>
+          <div class="stat-emoji" style="font-size: 3rem; margin-bottom: 15px;  ">📚</div>
+          <div class="stat-value" data-target="20">0</div>
+          <div class="stat-label">Smart Categories</div>
         </div>
         <div class="stat-item">
-          <div class="stat-emoji">🎯</div>
-          <div class="stat-value" data-target="95">95%</div>
-          <div class="stat-label">Success Rate</div>
+          <div class="stat-emoji" style="font-size: 3rem; margin-bottom: 15px;">🎯</div>
+          <div class="stat-value" data-target="95">98%</div>
+          <div class="stat-label">Accuracy Rate</div>
         </div>
       </div>
     </div>
@@ -93,11 +93,11 @@
             Next-Gen Learning
             <span class="title-highlight">Intelligence</span>
           </h2>
-            <p class="section-subtitle animate-on-scroll" data-animation="fade-in-up">
-              Harness the power of advanced AI to transform your learning
-              experience with intelligent question generation, adaptive learning
-              paths, and real-time insights.
-            </p>
+          <p class="section-subtitle animate-on-scroll" data-animation="fade-in-up">
+            Harness the power of advanced AI to transform your learning
+            experience with intelligent question generation, adaptive learning
+            paths, and real-time insights.
+          </p>
         </center>
       </div>
       <div class="features-grid" data-animation-container>
@@ -169,7 +169,7 @@
     </div>
   </section>
 
-  <section class="how-it-works">
+  <section class="how-it-works" id="how-it-works">
     <div class="container">
       <div class="section-header" data-animation-container>
         <div class="section-badge animate-on-scroll" data-animation="fade-in-up">
@@ -231,20 +231,20 @@
             </div>
             <h3>AI Topic Discovery</h3>
             <p>
-              Choose categories, describe any topic, or upload documents for
+              Choose categories or describe any topic for
               instant AI analysis.
             </p>
             <ul class="step-features">
               <li>
-                <i class="fas fa-check-circle"></i>100+ AI-curated
+                <i class="fas fa-check-circle"></i>20+ AI-curated
                 categories
               </li>
               <li>
-                <i class="fas fa-check-circle"></i>Natural language
+                <i class="fas fa-check-circle"></i>Customized topic
                 processing
               </li>
               <li>
-                <i class="fas fa-check-circle"></i>Document intelligence
+                <i class="fas fa-check-circle"></i>Natural Language Processing
               </li>
             </ul>
           </div>
@@ -329,6 +329,8 @@
   </div>
   {% include 'components/footer.html' %}
   <script src="{% static 'js/main.js' %}"></script>
+  <script src="{% static 'js/home.js' %}"></script>
+
 </body>
 
 </html>

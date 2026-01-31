@@ -12,14 +12,13 @@
 </head>
 
 <body>
-  {% load static %}
-  <nav class="navbar" id="navbar">
+  <nav class="custome-navbar" id="navbar">
     <div class="nav-container">
-      <a href="#" class="nav-logo">
+      <a href="{% url 'home-page' %}" class="nav-logo">
         <div class="logo-icon"><i class="fas fa-brain"></i></div>
         <span class="logo-text">Quizolve</span>
         {% if user.is_authenticated and user.is_premium %}
-          <span class="premium-badge">PREMIUM</span>
+        <span class="premium-badge">PREMIUM</span>
         {% endif %}
       </a>
 
@@ -33,23 +32,56 @@
       </div>
 
       <div class="nav-auth">
-        {% if request.user.is_staff %}
-        <a href="{% url 'admin:index' %}" class="nav-link admin-link">Admin</a>
-        {% endif %}
         {% if request.user.is_authenticated %}
         <div class="profile-menu">
+          {% if request.user.is_staff %}
+          <a href="{% url 'admin:index' %}" class="nav-link admin-link" style="margin: 0;">Admin</a>
+          {% endif %}&nbsp;&nbsp;&nbsp;
+          {% if user.is_authenticated and user.is_superuser %}
+          <a href="{% url 'admin-dashboard' %}" class="nav-link" style="color: #ff5722; font-weight: bold;">
+            <i class="fas fa-chart-line"></i> Dashboard
+          </a>&nbsp;&nbsp;&nbsp;
+          {% endif %}
           <img src="{{ request.user.profile_photo.url }}" alt="Profile" class="profile-photo"
             id="profile-photo-desktop" />
-          <div class="profile-dropdown" id="profile-dropdown-desktop">
-            <a href="{% url 'quiz-history' %}">My Quiz History</a>
-            <a href="{% url 'user-profile' %}">My Profile</a>
-            <a href="{% url 'checkout' %}">Subscription</a>
-            <a href="{% url 'logout' %}">Logout</a>
+
+          <div class="profile-dropdown-card" id="profile-dropdown-desktop">
+
+            <div class="pd-header">
+              <div class="pd-avatar-container">
+                <img src="{{ request.user.profile_photo.url }}" alt="Profile">
+              </div>
+              <div class="pd-user-name">
+                {{ request.user.first_name }} {{ request.user.last_name }}
+              </div>
+              <div class="pd-user-email">{{ request.user.email }}</div>
+              <a href="{% url 'user-profile' %}" class="pd-manage-btn">Manage your Profile</a>
+            </div>
+
+            <div class="pd-body">
+              <a href="{% url 'quiz-history' %}" class="pd-item">
+                <i class="fas fa-history"></i>
+                <span>My Quiz History</span>
+              </a>
+              <a href="{% url 'contact-page' %}" class="pd-item">
+                <i class="fas fa-circle-question"></i>
+                <span>Help & Support</span>
+              </a>
+              <a href="{% url 'checkout' %}" class="pd-item">
+                <i class="fas fa-crown"></i>
+                <span>Subscription</span>
+              </a>
+            </div>
+
+            <div class="pd-footer">
+              <a href="{% url 'logout' %}" class="pd-item logout-item">
+                <i class="fas fa-sign-out-alt"></i>
+                <span>Sign out</span>
+              </a>
+            </div>
           </div>
         </div>
         {% else %}
-        <a href="{% url 'login' %}" class="btn-ghost">Login</a>&nbsp;&nbsp;&nbsp;
-        <a href="{% url 'registration' %}" class="btn-primary"><span>Join AI</span></a>
         {% endif %}
 
       </div>
@@ -58,33 +90,65 @@
         <i class="fas fa-bars"></i>
       </button>
     </div>
-
     <div class="mobile-menu" id="mobile-menu">
-      <a href="{% url 'home-page' %}" class="mobile-link {% if page == 'home-page' %}active{% endif %}">Home</a>
-      <a href="{% url 'about-page' %}" class="mobile-link {% if page == 'about-page' %}active{% endif %}">About</a>
-      <a href="{% url 'quiz-page' %}" class="mobile-link {% if page == 'quiz-page' %}active{% endif %}">Quiz</a>
-      <a href="{% url 'exam-selection' %}"
-        class="mobile-link {% if page == 'exam-selection' %}active{% endif %}">Exam</a>
-      <a href="{% url 'contact-page' %}"
-        class="mobile-link {% if page == 'contact-page' %}active{% endif %}">Contact</a>
+      <a href="{% url 'home-page' %}" class="mobile-link">Home</a>
+      <a href="{% url 'about-page' %}" class="mobile-link">About</a>
+      <a href="{% url 'quiz-page' %}" class="mobile-link">Quiz</a>
+      <a href="{% url 'exam-selection' %}" class="mobile-link">Exam</a>
+      <a href="{% url 'contact-page' %}" class="mobile-link">Contact</a>
+
       <div class="mobile-auth">
+
         {% if request.user.is_authenticated %}
-        <div class="profile-menu">
+
+        <div class="profile-menu" style="width: 100%; justify-content: space-between;">
           {% if request.user.is_staff %}
-          <a href="{% url 'admin:index' %}" class="mobile-link admin-link">Admin</a>
+          <a href="{% url 'admin:index' %}" class="mobile-link admin-link" style="margin: 0;">Admin</a>
           {% endif %}
-          <img src="{{ request.user.profile_photo.url }}" alt="Profile" class="profile-photo"
-            id="profile-photo-mobile" />
-          <div class="profile-dropdown" id="profile-dropdown-mobile">
-            <a href="{% url 'quiz-history' %}">My Quiz History</a>
-            <a href="{% url 'user-profile' %}">My Profile</a>
-            <a href="{% url 'checkout' %}">Subscription</a>
-            <a href="{% url 'logout' %}">Logout</a>
+
+          <div class="mobile-profile-trigger" id="profile-photo-mobile"
+            style="display: flex; align-items: center; gap: 10px; cursor: pointer; padding: 5px;">
+            {% if user.is_authenticated and user.is_superuser %}
+            <a href="{% url 'admin-dashboard' %}" class="nav-link" style="color: #ff5722; font-weight: bold;">
+              <i class="fas fa-chart-line"></i> Dashboard
+            </a>
+            {% endif %}
+            <!-- <span style="font-weight: 600; font-size: 0.9rem;">{{ request.user.first_name }}</span> -->
+            <img src="{{ request.user.profile_photo.url }}" alt="Profile" class="profile-photo" />
           </div>
         </div>
+
+        <div class="profile-dropdown-card mobile-card" id="profile-dropdown-mobile">
+
+          <div class="pd-header">
+            <div class="pd-user-name">
+              {{ request.user.first_name }} {{ request.user.last_name }}
+            </div>
+            <div class="pd-user-email">{{ request.user.email }}</div>
+            <a href="{% url 'user-profile' %}" class="pd-manage-btn" style="text-align: center;">Manage Profile</a>
+          </div>
+
+          <div class="pd-body">
+            <a href="{% url 'quiz-history' %}" class="pd-item">
+              <i class="fas fa-history"></i><span>My Quiz History</span>
+            </a>
+            <a href="{% url 'contact-page' %}" class="pd-item">
+              <i class="fas fa-circle-question"></i><span>Help & Support</span>
+            </a>
+            <a href="{% url 'checkout' %}" class="pd-item">
+              <i class="fas fa-crown"></i><span>Subscription</span>
+            </a>
+          </div>
+          <div class="pd-footer">
+            <a href="{% url 'logout' %}" class="pd-item logout-item">
+              <i class="fas fa-sign-out-alt"></i><span>Sign out</span>
+            </a>
+          </div>
+        </div>
+
         {% else %}
         <a href="{% url 'login' %}" class="btn-ghost">Login</a>
-        <a href="{% url 'registration' %}" class="btn-primary">Join AI</a>
+        <a href="{% url 'registration' %}" class="btn-primary" style="text-align: center;">Join AI</a>
         {% endif %}
       </div>
     </div>

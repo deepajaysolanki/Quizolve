@@ -88,7 +88,7 @@
         <!-- <p>DEBUG: The quiz_type is: <strong>{{ quiz_type }}</strong></p> -->
         <div class="button-container">
 
-            <a href="{% url 'start-quiz' %}" class="result-btn btn-primary">Play Again?</a>
+            <a href="{% url 'start-quiz' %}" class="result-btn btn-primary" onclick="return startQuizAttempt(event)">Play Again?</a>
 
             {% if quiz_type == 'exam' %}
             <a href="{% url 'exam-selection' %}" class="result-btn btn-secondary">Go Back</a>

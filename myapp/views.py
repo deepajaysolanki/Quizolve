@@ -6,12 +6,15 @@ from django.contrib.auth import authenticate, login as auth_login
 from django.contrib.auth.hashers import make_password
 from django.http import JsonResponse
 from . import ai_services 
-from django.contrib.auth.decorators import login_required
+from django.contrib.auth.decorators import login_required, user_passes_test
 from .forms import UserProfileForm
 import re, json, random
 from django.utils import timezone
 from django.utils.dateparse import parse_datetime   
+from django.utils.safestring import mark_safe
 from .models import UserQuizAttempt, AnsweredQuestion, AppUsers
+from django.db.models import Count
+from django.db.models.functions import TruncDate
 from django.contrib import messages
 from django.views.decorators.http import require_POST
 from datetime import timedelta, datetime, date
@@ -298,7 +301,11 @@ def start_quiz_view(request):
                 created_at__gte=twenty_four_hours_ago
             ).count()
             if attempt_count >= DAILY_LIMIT:
-                messages.error(request, f"You have reached your daily limit of {DAILY_LIMIT} quizzes for the '{topic}' category.")
+                if not request.user.is_premium:
+                    msg = f"You've hit your limit of {DAILY_LIMIT} free quizzes today for the '{topic}'. <a href='/checkout/' style='color: inherit; font-weight: bold; text-decoration: underline;'>Upgrade to Premium</a> to unlock more quizzes!"
+                    messages.error(request, mark_safe(msg))
+                else:
+                    messages.error(request, f"You have reached your daily limit of {DAILY_LIMIT} quizzes for the '{topic}' category.")
                 return redirect('quiz-page')
             
         elif quiz_type == 'custom':
@@ -309,7 +316,11 @@ def start_quiz_view(request):
                 created_at__gte=twenty_four_hours_ago
             ).count()
             if attempt_count >= DAILY_LIMIT:
-                messages.error(request, "You have reached your daily limit of {DAILY_LIMIT} custom topic quizzes.")
+                if not request.user.is_premium:
+                    msg = f"You've hit your limit of {DAILY_LIMIT} free quizzes today for the '{topic}'. <a href='/checkout/' style='color: inherit; font-weight: bold; text-decoration: underline;'>Upgrade to Premium</a> to unlock more quizzes!"
+                    messages.error(request, mark_safe(msg))
+                else:
+                    messages.error(request, f"You have reached your daily limit of {DAILY_LIMIT} quizzes for the '{topic}' category.")
                 return redirect('quiz-page')
             
         # If allowed, create a new attempt record
@@ -587,7 +598,11 @@ def start_exam_quiz_view(request, exam_name):
 
     # CHANGE THIS LINE from >= 1 to >= 3
     if attempt_count >= DAILY_LIMIT:
-        messages.error(request, f"You have reached your daily limit of {DAILY_LIMIT} quizzes for the {exam_name} exam.")
+        if not request.user.is_premium:
+            msg = f"You've hit your limit of {DAILY_LIMIT} free quizzes today for the '{exam_name}'. <a href='/checkout/' style='color: inherit; font-weight: bold; text-decoration: underline;'>Upgrade to Premium</a> to unlock more quizzes!"
+            messages.error(request, mark_safe(msg))
+        else:
+            messages.error(request, f"You have reached your daily limit of {DAILY_LIMIT} quizzes for the '{exam_name}' category.")
         return redirect('exam-selection')
     
     # If allowed, create a new attempt record
@@ -952,3 +967,60 @@ def reset_new_password_view(request):
             messages.error(request, "Passwords do not match.")
 
     return render(request, 'user/ForgetPassword/reset_new_password.html')
+
+# Only allow superusers (admins) to see this page
+@user_passes_test(lambda u: u.is_superuser)
+def admin_dashboard_view(request):
+    # --- 1. QUICK STATS CARDS ---
+    total_users = AppUsers.objects.count()
+    total_quizzes_taken = UserQuizAttempt.objects.count()
+    total_premium = AppUsers.objects.filter(is_premium=True).count()
+    
+    # --- 2. CHART DATA: Quiz Attempts Last 30 Days (Line Chart) ---
+    last_30_days = timezone.now() - timedelta(days=30)
+    
+    # Group by date and count
+    attempts_data = UserQuizAttempt.objects.filter(created_at__gte=last_30_days)\
+        .annotate(date=TruncDate('created_at'))\
+        .values('date')\
+        .annotate(count=Count('id'))\
+        .order_by('date')
+        
+    # --- FIX: SAFE LOOP TO PREVENT CRASH ---
+    quiz_dates = []
+    quiz_counts = []
+    
+    for item in attempts_data:
+        # Only add data if the date is valid (not None)
+        if item['date']:
+            quiz_dates.append(item['date'].strftime("%Y-%m-%d"))
+            quiz_counts.append(item['count'])
+
+    # --- 3. CHART DATA: Premium vs Free (Doughnut Chart) ---
+    free_users = total_users - total_premium
+    
+    # --- 4. CHART DATA: Top 5 Popular Topics (Bar Chart) ---
+    popular_topics = UserQuizAttempt.objects.values('quiz_identifier')\
+        .annotate(total=Count('id'))\
+        .order_by('-total')[:5]
+        
+    # List comprehensions are safe here because strings/integers don't have .strftime()
+    topic_labels = [item['quiz_identifier'] for item in popular_topics]
+    topic_counts = [item['total'] for item in popular_topics]
+
+    # --- 5. CONTEXT ---
+    context = {
+        'total_users': total_users,
+        'total_premium': total_premium,
+        'total_quizzes_taken': total_quizzes_taken,
+        
+        # Pass lists directly (HTML template handles JSON conversion)
+        'quiz_dates': quiz_dates,
+        'quiz_counts': quiz_counts,
+        'topic_labels': topic_labels,
+        'topic_counts': topic_counts,
+        'premium_count': total_premium,
+        'free_count': free_users,
+    }
+    
+    return render(request, 'pages/admin_dashboard.html', context)

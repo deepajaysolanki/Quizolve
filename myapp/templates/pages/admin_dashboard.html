@@ -1,0 +1,441 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard</title>
+</head>
+
+<body>
+
+    {% block content %}
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <div class="dashboard-container">
+
+        <div class="dashboard-header">
+            <div>
+                <h1 class="page-title">Dashboard Overview</h1>
+                <p class="page-subtitle">Welcome back, Admin. Here is your platform's performance.</p>
+            </div>
+            <div class="header-actions">
+
+                <a href="{% url 'admin:index' %}" class="admin-btn">
+                    <i class="fas fa-user-shield"></i> Admin Panel
+                </a>
+
+                <div class="date-display">
+                    <i class="far fa-calendar-alt"></i> {% now "F j, Y" %}
+                </div>
+            </div>
+        </div>
+
+        <div class="stats-row">
+            <div class="stat-card">
+                <div class="icon-box blue">
+                    <i class="fas fa-users"></i>
+                </div>
+                <div class="stat-details">
+                    <h3>Total Users</h3>
+                    <div class="number">{{ total_users }}</div>
+                </div>
+            </div>
+
+            <div class="stat-card">
+                <div class="icon-box gold">
+                    <i class="fas fa-crown"></i>
+                </div>
+                <div class="stat-details">
+                    <h3>Premium Members</h3>
+                    <div class="number">{{ total_premium }}</div>
+                </div>
+            </div>
+
+            <div class="stat-card">
+                <div class="icon-box green">
+                    <i class="fas fa-clipboard-check"></i>
+                </div>
+                <div class="stat-details">
+                    <h3>Quizzes Taken</h3>
+                    <div class="number">{{ total_quizzes_taken }}</div>
+                </div>
+            </div>
+
+            <div class="stat-card">
+                <div class="icon-box purple">
+                    <i class="fas fa-user-tag"></i>
+                </div>
+                <div class="stat-details">
+                    <h3>Free Users</h3>
+                    <div class="number">{{ free_count }}</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="charts-grid">
+
+            <div class="chart-panel main-panel">
+                <div class="panel-header">
+                    <h3><i class="fas fa-chart-line"></i> User Activity (Last 30 Days)</h3>
+                </div>
+                <div class="canvas-container main-canvas">
+                    <canvas id="quizActivityChart"></canvas>
+                </div>
+            </div>
+
+            <div class="side-panels">
+                <div class="chart-panel">
+                    <div class="panel-header">
+                        <h3><i class="fas fa-chart-pie"></i> Premium vs Free</h3>
+                    </div>
+                    <div class="canvas-container small-canvas">
+                        <canvas id="userTypeChart"></canvas>
+                    </div>
+                </div>
+
+                <div class="chart-panel">
+                    <div class="panel-header">
+                        <h3><i class="fas fa-trophy"></i> Top Quiz Topics</h3>
+                    </div>
+                    <div class="canvas-container small-canvas">
+                        <canvas id="topicChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    {{ quiz_dates|json_script:"quiz-dates-data" }}
+    {{ quiz_counts|json_script:"quiz-counts-data" }}
+    {{ topic_labels|json_script:"topic-labels-data" }}
+    {{ topic_counts|json_script:"topic-counts-data" }}
+    {{ premium_count|json_script:"premium-count-data" }}
+    {{ free_count|json_script:"free-count-data" }}
+
+    <style>
+        /* Global Reset */
+        .display-admin-link {
+            background: white;
+            padding: 8px 16px;
+            border-radius: 50px;
+            font-weight: 600;
+            color: #475569;
+            border: 1px solid #e2e8f0;
+            /* Border added */
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+        }
+
+        .dashboard-container {
+            font-family: 'Inter', sans-serif;
+            background-color: #f8fafc;
+            /* Very light slate background */
+            min-height: 100vh;
+            padding: 40px;
+            color: #334155;
+        }
+
+        /* Header */
+        .dashboard-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            /* Aligns text bottom with button bottom */
+            margin-bottom: 35px;
+        }
+
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            /* Space between Admin button and Date */
+        }
+
+        .admin-btn {
+            background-color: #3b82f6;
+            /* Blue Color */
+            color: white;
+            text-decoration: none;
+            padding: 8px 16px;
+            border-radius: 50px;
+            font-weight: 600;
+            font-size: 0.9rem;
+            box-shadow: 0 2px 4px rgba(59, 130, 246, 0.3);
+            transition: background 0.2s, transform 0.1s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .admin-btn:hover {
+            background-color: #2563eb;
+            /* Darker Blue on Hover */
+            transform: translateY(-1px);
+            color: white;
+        }
+
+        .page-title {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: #1e293b;
+            margin: 0 0 5px 0;
+        }
+
+        .page-subtitle {
+            color: #64748b;
+            font-size: 0.95rem;
+            margin: 0;
+        }
+
+        .date-display {
+            background: white;
+            padding: 8px 16px;
+            border-radius: 50px;
+            font-weight: 600;
+            color: #475569;
+            border: 1px solid #e2e8f0;
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+        }
+
+        /* Stat Cards */
+        .stats-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 24px;
+            margin-bottom: 35px;
+        }
+
+        .stat-card {
+            background: white;
+            border-radius: 12px;
+            padding: 24px;
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            border: 1px solid #e2e8f0;
+            /* Border added */
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+            /* Softer shadow */
+            transition: transform 0.2s, box-shadow 0.2s, border-color 0.2s;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+            border-color: #cbd5e1;
+            /* Darker border on hover */
+        }
+
+        .icon-box {
+            width: 56px;
+            height: 56px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            border: 1px solid rgba(0, 0, 0, 0.05);
+            /* Subtle inner border */
+        }
+
+        .icon-box.blue {
+            background: #eff6ff;
+            color: #3b82f6;
+        }
+
+        .icon-box.gold {
+            background: #fffbeb;
+            color: #f59e0b;
+        }
+
+        .icon-box.green {
+            background: #f0fdf4;
+            color: #10b981;
+        }
+
+        .icon-box.purple {
+            background: #faf5ff;
+            color: #a855f7;
+        }
+
+        .stat-details h3 {
+            font-size: 0.85rem;
+            color: #64748b;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin: 0 0 5px 0;
+            font-weight: 600;
+        }
+
+        .number {
+            font-size: 1.75rem;
+            font-weight: 700;
+            color: #1e293b;
+            line-height: 1;
+        }
+
+        /* Charts Layout */
+        .charts-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 24px;
+        }
+
+        .chart-panel {
+            background: white;
+            border-radius: 12px;
+            padding: 24px;
+            border: 1px solid #e2e8f0;
+            /* Border added */
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+        }
+
+        .panel-header {
+            border-bottom: 1px solid #f1f5f9;
+            /* Separator line added */
+            margin: -24px -24px 20px -24px;
+            padding: 20px 24px;
+        }
+
+        .panel-header h3 {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin: 0;
+            color: #1e293b;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .canvas-container {
+            position: relative;
+            width: 100%;
+        }
+
+        .main-canvas {
+            height: 350px;
+        }
+
+        .small-canvas {
+            height: 220px;
+        }
+
+        .side-panels {
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+        }
+
+        /* Mobile Responsive */
+        @media (max-width: 992px) {
+            .charts-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .dashboard-container {
+                padding: 20px;
+            }
+        }
+    </style>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+
+            function getData(id) { return JSON.parse(document.getElementById(id).textContent); }
+
+            // Global Font Setting
+            Chart.defaults.font.family = "'Inter', sans-serif";
+            Chart.defaults.color = '#64748b';
+
+            // 1. Line Chart
+            const ctx1 = document.getElementById('quizActivityChart');
+            if (ctx1) {
+                new Chart(ctx1, {
+                    type: 'line',
+                    data: {
+                        labels: getData('quiz-dates-data'),
+                        datasets: [{
+                            label: 'Quizzes Taken',
+                            data: getData('quiz-counts-data'),
+                            borderColor: '#3b82f6', // Bright Blue
+                            backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                            borderWidth: 2,
+                            pointBackgroundColor: '#fff',
+                            pointBorderColor: '#3b82f6',
+                            pointRadius: 4,
+                            fill: true,
+                            tension: 0.4
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: { legend: { display: false } },
+                        scales: {
+                            y: { beginAtZero: true, grid: { borderDash: [4, 4], color: '#f1f5f9' } },
+                            x: { grid: { display: false } }
+                        }
+                    }
+                });
+            }
+
+            // 2. Doughnut Chart
+            const ctx2 = document.getElementById('userTypeChart');
+            if (ctx2) {
+                new Chart(ctx2, {
+                    type: 'doughnut',
+                    data: {
+                        labels: ['Premium', 'Free'],
+                        datasets: [{
+                            data: [getData('premium-count-data'), getData('free-count-data')],
+                            backgroundColor: ['#fbbf24', '#e2e8f0'], // Gold & Slate
+                            borderWidth: 0,
+                            hoverOffset: 4
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: { legend: { position: 'right', labels: { usePointStyle: true, boxWidth: 8 } } },
+                        cutout: '75%'
+                    }
+                });
+            }
+
+            // 3. Bar Chart
+            const ctx3 = document.getElementById('topicChart');
+            if (ctx3) {
+                new Chart(ctx3, {
+                    type: 'bar',
+                    data: {
+                        labels: getData('topic-labels-data'),
+                        datasets: [{
+                            label: 'Attempts',
+                            data: getData('topic-counts-data'),
+                            backgroundColor: '#10b981', // Emerald Green
+                            borderRadius: 4,
+                            barPercentage: 0.5
+                        }]
+                    },
+                    options: {
+                        indexAxis: 'y',
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: { legend: { display: false } },
+                        scales: {
+                            x: { grid: { display: false } },
+                            y: { grid: { display: false } }
+                        }
+                    }
+                });
+            }
+        });
+    </script>
+
+    {% endblock %}
+</body>
+
+</html>

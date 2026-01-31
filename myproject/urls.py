@@ -11,7 +11,8 @@ from myapp.forms import CustomPasswordChangeForm
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-
+    path('custom-admin/dashboard/', views.admin_dashboard_view, name='admin-dashboard'),
+    
     # --- Site-wide Pages ---
     path('', views.home_page, name='home-page'), 
     path('about/', views.about_page, name='about-page'), 

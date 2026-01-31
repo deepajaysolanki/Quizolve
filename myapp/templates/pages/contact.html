@@ -9,19 +9,6 @@
     <link rel="stylesheet" href="{% static 'css/main.css' %}">
     <link rel="stylesheet" href="{% static 'css/contact.css' %}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-    <style>
-        .toast {
-            position: fixed;
-            top: 20px;
-            left: 50%;
-            transform: translateX(-50%);
-            padding: 15px 25px;
-            color: white;
-            border-radius: 5px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-            z-index: 1000;
-        }
-    </style>
 </head>
 
 <body>
@@ -32,11 +19,22 @@
         <div class="loader-text">Initializing AI Core...</div>
     </div>
 
-    {% if messages %}
-    <div id="toast" class="toast">
-        {% for message in messages %}
-        <span class="{{ message.tags }}">{{ message }}</span>
-        {% endfor %}
+      {% if messages %}
+    <div id="toast-box" class="toast-message">
+        <div class="toast-content">
+            {% for message in messages %}
+            <span class="{{ message.tags }}">
+                {% if 'success' in message.tags %}
+                <i class="fas fa-check-circle" style="color: #4CAF50; margin-right: 8px;"></i>
+                {% elif 'error' in message.tags %}
+                <i class="fas fa-exclamation-circle" style="color: #f44336; margin-right: 8px;"></i>
+                {% endif %}
+                {{ message }}
+            </span>
+            {% endfor %}
+
+            <i class="fas fa-times close-toast" onclick="document.getElementById('toast-box').style.display='none'"></i>
+        </div>
     </div>
     {% endif %}
 
@@ -49,32 +47,53 @@
 
             <div class="contact-info animate-on-load" data-animation="fade-in-up">
                 <h1>Get in Touch</h1>
-                <p class="section-subtitle">Have a question, a proposal, or just want to say hello? We’d love to hear
-                    from you. Fill out the form or use the contact details below.</p>
+                <p class="section-subtitle">
+                    Have a question, a proposal, or just want to say hello? I'd love to hear from you.
+                </p>
 
-                <div class="info-item">
-                    <div class="info-icon"><i class="fas fa-phone-alt"></i></div>
-                    <div class="info-text">
-                        <h4>Phone</h4>
-                        <p>+1 (555) 123-4567</p>
-                    </div>
-                </div>
                 <div class="info-item">
                     <div class="info-icon"><i class="fas fa-envelope"></i></div>
                     <div class="info-text">
                         <h4>Email</h4>
-                        <p>hello@quizolve.com</p>
+                        <a href="mailto:demo09125@gmail.com"
+                            style="color: inherit; text-decoration: none; transition: 0.3s;">
+                            deepsolanki9125@gmail.com
+                        </a>
+                        <p style="font-size: 0.85rem; opacity: 0.7; margin-top: 5px;">(Best way to reach me)</p>
                     </div>
                 </div>
-                <div class="info-item">
-                    <div class="info-icon"><i class="fas fa-map-marker-alt"></i></div>
-                    <div class="info-text">
-                        <h4>Address</h4>
-                        <p>123 AI Avenue, Innovation City, 90210</p>
-                    </div>
-                </div>
-            </div>
 
+                <div class="info-item">
+                    <div class="info-icon"><i class="fas fa-share-alt"></i></div>
+                    <div class="info-text">
+                        <h4>Connect</h4>
+                        <div style="display: flex; gap: 15px; margin-top: 5px;">
+                            <a href="https://github.com/DeepSolanki09" target="_blank"
+                                style="color: var(--text-gray); font-size: 1.4rem; transition: 0.3s;"
+                                onmouseover="this.style.color='var(--primary-purple)'"
+                                onmouseout="this.style.color='var(--text-gray)'">
+                                <i class="fab fa-github"></i>
+                            </a>
+                            <a href="https://twitter.com/DeepSolanki09" target="_blank"
+                                style="color: var(--text-gray); font-size: 1.4rem; transition: 0.3s;"
+                                onmouseover="this.style.color='var(--primary-purple)'"
+                                onmouseout="this.style.color='var(--text-gray)'">
+                                <i class="fab fa-twitter"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="info-item">
+                    <div class="info-icon"><i class="fas fa-globe-asia"></i></div>
+                    <div class="info-text">
+                        <h4>Location</h4>
+                        <p>Based in India</p> 
+                        <p style="font-size: 0.85rem; opacity: 0.7; margin-top: 2px;">Available for Remote Work</p>
+                    </div>
+                </div>
+
+            </div>
             <div class="contact-form-wrapper animate-on-load" data-animation="zoom-in" style="animation-delay: 200ms;">
                 <form id="contact-form" method="POST" action="{% url 'contact-page' %}">
                     {% csrf_token %}
@@ -102,30 +121,6 @@
     </div>
     {% include 'components/footer.html' %}
     <script src="{% static 'js/main.js' %}"></script>
-    <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            const toast = document.getElementById("toast");
-            if (toast) {
-                // Show the toast
-                toast.style.display = "flex"; // Use flex to match your other CSS
-                toast.style.opacity = 1;
-
-                // Set the color based on the message type
-                if (toast.querySelector(".success")) {
-                    toast.style.backgroundColor = "green";
-                } else if (toast.querySelector(".error")) {
-                    toast.style.backgroundColor = "#f44336";
-                }
-
-                // Hide it after 4 seconds
-                setTimeout(() => {
-                    toast.style.opacity = 0;
-                    // Wait for fade out to finish before setting display to none
-                    setTimeout(() => { toast.style.display = "none"; }, 500);
-                }, 4000);
-            }
-        });
-    </script>
 </body>
 
 </html>

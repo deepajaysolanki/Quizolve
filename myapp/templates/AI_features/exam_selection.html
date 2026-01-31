@@ -12,10 +12,21 @@
 
 <body class="quiz-page-body">
     {% if messages %}
-    <div id="toast" class="toast">
-        {% for message in messages %}
-        <span class="{{ message.tags }}">{{ message }}</span>
-        {% endfor %}
+    <div id="toast-box" class="toast-message">
+        <div class="toast-content">
+            {% for message in messages %}
+            <span class="{{ message.tags }}">
+                {% if 'success' in message.tags %}
+                <i class="fas fa-check-circle" style="color: #4CAF50; margin-right: 8px;"></i>
+                {% elif 'error' in message.tags %}
+                <i class="fas fa-exclamation-circle" style="color: #f44336; margin-right: 8px;"></i>
+                {% endif %}
+                {{ message }}
+            </span>
+            {% endfor %}
+
+            <i class="fas fa-times close-toast" onclick="document.getElementById('toast-box').style.display='none'"></i>
+        </div>
     </div>
     {% endif %}
 
@@ -38,23 +49,8 @@
             </div>
         </div>
     </main>
-
+    <script src="{% static 'js/main.js' %}"></script>
     {% include 'components/footer.html' %}
-
-    <script>
-        const toast = document.getElementById("toast");
-        if (toast) {
-            toast.style.display = "block";
-            toast.style.backgroundColor = toast.querySelector(".success")
-                ? "green"
-                : "#f44336";
-        }
-        setTimeout(() => {
-            const toasts = document.querySelectorAll(".toast-message");
-            toasts.forEach((el) => el.remove());
-            toast.style.display = "none";
-        }, 4000);
-    </script>
 </body>
 
 </html>

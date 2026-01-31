@@ -20,13 +20,28 @@
     <div class="loader-text">Initializing AI Core...</div>
   </div>
 
-  {% if messages %}
-  <div id="toast" class="toast">
-    {% for message in messages %}
-    <span class="{{ message.tags }}">{{ message }}</span>
-    {% endfor %}
-  </div>
-  {% endif %}
+ {% if messages %}
+    <div id="toast-box" class="toast-message">
+        <div class="toast-content">
+            {% for message in messages %}
+            <span class="{{ message.tags }}">
+                {% if 'success' in message.tags %}
+                <i class="fas fa-check-circle" style="color: #4CAF50; margin-right: 8px;"></i>
+                {% elif 'error' in message.tags %}
+                <i class="fas fa-exclamation-circle" style="color: #f44336; margin-right: 8px;"></i>
+                {% endif %}
+                {{ message }}
+            </span>
+            {% endfor %}
+
+            <i class="fas fa-times close-toast" onclick="document.getElementById('toast-box').style.display='none'"></i>
+        </div>
+    </div>
+    {% endif %}
+            <i class="fas fa-times close-toast" onclick="document.getElementById('toast-box').style.display='none'"></i>
+        </div>
+    </div>
+    {% endif %}
 
   {% with field_errors=field_errors old_data=old_data %}
   <div class="auth-background">
@@ -119,22 +134,6 @@
           icon.classList.add("fa-eye");
         }
       });
-    }
-  </script>
-  <script>
-    const toast = document.getElementById("toast");
-    if (toast) {
-      toast.style.display = "block";
-      toast.style.backgroundColor = toast.querySelector(".success")
-        ? "green"
-        : "#f44336";
-
-      setTimeout(() => {
-        toast.style.opacity = "0";
-        setTimeout(() => {
-          toast.style.display = "none";
-        }, 1000);
-      }, 3000);
     }
   </script>
   <script src="{% static 'js/main.js' %}"></script>

@@ -1,34 +1,39 @@
 {% extends "admin/base.html" %}
-{% load i18n %}   {% block title %}
-    {{ title }} | {{ site_title|default:_('Django site admin') }}
+{% load i18n %} {% block title %}
+{{ title }} | {{ site_title|default:_('Django site admin') }}
 {% endblock %}
 
 {% block branding %}
-    <h1 id="site-name">
-        <a href="{% url 'admin:index' %}">{{ site_header|default:_('Django administration') }}</a>
-    </h1>
+<h1 id="site-name">
+    <a href="{% url 'admin:index' %}">{{ site_header|default:_('Django administration') }}</a>
+</h1>
 {% endblock %}
 
 {% block userlinks %}
-    {% if user.is_superuser %}
-        &nbsp;&nbsp;&nbsp;<a href="https://github.dev/DeepSolanki09/Quizolve-AI-Quiz-Generator" 
-           target="_blank" 
-           style="background-color: #dc2626; color: white; padding: 5px 10px; border-radius: 4px; font-weight: bold; text-decoration: none; margin-right: 15px;">
-           ⚡ Open Code
-        </a>
-    {% endif %}
+{% if user.is_superuser %}
+&nbsp;&nbsp;&nbsp;<a href="https://github.dev/DeepSolanki09/Quizolve-AI-Quiz-Generator" target="_blank"
+    style="background-color: #dc2626; color: white; padding: 5px 10px; border-radius: 4px; font-weight: bold; text-decoration: none; margin-right: 15px;">
+    ⚡ Open Code
+</a>
+{% endif %}
 
-    {% if site_url %}
-        <a href="{{ site_url }}">{% translate 'View site' %}</a> /
-    {% endif %}
-    {% if user.is_active and user.is_staff %}
-        {% url 'django-admindocs-docroot' as docsroot %}
-        {% if docsroot %}
-            <a href="{{ docsroot }}">{% translate 'Documentation' %}</a> /
-        {% endif %}
-    {% endif %}
-    {% if user.has_usable_password %}
-        <a href="{% url 'admin:password_change' %}">{% translate 'Change password' %}</a> /
-    {% endif %}
-    <a href="{% url 'admin:logout' %}">{% translate 'Log out' %}</a>
+{% if user.is_superuser %}
+&nbsp;&nbsp;&nbsp;<a href="{% url 'admin-dashboard' %}" target="_blank">
+    Dashboard/
+</a>
+{% endif %}
+
+{% if site_url %}
+<a href="{{ site_url }}">{% translate 'View site' %}</a> /
+{% endif %}
+{% if user.is_active and user.is_staff %}
+{% url 'django-admindocs-docroot' as docsroot %}
+{% if docsroot %}
+<a href="{{ docsroot }}">{% translate 'Documentation' %}</a> /
+{% endif %}
+{% endif %}
+{% if user.has_usable_password %}
+<a href="{% url 'admin:password_change' %}">{% translate 'Change password' %}</a> /
+{% endif %}
+<a href="{% url 'admin:logout' %}">{% translate 'Log out' %}</a>
 {% endblock %}

@@ -1,248 +1,477 @@
-* { margin: 0; padding: 0; box-sizing: border-box;}
-body { font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif; background-color: #f4f4f4; }
-.custome-navbar { position: fixed; top: 0; left: 0; right: 0; z-index: 1000; background: rgba(15, 23, 42, 0.8); backdrop-filter: blur(12px); border-bottom: 1px solid var(--border-color); transition: background 0.4s ease, box-shadow 0.4s ease; }
-.navbar.scrolled { background: rgba(15, 23, 42, 0.95); box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2); }
-.nav-container { display: flex; justify-content: space-between; align-items: center; height: 4.5rem; max-width: 1200px; margin: 0 auto; padding: 0 1rem; }
-.nav-logo { display: flex; align-items: center; gap: 0.75rem; color: var(--text-primary); text-decoration: none; }
-.logo-icon { position: relative; width: 2.5rem; height: 2.5rem; background: var(--text-gradient); border-radius: 0.5rem; display: flex; align-items: center; justify-content: center; font-size: 1.25rem; }
-.logo-sparkle { position: absolute; top: -0.25rem; right: -0.25rem; }
-.logo-text { font-size: 1.25rem; font-weight: 600; }
-.live-badge { display: flex; align-items: center; gap: 0.25rem; background: rgba(16, 185, 129, 0.2); border: 1px solid rgba(16, 185, 129, 0.4); border-radius: 1rem; padding: 0.2rem 0.5rem; font-size: 0.7rem; font-weight: 500; color: #6ee7b7; }
-.live-dot { width: 0.5rem; height: 0.5rem; background: #10b981; border-radius: 50%; animation: pulse 2s infinite cubic-bezier(0.66, 0, 0, 1); }
-.nav-links { display: none; } @media (min-width: 768px) { .nav-links { display: flex; gap: 2rem; } }
-.nav-link { color: var(--text-secondary); text-decoration: none; font-weight: 500; position: relative; padding: 0.5rem 0; }
-.nav-link::after { content: ''; position: absolute; bottom: 0; left: 0; width: 100%; height: 2px; background: var(--text-gradient); transform: scaleX(0); transform-origin: right; transition: transform 0.4s cubic-bezier(0.19, 1, 0.22, 1); }
-.nav-link:hover::after, .nav-link.active::after { transform: scaleX(1); transform-origin: left; }
-.nav-link.active, .nav-link:hover { color: var(--text-primary); }
-.nav-auth { display: none; } @media (min-width: 768px) { .nav-auth { display: flex; align-items: center; gap: 0.5rem; } }
-.mobile-menu-btn { display: block; background: none; border: none; color: var(--text-primary); font-size: 1.5rem; cursor: pointer; } @media (min-width: 768px) { .mobile-menu-btn { display: none; } }
-.mobile-menu { display: none; flex-direction: column; padding: 1rem; border-top: 1px solid var(--border-color); background: #0b1324; } .mobile-menu.active { display: flex; }
-.mobile-link { color: var(--text-secondary); text-decoration: none; padding: 0.75rem; border-radius: 0.5rem; transition: all 0.3s; }
-.mobile-link.active, .mobile-link:hover { color: var(--text-primary); background: rgba(255, 255, 255, 0.1); }
-.mobile-auth { display: flex; flex-direction: column; gap: 1rem; margin-top: 1rem; padding-top: 1rem; border-top: 1px solid var(--border-color); }
-.btn-ghost { text-decoration: none; color: #000;} 
-/* .dropdown-menu-desktop a {
-    color: #333;
-    padding: 10px 15px;
-    display: block;
-    text-decoration: none;
-    border-radius: 4px;
-    transition: background-color 0.2s, color 0.2s;
-}
-
-.dropdown-menu-desktop a:hover {
-    background-color: #333;
-    color: #fff;
-}
-.dropdown-menu {
-    display: none;
-}
-
-/* Show the dropdown when it has the 'active' class */
-.dropdown-menu.active {
-    display: block;
-    /* Add other styles for positioning, etc. */
-    border: 1px solid #ccc;
-    background-color: white;
-    position: absolute;
-} */
 /* =================================================================
-   NAVBAR.CSS - ALL STYLES FOR THE NAVBAR COMPONENT
+   GLOBAL RESETS & FONTS
    ================================================================= */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
 
-/* --- Profile Picture & Dropdown --- */
+body {
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  background-color: #f4f4f4;
+}
+
+/* =================================================================
+   MAIN NAVBAR STRUCTURE
+   ================================================================= */
+.custome-navbar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 1000;
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--border-color, #e5e7eb); /* Added fallback color */
+  transition:
+    background 0.4s ease,
+    box-shadow 0.4s ease;
+}
+
+.navbar.scrolled {
+  background: rgba(15, 23, 42, 0.95);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+}
+
+.nav-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  height: 4.5rem;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 1rem;
+}
+
+/* --- Logo Styling --- */
+.nav-logo {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  color: var(--text-primary, #fff);
+  text-decoration: none;
+}
+
+.logo-icon {
+  position: relative;
+  width: 2.5rem;
+  height: 2.5rem;
+  background: var(--text-gradient, linear-gradient(135deg, #6366f1, #a855f7));
+  border-radius: 0.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.25rem;
+}
+
+.logo-sparkle {
+  position: absolute;
+  top: -0.25rem;
+  right: -0.25rem;
+}
+
+.logo-text {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #000;
+}
+
+/* --- Live Badge (if used) --- */
+.live-badge {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  background: rgba(16, 185, 129, 0.2);
+  border: 1px solid rgba(16, 185, 129, 0.4);
+  border-radius: 1rem;
+  padding: 0.2rem 0.5rem;
+  font-size: 0.7rem;
+  font-weight: 500;
+  color: #6ee7b7;
+}
+
+.live-dot {
+  width: 0.5rem;
+  height: 0.5rem;
+  background: #10b981;
+  border-radius: 50%;
+  animation: pulse 2s infinite cubic-bezier(0.66, 0, 0, 1);
+}
+
+/* =================================================================
+   DESKTOP NAVIGATION LINKS
+   ================================================================= */
+.nav-links {
+  display: none;
+}
+
+.nav-link {
+  color: var(--text-secondary, #94a3b8);
+  text-decoration: none;
+  font-weight: 500;
+  position: relative;
+  padding: 0.5rem 0;
+}
+
+.nav-link::after {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 2px;
+  background: var(--text-gradient, #a855f7);
+  transform: scaleX(0);
+  transform-origin: right;
+  transition: transform 0.4s cubic-bezier(0.19, 1, 0.22, 1);
+}
+
+.nav-link:hover::after,
+.nav-link.active::after {
+  transform: scaleX(1);
+  transform-origin: left;
+}
+
+.nav-link.active,
+
+
+/* =================================================================
+   AUTHENTICATION & PROFILE DROPDOWN (GOOGLE STYLE)
+   ================================================================= */
+.nav-auth {
+  display: none;
+}
+
 .profile-menu {
-    position: relative;
-    display: flex;
-    align-items: center;
+  position: relative;
+  display: flex;
+  align-items: center;
 }
+
+/* The Avatar in Navbar */
 .profile-photo {
-    width: 45px;
-    height: 45px;
-    border-radius: 50%;
-    cursor: pointer;
-    border: 2px solid var(--primary-color);
-    object-fit: cover;
+  width: 45px;
+  height: 45px;
+  border-radius: 50%;
+  cursor: pointer;
+  border: 2px solid var(--primary-color, #a855f7);
+  object-fit: cover;
+  transition: box-shadow 0.2s ease;
 }
 
-
-/* --- General Responsive Styles --- */
-/* Hide desktop links and auth buttons on mobile */
-.nav-links, .nav-auth {
-    display: none;
-}
-/* Show the hamburger menu button only on mobile */
-.mobile-menu-btn {
-    display: block;
-}
-.profile-dropdown {
-  display: none; /* Hide the dropdown by default */
-    position: absolute;
-    right: 0;
-    top: calc(100% + 10px); /* Position it below the profile icon */
-    z-index: 2000;
-    
-    /* Your existing visual styles */
-    background-color: var(--card-dark);
-    border: 1px solid var(--border-color);
-    border-radius: 0.75rem;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
-    min-width: 180px;
-    overflow: hidden;
-}
-.profile-menu{
-    position: relative;
-} 
-.profile-dropdown.show {
-   display: block;
+.profile-photo:hover {
+  box-shadow: 0 0 0 4px rgba(168, 85, 247, 0.25);
 }
 
-/* Links inside the dropdown */
-.profile-dropdown a {
-   color: var(--text-secondary);
-    padding: 0.75rem 1rem;
-    text-decoration: none;
-    display: block;
-    font-size: 0.9rem;
-    transition: background-color 0.2s ease, color 0.2s ease;
+/* --- The Google-Style Card Container --- */
+.profile-dropdown-card {
+  display: none; /* Hidden by default */
+  position: absolute;
+  top: 65px; /* Pushes it below the navbar */
+  right: 0; /* Aligns to the right edge of avatar */
+  width: 320px; /* Standard card width */
+  background: #ffffff;
+  border-radius: 28px; /* Large rounded corners */
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+  z-index: 2000; /* Ensures it sits on top of everything */
+  overflow: hidden;
+  flex-direction: column;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  transform-origin: top right;
 }
 
-.profile-dropdown a:hover {
-    background-color: rgba(59, 130, 246, 0.1);
-    color: var(--text-primary);
+/* JS toggles this class */
+.profile-dropdown-card.show {
+  display: flex;
+  animation: popIn 0.2s cubic-bezier(0.2, 0, 0.2, 1);
 }
-.profile-modal-overlay {
-    visibility: hidden; /* Hidden by default */
+
+/* --- Card Header (User Info) --- */
+.pd-header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 24px;
+  background-color: #ffffff;
+  border-bottom: 1px solid #f1f5f9;
+}
+
+.pd-avatar-container img {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  object-fit: cover;
+  margin-bottom: 16px;
+  border: 1px solid #e2e8f0;
+}
+
+.pd-user-name {
+  font-size: 1.15rem;
+  font-weight: 600;
+  color: #1e293b;
+  margin-bottom: 4px;
+}
+
+.pd-user-email {
+  font-size: 0.9rem;
+  color: #64748b;
+  margin-bottom: 16px;
+}
+
+.pd-manage-btn {
+  display: inline-block;
+  text-decoration: none;
+  background-color: transparent;
+  border: 1px solid #cbd5e1;
+  border-radius: 999px; /* Pill shape */
+  padding: 8px 24px;
+  font-size: 0.875rem;
+  color: #475569;
+  font-weight: 500;
+  transition: all 0.2s;
+}
+
+.pd-manage-btn:hover {
+  background-color: #f8fafc;
+  border-color: #94a3b8;
+  color: #0f172a;
+}
+
+/* --- Card Body (Menu Links) --- */
+.pd-body {
+  padding: 8px 0;
+}
+
+.pd-item {
+  display: flex;
+  align-items: center;
+  padding: 12px 24px;
+  text-decoration: none;
+  color: #334155;
+  font-size: 0.95rem;
+  transition: background-color 0.2s;
+  margin: 0 8px; /* Adds side spacing for floating effect */
+  border-radius: 12px;
+}
+
+.pd-item:hover {
+  background-color: #f1f5f9;
+}
+
+.pd-item i {
+  width: 24px;
+  margin-right: 12px;
+  color: #64748b;
+  font-size: 1.1rem;
+  text-align: center;
+}
+
+/* --- Card Footer (Logout) --- */
+.pd-footer {
+  padding: 8px 0 16px 0;
+  border-top: 1px solid #f1f5f9;
+  margin-top: 4px;
+}
+
+.logout-item:hover {
+  background-color: #fee2e2; /* Light red bg */
+  color: #ef4444; /* Red text */
+}
+.logout-item:hover i {
+  color: #ef4444;
+}
+
+@keyframes popIn {
+  from {
     opacity: 0;
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(0, 0, 0, 0.7);
-    z-index: 2000;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    transition: opacity 0.3s ease, visibility 0.3s ease;
-}
-
-/* Class added by JS to show the modal */
-.profile-modal-overlay.show {
-    visibility: visible;
+    transform: scale(0.95) translateY(-10px);
+  }
+  to {
     opacity: 1;
+    transform: scale(1) translateY(0);
+  }
 }
 
-/* The content box of the modal */
-.profile-modal-content {
-    background-color: var(--card-dark);
-    border: 1px solid var(--border-color);
-    border-radius: 1rem;
-    padding: 1.5rem;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
-    width: 90%;
-    max-width: 320px;
-    position: relative;
-    transform: scale(0.95);
-    transition: transform 0.3s ease;
+/* =================================================================
+   MOBILE NAVIGATION
+   ================================================================= */
+.mobile-menu-btn {
+  display: block;
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  cursor: pointer;
 }
 
-.profile-modal-overlay.show .profile-modal-content {
-    transform: scale(1); /* Animation effect */
+.mobile-menu {
+ display: none; 
+    flex-direction: column; 
+    background: #ffffff; 
+    padding: 1rem; 
+    border-top: 1px solid #e5e7eb; 
+    position: absolute; 
+    top: 4.5rem; 
+    left: 0; 
+    right: 0;
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
 }
 
-/* The links inside the modal */
-.profile-modal-content a {
-    display: block;
-    color: var(--text-secondary);
-    text-decoration: none;
-    padding: 0.8rem 1rem;
-    border-radius: 0.5rem;
-    margin: 0.5rem 0;
-    transition: background-color 0.2s ease, color 0.2s ease;
+.mobile-menu.active {
+  display: flex;
 }
 
-.profile-modal-content a:hover {
-    background-color: rgba(59, 130, 246, 0.1);
-    color: var(--text-primary);
+.mobile-link {
+  color: var(--text-secondary, #94a3b8);
+  text-decoration: none;
+  padding: 0.75rem;
+  border-radius: 0.5rem;
+  transition: all 0.3s;
+  margin-bottom: 5px;
 }
 
-.profile-modal-content h2 {
-    color: var(--text-primary);
-    margin-bottom: 1rem;
-    text-align: center;
+.mobile-link.active,
+.mobile-link:hover {
+  color: var(--text-primary, #fff);
+  background: #f1f5f9;
 }
 
-/* The 'x' close button */
-.close-button {
-    position: absolute;
-    top: 10px;
-    right: 15px;
-    font-size: 28px;
-    font-weight: bold;
-    color: #888;
-    cursor: pointer;
-    line-height: 1;
-}
-.close-button:hover {
-    color: var(--text-primary);
-}
-/* On screens larger than 768px... */
-@media (min-width: 768px) {
-    /* Show the desktop links and auth buttons */
-    .nav-links, .nav-auth {
-        display: flex;
-        align-items: center;
-    }
-    /* Hide the hamburger menu button */
-    .mobile-menu-btn {
-        display: none;
-    }
+.mobile-auth {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  margin-top: 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid #e5e7eb;
 }
 
-/* Admin button */
+.mobile-card {
+    position: static; 
+    width: 100%; 
+    box-shadow: none; 
+    border: 1px solid #e5e7eb; /* Light border around profile card */
+    border-radius: 12px; 
+    margin-top: 15px;
+}
+
+.mobile-card .pd-header { padding: 15px; } 
+.mobile-card .pd-avatar-container { display: none; }
+.mobile-profile-trigger span {
+    color: #334155; /* Name color */
+}
+/* =================================================================
+   BUTTONS & BADGES
+   ================================================================= */
+.btn-ghost {
+  text-decoration: none;
+  color: var(--text-primary, #fff); /* Fixed color visibility */
+  font-weight: 500;
+}
+
+.btn-primary {
+  background: var(--primary-color, #a855f7);
+  color: white;
+  padding: 8px 16px;
+  border-radius: 6px;
+  text-decoration: none;
+  font-weight: 600;
+}
+
+/* Admin Link Styling */
 .nav-link.admin-link {
-    border: 1px solid var(--text-secondary);
-    padding: 0.25rem 0.75rem;
-    border-radius: 5px;
-    color: var(--text-secondary);
-    transition: background-color 0.2s ease, color 0.2s ease;
-    margin-right: 10px;
+  border: 1px solid var(--text-secondary, #94a3b8);
+  padding: 0.25rem 0.75rem;
+  border-radius: 5px;
+  color: var(--text-secondary, #94a3b8);
+  transition:
+    background-color 0.2s ease,
+    color 0.2s ease;
+  margin-right: 10px;
 }
 
-/* Remove the default underline hover effect from the admin link */
 .nav-link.admin-link::after {
-    display: none;
+  display: none;
 }
 
-/* Hover effect for the admin link */
 .nav-link.admin-link:hover {
-    background-color: var(--primary-color);
-    border-color: var(--primary-color);
-    color: rgb(11, 0, 0);
+  background-color: var(--primary-color, #a855f7);
+  border-color: var(--primary-color, #a855f7);
 }
 
-/* --- Style for the Admin link on Mobile --- */
 .mobile-link.admin-link {
-    background-color: rgba(59, 130, 246, 0.1); /* A subtle background to stand out */
-    border: 1px solid var(--primary-color);
-    color: var(--primary-color);
-    font-weight: 600;
-    margin-right: 10px;
+  border: 1px solid var(--primary-color, #a855f7);
+  color: var(--primary-color, #a855f7);
+  font-weight: 600;
+  margin-right: 10px;
 }
 
+/* Premium Badge */
 .premium-badge {
-    background: linear-gradient(45deg, #FFD700, #FFA500); /* Gold gradient */
-    color: #000; /* Black text for contrast */
-    font-size: 0.6rem;
-    font-weight: 800;
-    padding: 2px 6px;
-    border-radius: 4px;
-    letter-spacing: 0.5px;
-    text-transform: uppercase;
-    box-shadow: 0 0 10px rgba(255, 215, 0, 0.4); /* Glowing effect */
-    vertical-align: middle;
-    
-    /* Optional: Slight tilt for style */
-    transform: skew(-10deg); 
+  background: linear-gradient(45deg, #ffd700, #ffa500);
+  color: #000;
+  font-size: 0.6rem;
+  font-weight: 800;
+  padding: 2px 6px;
+  border-radius: 4px;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  box-shadow: 0 0 10px rgba(255, 215, 0, 0.4);
+  vertical-align: middle;
+  transform: skew(-10deg);
+}
+
+/* --- Mobile Dropdown Fixes --- */
+@media (max-width: 768px) {
+  /* Reset the absolute positioning for mobile so it stacks nicely */
+  .profile-dropdown-card.mobile-card {
+    position: static; /* Not floating */
+    width: 100%; /* Full width */
+    box-shadow: none; /* Remove shadow for flat look */
+    border: 1px solid #eee;
+    margin-top: 15px;
+    transform: none; /* Remove pop animation scaling */
+  }
+
+  /* Adjust animation for mobile (slide down instead of pop) */
+  .profile-dropdown-card.mobile-card.show {
+    animation: slideDown 0.3s ease-out;
+  }
+
+  /* Hide the large avatar in the header since we show it on the trigger */
+  .mobile-card .pd-avatar-container {
+    display: none;
+  }
+
+  /* Center the header text */
+  .mobile-card .pd-header {
+    align-items: center;
+    padding-top: 15px;
+  }
+}
+@media (min-width: 768px) {
+  .mobile-menu-btn {
+    display: none;
+  }
+}
+@media (min-width: 768px) {
+  .nav-auth {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+}
+@media (min-width: 768px) {
+  .nav-links {
+    display: flex;
+    gap: 2rem;
+  }
+}
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }

@@ -144,8 +144,24 @@
 </head>
 
 <body>
-    
+    {% if messages %}
+    <div id="toast-box" class="toast-message">
+        <div class="toast-content">
+            {% for message in messages %}
+            <span class="{{ message.tags }}">
+                {% if 'success' in message.tags %}
+                <i class="fas fa-check-circle" style="color: #4CAF50; margin-right: 8px;"></i>
+                {% elif 'error' in message.tags %}
+                <i class="fas fa-exclamation-circle" style="color: #f44336; margin-right: 8px;"></i>
+                {% endif %}
+                {{ message }}
+            </span>
+            {% endfor %}
 
+            <i class="fas fa-times close-toast" onclick="document.getElementById('toast-box').style.display='none'"></i>
+        </div>
+    </div>
+    {% endif %}
     <div class="edit-card">
         <h1>Edit Your Profile</h1>
 

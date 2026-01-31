@@ -131,6 +131,69 @@ body.loaded .loader {
   visibility: hidden;
 }
 
+.toast-message {
+    position: fixed;
+    top: 5.5rem;  /* Distance from top (below navbar) */
+    
+    /* CENTERING LOGIC */
+    left: 50%;
+    transform: translateX(-50%); /* Shifts it perfectly to center */
+    right: auto; /* Remove the old 'right' positioning */
+    
+    background-color: #ffffff;
+    color: #333;
+    padding: 15px 25px; /* Slightly more padding looks better centered */
+    border-radius: 50px; /* Pill shape looks better centered */
+    
+    z-index: 99999 !important;
+    
+    box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+    border: 1px solid #e0e0e0;
+    
+    display: flex;
+    align-items: center;
+    justify-content: center; /* Center content inside */
+    min-width: 320px;
+    max-width: 90%; /* Prevents it from being too wide on mobile */
+    
+    /* UPDATED ANIMATION NAME */
+    animation: slideDownCenter 0.4s ease-out;
+}
+.toast-message.success { border-left: none; border-bottom: 4px solid #4CAF50; }
+.toast-message.error { border-left: none; border-bottom: 4px solid #f44336; }
+.toast-content {
+   display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    gap: 15px;
+    font-size: 0.95rem;
+    font-weight: 500;
+}
+.close-toast {
+    cursor: pointer;
+    color: #999;
+    padding: 5px;
+}
+.close-toast:hover { color: #333; }
+@media (max-width: 768px) {
+    .toast-message {
+        width: 90%;      /* Take up most of the screen width */
+        min-width: auto;
+        border-radius: 12px; /* Less rounded on mobile saves space */
+    }
+}
+@keyframes slideDownCenter {
+    from { 
+        opacity: 0; 
+        transform: translate(-50%, -20px); /* Keep X centered, move Y up */
+    }
+    to { 
+        opacity: 1; 
+        transform: translate(-50%, 0);     /* Keep X centered, Y normal */
+    }
+}
+
 @keyframes pulse {
   0%,
   100% {
