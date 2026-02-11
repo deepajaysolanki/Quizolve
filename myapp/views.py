@@ -1,6 +1,6 @@
 from django.shortcuts import render, redirect
 from django.contrib import messages
-from .models import AppUsers, PaymentRequest, ContactMessage
+from .models import AppUsers, PaymentRequest, ContactMessage, AnsweredQuestion, UserQuizAttempt
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth import authenticate, login as auth_login
 from django.contrib.auth.hashers import make_password
@@ -353,10 +353,10 @@ def start_quiz_view(request):
 
 def play_quiz_view(request):
     if request.user.is_authenticated:
-
         # Get the current quiz attempt ID from the session
         attempt_id = request.session.get('current_attempt_id')
-        total_played = 0
+        total_played = AnsweredQuestion.objects.filter(attempt__id=attempt_id).count()
+        total_questions = request.session.get('total_questions', 10)
 
         if attempt_id:
             try:
@@ -365,15 +365,48 @@ def play_quiz_view(request):
             except AnsweredQuestion.DoesNotExist:
                 total_played = 0
 
+        if total_played >= total_questions:
+            # Quiz is over, go to results
+            return redirect('result-page')
+        
         difficulty = request.session.get('difficulty', 'medium')
         topic = request.session.get('topic', 'General Quiz')
-        total_questions = request.session.get('total_questions', 0)
+        saved_question = request.session.get('current_question_data')
+        current_question = None
+
+        # Case A: REFRESH DETECTED
+        # If we have a saved question AND its index matches where we are (total_played),
+        # just reload it. Do not generate a new one.
+        if saved_question and saved_question.get('index') == total_played:
+            print(f"--- Reloading Question #{total_played + 1} from Session (Refresh) ---")
+            current_question = saved_question['data']
+        
+        # Case B: NEW QUESTION NEEDED
+        else:
+            print(f"--- Generating New Question #{total_played + 1} ---")
+            
+            # ==================================================
+            # PUT YOUR AI / QUESTION GENERATION LOGIC HERE
+            # ==================================================
+            # For now, I am putting a placeholder. Replace this with your actual AI call.
+            current_question = {
+                'text': f"Question {total_played + 1}: What is the capital of France?",
+                'options': ['Paris', 'London', 'Berlin', 'Madrid'],
+                'correct': 'Paris'
+            }
+            # ==================================================
+
+            # Save this specific question to the session so it survives a refresh
+            request.session['current_question_data'] = {
+                'index': total_played,
+                'data': current_question
+            }
+            request.session.modified = True
 
         # Set time limit based on quiz type
         if difficulty == 'exam':
             time_limit = 59  # Set to 59 for all exam quizzes
         else:
-            # You can keep varied times for regular quizzes
             if difficulty == 'easy':
                 time_limit = 30
             elif difficulty == 'hard':
@@ -381,15 +414,17 @@ def play_quiz_view(request):
             else: # medium
                 time_limit = 20
         
-        # Get the number of questions the user has already played in this quiz
-        total_played = request.session.get('total_played', 0)
-        print("Total played from play_quiz view:", total_played)
+        # # Get the number of questions the user has already played in this quiz
+        # total_played = request.session.get('total_played', 0)
+        # print("Total played from play_quiz view:", total_played)
 
         context = {
+            'question': current_question,  
+            'question_number': total_played + 1,
+            'total_questions': total_questions,
             'time_limit': time_limit,
             'quizTopic': topic,
-            'total_questions': total_questions,
-            'current_attempt_id': request.session.get('current_attempt_id'),
+            'current_attempt_id': attempt_id,
             'total_played': total_played,
         }
         

@@ -37,10 +37,6 @@
         </div>
     </div>
     {% endif %}
-            <i class="fas fa-times close-toast" onclick="document.getElementById('toast-box').style.display='none'"></i>
-        </div>
-    </div>
-    {% endif %}
 
     {% include 'components/navbar.html' %}
     <main class="quiz-view-container" data-start-quiz-url="{% url 'start-quiz' %}" data-csrf-token="{{ csrf_token }}">
