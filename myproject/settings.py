@@ -1,5 +1,6 @@
 from pathlib import Path
-from decouple import config
+from decouple import config, Csv
+import dj_database_url
 import os
 
 
@@ -11,12 +12,12 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-$$wraba!qqpc-5wf88uq1tny+j04y@6htu2uywr0f6_r=m)e29'
+SECRET_KEY = config('SECRET_KEY', default='django-insecure-change-me-locally-only')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = not config('RENDER', default=False, cast=bool)
 
-ALLOWED_HOSTS = ['127.0.0.1', 'localhost']
+ALLOWED_HOSTS = config('ALLOWED_HOSTS', default='127.0.0.1,localhost', cast=Csv())
 
 
 # Application definition
@@ -78,7 +79,15 @@ WSGI_APPLICATION = 'myproject.wsgi.application'
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
 
 DATABASES = {
-    'default': {
+    'default': {}
+}
+
+if config('RENDER', default=False, cast=bool):
+    # YES -> Use PostgreSQL (Render automatically provides DATABASE_URL)
+    DATABASES['default'] = dj_database_url.config(conn_max_age=600, ssl_require=True)
+else:
+    # NO -> Use MySQL (Your local setup)
+    DATABASES['default'] = {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': config('DB_NAME'),
         'USER': config('DB_USER'),
@@ -89,8 +98,6 @@ DATABASES = {
             'init_command': "SET sql_mode='STRICT_TRANS_TABLES'"
         }
     }
-}
-
 
 # Password validation
 # https://docs.djangoproject.com/en/5.2/ref/settings/#auth-password-validators
@@ -206,15 +213,12 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 # API key for AI models
 GOOGLE_API_KEY = config('GOOGLE_API_KEY')
 
-# 1. DEVELOPMENT MODE 
-# This prints the OTP to black terminal screen instead of sending it to fGoogle.
-EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
-
-# 2. PRODUCTION MODE (Google)
-# EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-# EMAIL_HOST = 'smtp.gmail.com' 
-# EMAIL_PORT = 587
-# EMAIL_USE_TLS = True
-# EMAIL_HOST_USER = config('EMAIL_HOST_USER')
-# EMAIL_HOST_PASSWORD = config('EMAIL_HOST_PASSWORD')
+# Email settings for sending OTPs in user email 
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.gmail.com' 
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER = config('EMAIL_HOST_USER')
+EMAIL_HOST_PASSWORD = config('EMAIL_HOST_PASSWORD')
+DEFAULT_FROM_EMAIL = config('EMAIL_HOST_USER')
                                                                                                                                                             

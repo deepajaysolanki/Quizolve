@@ -549,11 +549,11 @@ def get_next_question_api(request):
         
         # --- Choose the correct AI function ---
         new_batch = []
-        if settings.DEBUG:
-            # If we are in development, use the fast, free mock data
-            new_batch = ai_services.get_mock_questions(topic, difficulty)
-        else:
-            if difficulty == 'exam':
+        # if settings.DEBUG:
+        #     # If we are in development, use the fast, free mock data
+        #     new_batch = ai_services.get_mock_questions(topic, difficulty)
+        # else:
+        if difficulty == 'exam':
                 EXAM_FULL_NAMES = {
                     'UPSC': 'UPSC Civil Services Examination',
                     'JEE': 'JEE (Joint Entrance Examination) for engineering',
@@ -565,10 +565,9 @@ def get_next_question_api(request):
                 full_exam_name_for_ai = EXAM_FULL_NAMES.get(topic, topic)
                 # For exams, use the specialized function to get a batch
                 new_batch = ai_services.generate_exam_question_batch(full_exam_name_for_ai, exclude_questions=asked_questions)
-            else:
+        else:
                 # For regular quizzes, use the general function
                 new_batch = ai_services.generate_question_batch(topic, difficulty, exclude_questions=asked_questions)
-            # --- END OF NEW LOGIC ---
 
         if not new_batch:
             return JsonResponse({'error': 'Failed to generate new questions from the AI.'}, status=500)
