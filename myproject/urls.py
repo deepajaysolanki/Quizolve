@@ -17,7 +17,8 @@ urlpatterns = [
     path('', views.home_page, name='home-page'), 
     path('about/', views.about_page, name='about-page'), 
     path('contact/', views.contact_page, name='contact-page'), 
-
+    path('quiz-page/', views.exam_selection_view, name='quiz-page'),
+    
     # --- User Authentication ---
     path('login/', views.login_view, name='login'),
     path('login/verify/', views.verify_login_otp_view, name='verify-login-otp'),
