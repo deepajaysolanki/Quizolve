@@ -88,6 +88,12 @@ if config('RENDER', default=False, cast=bool):
     # Enable Compressed Static Files (Crucial for CSS)
     STATICFILES_STORAGE = 'whitenoise.storage.CompressedStaticFilesStorage'
 
+    # We TRUST Render to handle the HTTPS. We do NOT ask Django to redirect.
+    SECURE_SSL_REDIRECT = False            
+    SESSION_COOKIE_SECURE = True            
+    CSRF_COOKIE_SECURE = True               
+    SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+
 else:
     # NO -> Use MySQL (Your local setup)
     DATABASES['default'] = {
