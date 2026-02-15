@@ -41,7 +41,7 @@ AUTH_USER_MODEL = 'myapp.AppUsers'
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
-    # 'whitenoise.middleware.WhiteNoiseMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -79,7 +79,7 @@ DATABASES = {
 # INTELLIGENT DATABASE SWITCH
 if config('RENDER', default=False, cast=bool):
     # YES -> Use PostgreSQL (Render automatically provides DATABASE_URL)
-    DATABASES['default'] = dj_database_url.config(conn_max_age=600)
+    DATABASES['default'] = dj_database_url.config(conn_max_age=600, ssl_require=True)
 
     # # FIX SSL LOOP (Crucial for "Infinite Loading")
     # SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
