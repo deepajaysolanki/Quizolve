@@ -85,7 +85,7 @@ if config('RENDER', default=False, cast=bool):
     SECURE_SSL_REDIRECT = True
     
     # Enable Compressed Static Files (Crucial for CSS)
-    STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+    STATICFILES_STORAGE = 'whitenoise.storage.CompressedStaticFilesStorage'
 
 else:
     # NO -> Use MySQL (Your local setup)
