@@ -79,11 +79,11 @@ DATABASES = {
 # INTELLIGENT DATABASE SWITCH
 if config('RENDER', default=False, cast=bool):
     # YES -> Use PostgreSQL (Render automatically provides DATABASE_URL)
-    DATABASES['default'] = dj_database_url.config(conn_max_age=600, ssl_require=True)
+    DATABASES['default'] = dj_database_url.config(conn_max_age=600)
 
-    # FIX SSL LOOP (Crucial for "Infinite Loading")
-    SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
-    SECURE_SSL_REDIRECT = True
+    # # FIX SSL LOOP (Crucial for "Infinite Loading")
+    # SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+    # SECURE_SSL_REDIRECT = True
     
     # Enable Compressed Static Files (Crucial for CSS)
     STATICFILES_STORAGE = 'whitenoise.storage.CompressedStaticFilesStorage'
