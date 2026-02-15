@@ -7,15 +7,13 @@ import os
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-# Quick-start development settings - unsuitable for production
-# See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
-
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = config('SECRET_KEY', default='django-insecure-change-me-locally-only')
 
-# SECURITY WARNING: don't run with debug turned on in production!
+# Checks if we are on Render. If yes, Debug=False. If no, Debug=True.
 DEBUG = not config('RENDER', default=False, cast=bool)
 
+# Allow all hosts for now to prevent 400 Bad Request errors
 ALLOWED_HOSTS = ['*']
 
 # Application definition
@@ -73,16 +71,22 @@ TEMPLATES = [
 WSGI_APPLICATION = 'myproject.wsgi.application'
 
 
-# Database
-# https://docs.djangoproject.com/en/5.2/ref/settings/#databases
-
 DATABASES = {
     'default': {}
 }
 
+# INTELLIGENT DATABASE SWITCH
 if config('RENDER', default=False, cast=bool):
     # YES -> Use PostgreSQL (Render automatically provides DATABASE_URL)
     DATABASES['default'] = dj_database_url.config(conn_max_age=600, ssl_require=True)
+
+    # FIX SSL LOOP (Crucial for "Infinite Loading")
+    SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+    SECURE_SSL_REDIRECT = True
+    
+    # Enable Compressed Static Files (Crucial for CSS)
+    STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+
 else:
     # NO -> Use MySQL (Your local setup)
     DATABASES['default'] = {
@@ -97,8 +101,6 @@ else:
         }
     }
 
-# Password validation
-# https://docs.djangoproject.com/en/5.2/ref/settings/#auth-password-validators
 
 AUTH_PASSWORD_VALIDATORS = [
     {
@@ -114,10 +116,6 @@ AUTH_PASSWORD_VALIDATORS = [
         'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
     },
 ]
-
-
-# Internationalization
-# https://docs.djangoproject.com/en/5.2/topics/i18n/
 
 LANGUAGE_CODE = 'en-us'
 
