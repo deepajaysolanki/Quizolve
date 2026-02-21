@@ -35,6 +35,9 @@ INSTALLED_APPS = [
 
     # my app
     'myapp',
+
+    # for sending emails (OTPs)
+    'anymail',
 ]
 
 AUTH_USER_MODEL = 'myapp.AppUsers'
@@ -217,7 +220,15 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 GOOGLE_API_KEY = config('GOOGLE_API_KEY')
 
 # Email settings for sending OTPs in user email 
-EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_BACKEND = "anymail.backends.resend.EmailBackend"
+ANYMAIL = {
+    "RESEND_API_KEY": os.environ.get("RESEND_API_KEY"),
+}
+
+# Resend uses this default address for testing without a custom domain
+DEFAULT_FROM_EMAIL = "onboarding@resend.dev"
+
+
 EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
