@@ -611,50 +611,53 @@ def exam_selection_view(request):
     return render(request, 'AI_features/exam_selection.html')
 
 def start_exam_quiz_view(request, exam_name):
-    now = timezone.now()
-    twenty_four_hours_ago = now - timedelta(days=1)
-    DAILY_LIMIT = 3
+    if request.user.is_authenticated:
+        now = timezone.now()
+        twenty_four_hours_ago = now - timedelta(days=1)
+        DAILY_LIMIT = 3
 
-    # Check if user is premium AND subscription hasn't expired
-    if request.user.is_premium:
-        if request.user.subscription_expiry and request.user.subscription_expiry >= date.today():
-            DAILY_LIMIT = 12  # ✅ Premium Limit
-        else:
-            DAILY_LIMIT = 3
+        # Check if user is premium AND subscription hasn't expired
+        if request.user.is_premium:
+            if request.user.subscription_expiry and request.user.subscription_expiry >= date.today():
+                DAILY_LIMIT = 12  # ✅ Premium Limit
+            else:
+                DAILY_LIMIT = 3
 
-     # Per-exam limit check
-    attempt_count = UserQuizAttempt.objects.filter(
-        user=request.user, 
-        quiz_type='exam', 
-        quiz_identifier=exam_name,
-        created_at__gte=twenty_four_hours_ago
-    ).count()
+        # Per-exam limit check
+        attempt_count = UserQuizAttempt.objects.filter(
+            user=request.user, 
+            quiz_type='exam', 
+            quiz_identifier=exam_name,
+            created_at__gte=twenty_four_hours_ago
+        ).count()
 
-    # CHANGE THIS LINE from >= 1 to >= 3
-    if attempt_count >= DAILY_LIMIT:
-        if not request.user.is_premium:
-            msg = f"You've hit your limit of {DAILY_LIMIT} free quizzes today for the '{exam_name}'. <a href='/checkout/' style='color: inherit; font-weight: bold; text-decoration: underline;'>Upgrade to Premium</a> to unlock more quizzes!"
-            messages.error(request, mark_safe(msg))
-        else:
-            messages.error(request, f"You have reached your daily limit of {DAILY_LIMIT} quizzes for the '{exam_name}' category.")
-        return redirect('exam-selection')
-    
-    # If allowed, create a new attempt record
-    attemp = UserQuizAttempt.objects.create(user=request.user, quiz_type='exam', quiz_identifier=exam_name, total_questions=50)
+        # CHANGE THIS LINE from >= 1 to >= 3
+        if attempt_count >= DAILY_LIMIT:
+            if not request.user.is_premium:
+                msg = f"You've hit your limit of {DAILY_LIMIT} free quizzes today for the '{exam_name}'. <a href='/checkout/' style='color: inherit; font-weight: bold; text-decoration: underline;'>Upgrade to Premium</a> to unlock more quizzes!"
+                messages.error(request, mark_safe(msg))
+            else:
+                messages.error(request, f"You have reached your daily limit of {DAILY_LIMIT} quizzes for the '{exam_name}' category.")
+            return redirect('exam-selection')
+        
+        # If allowed, create a new attempt record
+        attemp = UserQuizAttempt.objects.create(user=request.user, quiz_type='exam', quiz_identifier=exam_name, total_questions=50)
 
-    # Set up the session rules for the exam quiz
-    request.session['current_attempt_id'] = attemp.id
-    request.session['question_batch'] = [] # Start with an empty batch
-    request.session['topic'] = exam_name
-    request.session['difficulty'] = 'exam' # Set the difficulty to 'exam'
-    request.session['total_questions'] = 50 
-    request.session['correct_answers'] = 0
-    request.session['total_played'] = 0
-    request.session['asked_questions'] = [] 
-    request.session['quiz_review_data'] = []
+        # Set up the session rules for the exam quiz
+        request.session['current_attempt_id'] = attemp.id
+        request.session['question_batch'] = [] # Start with an empty batch
+        request.session['topic'] = exam_name
+        request.session['difficulty'] = 'exam' # Set the difficulty to 'exam'
+        request.session['total_questions'] = 50 
+        request.session['correct_answers'] = 0
+        request.session['total_played'] = 0
+        request.session['asked_questions'] = [] 
+        request.session['quiz_review_data'] = []
 
-    request.session.save()
-    return redirect('play-exam-quiz')
+        request.session.save()
+        return redirect('play-exam-quiz')
+    else:
+        return redirect('login')    
 
 @login_required
 @require_POST

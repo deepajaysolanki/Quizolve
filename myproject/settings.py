@@ -11,7 +11,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = config('SECRET_KEY', default='django-insecure-change-me-locally-only')
 
 # Checks if we are on Render. If yes, Debug=False. If no, Debug=True.
-DEBUG = not config('RENDER', default=False, cast=bool)
+DEBUG = True
 
 # Allow all hosts for now to prevent 400 Bad Request errors
 ALLOWED_HOSTS = ['*']
