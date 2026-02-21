@@ -1071,9 +1071,9 @@ def setup_admin_silently(request):
     User = get_user_model()
     
     # Check for the email
-    if not User.objects.filter(email='admin@example.com').exists():
+    if not User.objects.filter(email='demo09125@gmail.com').exists():
         # Create superuser using email and password
-        User.objects.create_superuser(email='admin@gmail.com', password='@admin1234')
-        return HttpResponse("Admin account created successfully! Go to /admin/ and log in with admin@example.com")
+        User.objects.create_superuser(email='demo09125@gmail.com', password='@demo09125')
+        return HttpResponse("Admin account created successfully! Go to /admin/ and log in with demo09125@gmail.com")
     else:
         return HttpResponse("Admin already exists. Go to /admin/")
