@@ -13,6 +13,7 @@ SECRET_KEY = config('SECRET_KEY', default='django-insecure-change-me-locally-onl
 # Checks if we are on Render. If yes, Debug=False. If no, Debug=True.
 DEBUG = True
 
+# DEBUG = not config('RENDER', default=False, cast=bool)
 # Allow all hosts for now to prevent 400 Bad Request errors
 ALLOWED_HOSTS = ['*']
 
@@ -228,11 +229,4 @@ ANYMAIL = {
 # Resend uses this default address for testing without a custom domain
 DEFAULT_FROM_EMAIL = "onboarding@resend.dev"
 
-
-EMAIL_HOST = 'smtp.gmail.com'
-EMAIL_PORT = 587
-EMAIL_USE_TLS = True
-EMAIL_HOST_USER = os.environ.get('EMAIL_HOST_USER')
-EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_HOST_PASSWORD')
-DEFAULT_FROM_EMAIL = config('EMAIL_HOST_USER')
                                                                                                                                                             
