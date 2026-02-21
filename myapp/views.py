@@ -29,7 +29,9 @@ def home_page(request):
 def about_page(request):
     return render(request, 'pages/about.html')
 def quiz_page(request):
-    return render(request, 'pages/quiz.html')
+    if not request.user.is_authenticated:
+        messages.error(request, "You must be logged in to access the quiz.")
+        return render(request, 'pages/quiz.html')
 def contact_page(request):
     if request.user.is_authenticated:
         if request.method == 'POST':
@@ -608,7 +610,9 @@ def check_answer_api(request):
 
 # views for Exam Quiz Feature
 def exam_selection_view(request):
-    return render(request, 'AI_features/exam_selection.html')
+    if not request.user.is_authenticated:
+        messages.error(request, "You must be logged in to access the exam quiz.")
+        return render(request, 'AI_features/exam_selection.html')
 
 def start_exam_quiz_view(request, exam_name):
     if request.user.is_authenticated:
