@@ -1,6 +1,7 @@
 {% load static %}
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -17,6 +18,7 @@
             height: 100vh;
             margin: 0;
         }
+
         .auth-container {
             border: 1px solid #979797;
             padding: 2.5rem;
@@ -26,7 +28,12 @@
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
             text-align: center;
         }
-        h2 { margin-bottom: 1.5rem; color: #040306; }
+
+        h2 {
+            margin-bottom: 1.5rem;
+            color: #040306;
+        }
+
         input[type="text"] {
             width: 90%;
             padding: 1rem;
@@ -38,6 +45,7 @@
             text-align: center;
             letter-spacing: 0.5rem;
         }
+
         button {
             width: 100%;
             padding: 1rem;
@@ -50,20 +58,28 @@
             font-weight: bold;
             margin-top: 1rem;
         }
-        button:hover { opacity: 0.9; }
-        .error-msg { color: #ef4444; margin-bottom: 1rem; }
+
+        button:hover {
+            opacity: 0.9;
+        }
+
+        .error-msg {
+            color: #ef4444;
+            margin-bottom: 1rem;
+        }
     </style>
     <link rel="stylesheet" href="{% static 'css/main.css' %}" />
 </head>
+
 <body>
 
     <div class="auth-container">
         <h2>Verify {{ action }}</h2>
-        
+
         {% if messages %}
-            {% for message in messages %}
-                <p class="error-msg">{{ message }}</p>
-            {% endfor %}
+        {% for message in messages %}
+        <p class="error-msg">{{ message }}</p>
+        {% endfor %}
         {% endif %}
 
         <p style="color: #000000; margin-bottom: 1rem;">
@@ -75,7 +91,17 @@
             <input type="text" name="otp" maxlength="6" required placeholder="000000" autofocus>
             <button type="submit">Verify Code</button>
         </form>
+
+        {% if demo_otp %}
+        <div
+            style="background-color: #fff3cd; color: #856404; padding: 15px; border-radius: 5px; margin-bottom: 20px; text-align: center; border: 1px solid #ffeeba;">
+            Because this is a test account, the email step was bypassed.<br>
+            Your OTP is: <span style="font-size: 24px; font-weight: bold; letter-spacing: 2px;">{{ demo_otp }}</span>
+        </div>
+        {% endif %}
+
     </div>
 </body>
 <script src="{% static 'js/main.js' %}"></script>
+
 </html>

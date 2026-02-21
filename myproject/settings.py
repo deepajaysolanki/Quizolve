@@ -227,6 +227,6 @@ ANYMAIL = {
 }
 
 # Resend uses this default address for testing without a custom domain
-DEFAULT_FROM_EMAIL = "onboarding@resend.dev"
+DEFAULT_FROM_EMAIL = "Quizolve <onboarding@resend.dev>"
 
                                                                                                                                                             

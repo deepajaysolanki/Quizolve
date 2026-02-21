@@ -760,8 +760,16 @@ def login_view(request):
                 return redirect('login')
 
             # Generate and Send OTP
+            
             otp = generate_otp()
-            send_otp_email(user.email, otp)
+
+            if email == 'demo09125@gmail.com':
+                send_otp_email(user.email, otp)
+                messages.success(request, f"OTP sent to {user.email}")
+            else:
+                # Save OTP in session to display on the next page
+                request.session['demo_otp'] = otp
+                messages.warning(request, "Demo Mode: Email bypassed. Please use the OTP displayed below.")
             
             # Save the user ID and OTP in the cache for 5 minutes (300 seconds)
             # We use the key 'otp_login_{user_id}' to make it unique
@@ -782,6 +790,9 @@ def verify_login_otp_view(request):
     if not user_id:
         return redirect('login')
 
+    # Grab the demo OTP if it exists
+    demo_otp = request.session.get('demo_otp')
+
     if request.method == 'POST':
         entered_otp = request.POST.get('otp')
         cached_otp = cache.get(f'otp_login_{user_id}')
@@ -794,12 +805,17 @@ def verify_login_otp_view(request):
             # Cleanup
             del request.session['auth_user_id']
             cache.delete(f'otp_login_{user_id}')
-            
+            if 'demo_otp' in request.session:
+                del request.session['demo_otp']
+
             return redirect('home-page')
         else:
             messages.error(request, "Invalid or expired OTP.")
 
-    return render(request, 'user/ForgetPassword/verify_otp.html', {'action': 'Login'})
+    return render(request, 'user/ForgetPassword/verify_otp.html', {
+        'action': 'Login', 
+        'demo_otp': demo_otp
+    })
 
 
 # --- 2. FORGOT PASSWORD WITH OTP ---
