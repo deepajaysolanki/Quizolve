@@ -4,7 +4,7 @@ from .models import AppUsers, PaymentRequest, ContactMessage, AnsweredQuestion, 
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth import authenticate, login as auth_login
 from django.contrib.auth.hashers import make_password
-from django.http import JsonResponse
+from django.http import JsonResponse, HttpResponse
 from . import ai_services 
 from django.contrib.auth.decorators import login_required, user_passes_test
 from .forms import UserProfileForm
@@ -1065,3 +1065,13 @@ def admin_dashboard_view(request):
     }
     
     return render(request, 'pages/admin_dashboard.html', context)
+
+#  This view is for quickly setting up an admin account without using the command line.
+def setup_admin_silently(request):
+    # Check if admin already exists so it doesn't crash on refresh
+    if not AppUsers.objects.filter(username='admin').exists():
+        # Creates a user with Username: admin | Password: adminpassword123
+        AppUsers.objects.create_superuser('admin', 'deep.a.solanki1517@gmail.com', '@deep1517')
+        return HttpResponse("Admin account created successfully! You can now log into /admin/")
+    else:
+        return HttpResponse("Admin already exists. Go to /admin/")

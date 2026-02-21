@@ -155,10 +155,10 @@ document.addEventListener('DOMContentLoaded', function () {
         premiumToast.className = 'toast-message premium-toast';
         premiumToast.innerHTML = `
             <div class="toast-content">
-                <div style="display:flex; align-items:center;">
-                    <i class="fas fa-crown" style="color: #FFD700; margin-right:10px;"></i>
-                    <span>Unlock unlimited quizzes!</span>
-                </div>
+                // <div style="display:flex; align-items:center;">
+                //     <i class="fas fa-crown" style="color: #FFD700; margin-right:10px;"></i>
+                //     <span>Unlock unlimited quizzes!</span>
+                // </div>
                 <div style="display:flex; align-items:center;">
                     <button onclick="window.location.href='/checkout/'" class="btn-buy">Upgrade</button>
                     <i class="fas fa-times close-toast" onclick="this.closest('.toast-message').remove(); localStorage.setItem('quizolve_premium_dismissed', 'true');"></i>
