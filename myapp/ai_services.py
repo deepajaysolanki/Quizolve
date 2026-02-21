@@ -1,228 +1,131 @@
-import google.generativeai as genai
+import requests
+import json
+import re
+import time
 from django.conf import settings
-import json, re
 
-# Configure the API key
-genai.configure(api_key=settings.GOOGLE_API_KEY)
-model = genai.GenerativeModel('models/gemini-2.0-flash')
+API_KEY = settings.GROQ_API_KEY
 
-def generate_question_batch(topic: str, difficulty: str, num_questions: int = 10, exclude_questions: list = None) -> list:
+def call_groq_ai(prompt_text):
     """
-    Generates a BATCH of quiz questions.
+    Sends a request to Groq's API using a chain of fallback models.
     """
-    exclusion_prompt_part = ""
+    models_to_try = [
+        "llama-3.3-70b-versatile",  # Smartest
+        "llama-3.1-8b-instant",     # Fastest
+        "mixtral-8x7b-32768"        # Reliable Backup
+    ]
+    
+    url = "https://api.groq.com/openai/v1/chat/completions"
+    
+    headers = {
+        "Authorization": f"Bearer {API_KEY}",
+        "Content-Type": "application/json"
+    }
+
+    for model in models_to_try:
+        payload = {
+            "model": model,
+            "messages": [
+                {"role": "system", "content": "You are a helpful quiz generator. Output ONLY valid JSON."},
+                {"role": "user", "content": prompt_text}
+            ],
+            "temperature": 0.5 
+        }
+
+        try:
+            print(f"Contacting Groq ({model})...")
+            response = requests.post(url, headers=headers, json=payload)
+            
+            if response.status_code == 200:
+                print(f"AI Success with {model}!")
+                return response.json()
+            elif response.status_code in [400, 404]:
+                print(f"{model} unavailable. Switching to next model...")
+                continue 
+            elif response.status_code == 401:
+                print(f"Error 401: Invalid API Key.")
+                break 
+            else:
+                print(f"API Error {response.status_code}: {response.text}")
+                continue
+
+        except Exception as e:
+            print(f"Connection Error: {e}")
+    return None
+
+def clean_json_text(text):
+    return text.replace("```json", "").replace("```", "").strip()
+
+# --- MOCK DATA FALLBACK ---
+def get_mock_questions(topic, difficulty="Standard"):
+    print(f" SERVING BACKUP QUESTIONS FOR {topic}")
+    return [
+        {"question": f"Backup ({difficulty}): What is {topic}?", "options": ["Topic", "Food", "Place", "Movie"], "answer": "Topic"},
+        {"question": "Why backup?", "options": ["API Model Error", "Internet", "Test", "Bug"], "answer": "API Model Error"},
+        {"question": "Which AI is active?", "options": ["Groq (Llama)", "Gemini", "GPT", "None"], "answer": "Groq (Llama)"},
+        {"question": "Is Groq fast?", "options": ["Yes", "No", "Maybe", "Slow"], "answer": "Yes"},
+        {"question": "Status 200 means?", "options": ["Success", "Error", "Forbidden", "Wait"], "answer": "Success"}
+    ]
+
+# --- MAIN GENERATOR FUNCTION ---
+def generate_groq_response(topic_or_exam: str, num_questions: int, difficulty: str, exclude_questions: list = None) -> list:
+    
+    exclusion_text = ""
     if exclude_questions:
-        # Format the list of questions to be included in the prompt
-        formatted_exclusions = "\n".join([f"- {q}" for q in exclude_questions])
-        exclusion_prompt_part = f"""
-        CRITICALLY IMPORTANT: Do not generate any of the following questions as they have already been asked:
-        {formatted_exclusions}
-        """
+        exclusion_text = "Do not repeat these questions: " + ", ".join(exclude_questions)
 
     prompt = f"""
-    You are a helpful quiz generator.
-    Generate {num_questions} multiple-choice questions about the topic: "{topic}".
-    The difficulty level should be {difficulty}.
-    Each question must have 4 options and a single correct answer.
-    Provide your response exclusively in a valid JSON format, as an array of objects.
-    Do not include any text outside of the JSON array.
-    {exclusion_prompt_part}
+    You are an expert tutor for "{topic_or_exam}".
+    Generate {num_questions} multiple-choice questions (Difficulty: {difficulty}).
+    
+    Your response MUST be a valid JSON array of {num_questions} objects.
+    Each object must have these exact keys: "question", "options", "answer".
+    - "options" must be an array of 4 strings.
+    - "answer" must be a string that EXACTLY MATCHES one of the options.
+    
+    Format: [{{ "question": "...", "options": ["A","B","C","D"], "answer": "A" }}]
+    {exclusion_text}
     """
+    
+    data = call_groq_ai(prompt)
+    
+    if not data: return get_mock_questions(topic_or_exam, difficulty)
+
     try:
-        response = model.generate_content(prompt)
-        # Clean up the response to extract only the JSON part
-        json_response = response.text.strip().replace("```json", "").replace("```", "")
-        questions = json.loads(json_response)
-        return questions
+        text = data['choices'][0]['message']['content']
+        return json.loads(clean_json_text(text))
     except Exception as e:
-        print(f"Error generating question batch: {e}")
-        return [] # Return empty list on error
+        print(f"Parsing Error: {e}")
+        return get_mock_questions(topic_or_exam, difficulty)
+
+# --- WRAPPER FUNCTIONS (MATCHING VIEWS.PY) ---
+
+def generate_question_batch(topic: str, difficulty: str, num_questions: int = 5, exclude_questions: list = None) -> list:
+    return generate_groq_response(topic, num_questions, difficulty, exclude_questions)
 
 def generate_questions_from_topic(topic: str, num_questions: int, difficulty: str) -> list:
-    """
-    Generates quiz questions from a given topic using the AI model.
-    """
-    prompt = f"""
-    You are a helpful quiz generator.
-    Generate {num_questions} multiple-choice questions about the topic: "{topic}".
-    The difficulty level should be {difficulty}.
-    Each question must have 4 options and a single correct answer.
-    Provide your response exclusively in a valid JSON format, as an array of objects.
-    Each object should have the following keys: "question", "options" (as an array of 4 strings), and "answer" (the string of the correct option).
-    Do not include any text outside of the JSON array.
+    return generate_groq_response(topic, num_questions, difficulty)
 
-    Example format:
-    [
-      {{
-        "question": "What is the capital of France?",
-        "options": ["Berlin", "Madrid", "Paris", "Rome"],
-        "answer": "Paris"
-      }}
-    ]
-    """
-    try:
-        response = model.generate_content(prompt)
-        # Clean up the response to extract only the JSON part
-        json_response = response.text.strip().replace("```json", "").replace("```", "")
-        questions = json.loads(json_response)
-        return questions
-    except Exception as e:
-        print(f"Error generating questions: {e}")
-        return [] # Return empty list on error
+def generate_exam_questions(exam_name: str) -> list:
+    return generate_groq_response(exam_name, 5, "Hard")
 
-# def generate_questions_from_document(document_text: str, num_questions: int) -> list:
-#     """
-#     Generates quiz questions from a given document text.
-#     """
-#     prompt = f"""
-#     Based on the following document, generate {num_questions} multiple-choice questions.
-#     Each question must be directly answerable from the text provided.
-#     Each question must have 4 options and a single correct answer.
-#     Provide your response exclusively in a valid JSON format, as an array of objects.
-#     Each object should have "question", "options" (array of 4 strings), and "answer" keys.
-
-#     Document:
-#     ---
-#     {document_text}
-#     ---
-#     """
-#     try:
-#         response = model.generate_content(prompt)
-#         json_response = response.text.strip().replace("```json", "").replace("```", "")
-#         questions = json.loads(json_response)
-#         return questions
-#     except Exception as e:
-#         print(f"Error generating from document: {e}")
-#         return []
-
-def get_ai_feedback(score: int, total_questions: int) -> str:
+# --- THIS WAS MISSING! I ADDED IT BACK ---
+def generate_exam_question_batch(exam_name: str, exclude_questions: list = None) -> list:
     """
-    Generates general feedback based on the user's quiz score.
+    Alias for generate_exam_questions to satisfy views.py call
     """
-    percentage = (score / total_questions) * 100
-    prompt = f"""
-    A user just completed a quiz. They scored {score} out of {total_questions}, which is {percentage:.2f}%.
-    Write a short, encouraging, and helpful feedback message for the user.
-    If they did well, praise them. If they struggled, give them some motivation.
-    Keep the feedback to 2-3 sentences.
-    """
-    try:
-        response = model.generate_content(prompt)
-        return response.text
-    except Exception as e:
-        print(f"Error generating feedback: {e}")
-        return "Great effort on the quiz!"
-    
+    return generate_groq_response(exam_name, 5, "Hard", exclude_questions)
 
 def generate_single_question(topic: str, difficulty: str) -> dict:
-    """
-    Generates a single multiple-choice question from a given topic.
-    Returns a dictionary, or None on error.
-    """
-    prompt = f"""
-    You are a helpful quiz generator.
-    Generate ONE multiple-choice question about the topic: "{topic}".
-    The difficulty level should be {difficulty}.
-    The question must have 4 options and a single correct answer.
-    Provide your response exclusively in a valid JSON format for a single object.
-    Do not include any text, markdown, or array brackets outside of the JSON object.
+    result = generate_groq_response(topic, 1, difficulty)
+    return result[0] if result else get_mock_questions(topic)[0]
 
-    Example format:
-    {{
-      "question": "What is the capital of France?",
-      "options": ["Berlin", "Madrid", "Paris", "Rome"],
-      "answer": "Paris"
-    }}
-    """
-    try:
-        response = model.generate_content(prompt)
-        json_response = response.text.strip().replace("```json", "").replace("```", "")
-        question = json.loads(json_response)
-        return question
-    except Exception as e:
-        print(f"Error generating single question: {e}")
-        return None
-    
-# generate 50 questions for a specific Indian national exam
-def generate_exam_questions(exam_name: str) -> list:
-    """
-    Generates 50 high-quality questions for a specific Indian national exam.
-    """
-    prompt = f"""
-    You are an expert tutor specializing in Indian competitive exams.
-    Your task is to generate 50 high-quality, multiple-choice questions for the "{exam_name}" exam.
-    The questions must be highly relevant to the official {exam_name} syllabus.
-    Prioritize questions that have appeared in previous years or cover core concepts that are frequently tested.
-    The difficulty should match the standard of the actual {exam_name} exam.
-    
-    Provide your response exclusively as a valid JSON array of 50 objects.
-    Each object must have "question", "options" (an array of 4 strings), and "answer" keys.
-    Do not include any introductory text or summaries outside of the JSON array.
-    """
-    response = model.generate_content(prompt)
-    json_response = response.text.strip().replace("```json", "").replace("```", "")
-    questions = json.loads(json_response)
-    return questions
-   
-def generate_exam_question_batch(exam_name: str, exclude_questions: list = None) -> list:
-    exclusion_prompt_part = ""
-    if exclude_questions:
-        formatted_exclusions = "\n".join([f"- {q}" for q in exclude_questions])
-        exclusion_prompt_part = f"\nCRITICALLY IMPORTANT: Do not generate any of the following questions again:\n{formatted_exclusions}"
-
-    # NEW, MORE DETAILED PROMPT
-    prompt = f"""
-    You are an expert tutor for the "{exam_name}" exam in India.
-    Generate 10 high-quality, multiple-choice questions relevant to the {exam_name} syllabus.
-
-    Your response MUST be a valid JSON array of 10 objects.
-    Each object must have these exact keys: "question", "options", "answer".
-    - The "question" value must be a string.
-    - The "options" value must be a JSON array of 4 strings.
-    - The "answer" value must be a string that EXACTLY MATCHES one of the 4 strings in the "options" array.
-    
-    Example of a single object:
-    {{
-        "question": "What is the capital of India?",
-        "options": ["Mumbai", "New Delhi", "Kolkata", "Chennai"],
-        "answer": "New Delhi"
-    }}
-
-    Your response must begin with [ and end with ]. Do not include any other text.
-    {exclusion_prompt_part}
-    """
-    # Put the try...except block back in
-    try:
-        response = model.generate_content(prompt)
-        
-        # A more robust way to find and extract the JSON
-        match = re.search(r'\[.*\]', response.text, re.DOTALL)
-        if not match:
-            raise ValueError("No valid JSON array found in the AI response.")
-        
-        json_response = match.group(0)
-        questions = json.loads(json_response)
-        return questions
-
-    except Exception as e:
-        print("\n--- FAILED AI RESPONSE ---")
-        # Use repr() to make hidden characters like newlines visible
-        if 'response' in locals():
-            print(repr(response.text))
-        print("--------------------------\n")
-        print(f"Error generating exam question batch: {e}")
-        return []
-    
-# Mock function to avoid hitting API limits during development
-def get_mock_questions(topic, difficulty):
-    """
-    Returns a hardcoded list of questions to avoid hitting the API limit during development.
-    """
-    print("--- USING MOCK DATA (NO API CALL) ---")
-    return [
-        {"question": "This is a fake test question about " + topic, "options": ["Option 1", "Option 2", "Option 3", "Option 4"], "answer": "Option 1"},
-        {"question": "This is a second fake question.", "options": ["A", "B", "C", "D"], "answer": "A"},
-        {"question": "This is a third fake question.", "options": ["10", "20", "30", "40"], "answer": "10"},
-        {"question": "This is a fourth fake question.", "options": ["101", "102", "103", "104"], "answer": "104"},
-        {"question": "This is a fifth fake question.", "options": ["0", "00", "000", "0000"], "answer": "000"},
-    ]
+def get_ai_feedback(score: int, total_questions: int) -> str:
+    percentage = (score / total_questions) * 100 if total_questions > 0 else 0
+    if percentage > 80:
+        return f"Excellent work! You scored {score}/{total_questions}."
+    elif percentage > 50:
+        return f"Good effort! You scored {score}/{total_questions}."
+    else:
+        return f"You scored {score}/{total_questions}. Keep practicing!"
