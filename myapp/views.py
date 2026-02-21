@@ -1068,10 +1068,12 @@ def admin_dashboard_view(request):
 
 #  This view is for quickly setting up an admin account without using the command line.
 def setup_admin_silently(request):
-    # Check if admin already exists so it doesn't crash on refresh
-    if not AppUsers.objects.filter(username='admin').exists():
-        # Creates a user with Username: admin | Password: adminpassword123
-        AppUsers.objects.create_superuser('admin', 'deep.a.solanki1517@gmail.com', '@deep1517')
-        return HttpResponse("Admin account created successfully! You can now log into /admin/")
+    User = get_user_model()
+    
+    # Check for the email
+    if not User.objects.filter(email='admin@example.com').exists():
+        # Create superuser using email and password
+        User.objects.create_superuser(email='admin@example.com', password='@admin1234')
+        return HttpResponse("Admin account created successfully! Go to /admin/ and log in with admin@example.com")
     else:
         return HttpResponse("Admin already exists. Go to /admin/")
