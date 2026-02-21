@@ -364,8 +364,8 @@ body {
 .btn-ghost {
   text-decoration: none;
   font-weight: 500;
+  color: #551A8B;
 }
-
 .btn-primary {
   background: var(--primary-color, #a855f7);
   color: white;
