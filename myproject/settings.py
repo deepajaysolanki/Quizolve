@@ -218,7 +218,7 @@ MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 # API key for AI models
-GROQ_API_KEY = config('GROQ_API_KEY')
+GROQ_API_KEY = os.environ.get("GROQ_API_KEY")
 
 # Email settings for sending OTPs in user email 
 EMAIL_BACKEND = "anymail.backends.resend.EmailBackend"
