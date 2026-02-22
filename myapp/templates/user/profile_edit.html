@@ -129,15 +129,40 @@
             background: transparent;
             border: 1px solid #979797;
         }
-       
+
         @media (max-width: 600px) {
             .edit-card {
-                padding: 1.5rem;
+                padding: 1.5rem !important;
+                width: 90% !important;
+                /* Gives the card breathing room on the screen edges */
+                box-sizing: border-box !important;
             }
 
             .profile-photo-group {
                 flex-direction: column;
                 align-items: flex-start;
+            }
+
+            /* 1. Stops the input boxes from overflowing past the white card */
+            .form-group input[type="text"],
+            .form-group input[type="date"],
+            .form-group input[type="email"],
+            .form-group input[type="password"] {
+                box-sizing: border-box !important;
+                width: 100% !important;
+            }
+
+            /* 2. Stacks the Cancel and Save buttons vertically */
+            .button-group {
+                flex-direction: column !important;
+                gap: 12px !important;
+                width: 100%;
+            }
+
+            /* 3. Makes the buttons full width */
+            .btn {
+                width: 100% !important;
+                box-sizing: border-box !important;
             }
         }
     </style>
@@ -204,7 +229,7 @@
             });
         }
     </script>
-    
+
 </body>
 
 </html>

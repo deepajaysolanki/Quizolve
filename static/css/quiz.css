@@ -362,7 +362,6 @@ input:-webkit-autofill:active {
 
 .dropdown-options.show {
   display: block; /* Show with JavaScript */
-
 }
 
 .dropdown-option {
@@ -407,7 +406,7 @@ input:-webkit-autofill:active {
 
 .simple-submit-btn:hover {
   background-color: #000000;
-  color: #ffffff
+  color: #ffffff;
 }
 /* --- Difficulty Dropdown Styles --- */
 .difficulty-selector-container {
@@ -446,4 +445,24 @@ input:-webkit-autofill:active {
   .simple-submit-btn {
     margin-left: 0; /* Resets the margin for stacked layout */
   }
+
+  .options-container {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 12px !important;
+  }
+
+  /* Forces all the dynamically loaded buttons to stretch full width */
+  .options-container button,
+  .options-container .option-btn {
+    width: 100% !important;
+    box-sizing: border-box !important;
+  }
+
+  .category-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr; /* Forces exactly 2 columns on mobile */
+        gap: 10px;
+    }
+    
 }
