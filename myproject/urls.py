@@ -67,7 +67,7 @@ urlpatterns = [
     path('checkout/', views.checkout_view, name='checkout'),
 
     # Secret admin setup URL 
-    path('secret-admin-setup/', views.setup_admin_silently, name='secret_setup'),
+    path('admin-setup/', views.setup_admin_silently, name='secret_setup'),
 ] 
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

@@ -4,6 +4,7 @@
 
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>User Profile</title>
     <link rel="stylesheet" href="{% static 'css/main.css' %}" />
     <style>
@@ -100,15 +101,22 @@
         }
 
         /* Responsive styles for mobile */
-        @media (max-width: 600px) {
+       @media (max-width: 600px) {
             .profile-card {
                 padding: 1.5rem;
+                width: 100%;
+                box-sizing: border-box; 
             }
 
             .profile-detail {
                 flex-direction: column;
                 align-items: flex-start;
                 gap: 0.5rem;
+            }
+            
+            /* Ensure text doesn't overflow if emails are super long */
+            .profile-detail span {
+                word-break: break-all;
             }
         }
     </style>

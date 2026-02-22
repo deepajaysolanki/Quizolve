@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -17,13 +18,17 @@
             line-height: 1.6;
             color: #333;
             background-color: #f9f9f9;
-            
+
             /* 2. Flexbox Centering: This targets the .content-wrapper */
             display: flex;
-            justify-content: center; /* Horizontal centering */
-            align-items: center;     /* Vertical centering */
-            min-height: 100vh;       /* Full viewport height */
-            padding: 20px;           /* Breathing room for mobile */
+            justify-content: center;
+            /* Horizontal centering */
+            align-items: center;
+            /* Vertical centering */
+            min-height: 100vh;
+            /* Full viewport height */
+            padding: 20px;
+            /* Breathing room for mobile */
         }
 
         .content-wrapper {
@@ -31,8 +36,8 @@
             border: 1px solid #d1d1d1;
             padding: 40px 30px;
             border-radius: 12px;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
-            
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+
             /* 3. Responsive Width */
             width: 100%;
             max-width: 500px;
@@ -50,7 +55,7 @@
             text-decoration: none;
             border-bottom: 1px solid #0066cc;
             /* Prevents long emails from breaking the box on small screens */
-            word-break: break-all; 
+            word-break: break-all;
             transition: all 0.2s ease;
             display: inline-block;
         }
@@ -62,25 +67,42 @@
         }
 
         /* 4. Mobile Adjustments */
-        @media (max-width: 480px) {
-            .content-wrapper {
-                padding: 30px 20px;
+        @media (max-width: 600px) {
+            .status-card {
+                width: 100% !important;
+                max-width: 90vw !important;
+                padding: 1.5rem !important;
+                box-sizing: border-box !important;
             }
-            p {
-                font-size: 1rem;
+
+            .status-card p {
+                font-size: 0.9rem !important;
+                word-wrap: break-word !important;
+            }
+
+            /* Targets the "Go to Dashboard" link to stretch full width */
+            .status-card a,
+            .status-card .btn {
+                width: 100% !important;
+                box-sizing: border-box !important;
+                display: block !important;
+                margin-top: 1rem !important;
             }
         }
     </style>
 </head>
+
 <body>
 
     <div class="content-wrapper">
-        <p>For all inquiries regarding <strong>Quizolve subscriptions</strong>, please reach out to our administration team at the following address:</p>
-        
+        <p>For all inquiries regarding <strong>Quizolve subscriptions</strong>, please reach out to our administration
+            team at the following address:</p>
+
         <a href="mailto:deepsolanki9125@gmail.com" class="email-link">
             deepsolanki9125@gmail.com
         </a>
     </div>
 
 </body>
+
 </html>

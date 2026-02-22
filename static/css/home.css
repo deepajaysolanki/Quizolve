@@ -402,3 +402,41 @@ body { font-family: "Poppins", sans-serif; background-color: var(--bg-color); co
   .how-it-works { padding: 40px 0; }
   .section-title { font-size: 28px; }
 }
+
+@media (max-width: 600px) {
+  .hero-stats {
+        display: grid !important;
+        grid-template-columns: repeat(2, 1fr) !important;
+        gap: 15px !important;
+        width: 100% !important;
+        padding: 0 10px !important;
+        box-sizing: border-box !important;
+    }
+
+    .stat-item {
+        width: 100% !important;
+        box-sizing: border-box !important;
+        padding: 15px 10px !important;
+        margin: 0 !important;
+        display: flex !important;
+        flex-direction: column !important;
+        align-items: center !important;
+        justify-content: center !important;
+    }
+
+    .stat-emoji {
+        font-size: 2.2rem !important; 
+        margin-bottom: 10px !important;
+    }
+
+    .stat-value {
+        font-size: 1.6rem !important; 
+        word-wrap: break-word !important;
+    }
+
+    .stat-label {
+        font-size: 0.85rem !important;
+        word-wrap: break-word !important;
+        text-align: center !important;
+    }
+}

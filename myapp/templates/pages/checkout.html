@@ -5,188 +5,381 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>Subscription Plan</title>
     <link rel="stylesheet" href="{% static 'css/main.css' %}" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+    
+    <style>
+        /* --- 1. Global Reset & Box Sizing --- */
+        *, *::before, *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        /* --- 2. Main Layout Containers --- */
+        .page-wrapper {
+            min-height: 100vh;
+            background: var(--bg-primary);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 40px 20px;
+            font-family: 'Segoe UI', sans-serif;
+        }
+
+        .subscription-card {
+            background: var(--bg-card);
+            width: 100%;
+            max-width: 1000px;
+            border-radius: 16px;
+            overflow: hidden;
+            display: flex;
+            flex-direction: row;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+        }
+
+        .left-panel {
+            flex: 1;
+            background: var(--bg-primary);
+            padding: 40px;
+            border-right: 1px solid var(--border-color);
+        }
+
+        .right-panel {
+            flex: 1.4;
+            padding: 40px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* --- 3. Typography --- */
+        .section-title {
+            color: var(--text-main);
+            margin-top: 0;
+            margin-bottom: 20px;
+            font-size: 1.8rem;
+        }
+
+        .plan-title {
+            margin-top: 0;
+            color: var(--accent-color);
+            font-size: 1.5rem;
+        }
+
+        /* --- 4. Plan Selection Box --- */
+        .plan-details-box {
+            background: var(--bg-card);
+            padding: 25px;
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
+        }
+
+        .price-container {
+            margin: 20px 0;
+        }
+
+        .display-price {
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: var(--text-main);
+        }
+
+        .price-suffix {
+            color: var(--text-secondary);
+        }
+
+        .feature-list {
+            list-style: none;
+            padding: 0;
+            color: var(--text-secondary);
+            line-height: 2;
+        }
+        
+        .feature-icon {
+            color: #10b981;
+            margin-right: 8px;
+        }
+
+        /* --- 5. QR Code & Payment Info --- */
+        .qr-section {
+            background: var(--bg-primary);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 20px;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .qr-title {
+            color: var(--accent-color);
+            font-weight: bold;
+            margin-bottom: 15px;
+        }
+
+        .qr-content {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .qr-image-wrapper {
+            background: white;
+            padding: 10px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+
+        .info-text {
+            color: #000000;
+            font-size: 0.9rem;
+            margin-top: 10px;
+            max-width: 250px;
+            line-height: 1.4;
+        }
+
+        .info-icon {
+            color: #3b82f6;
+        }
+
+        .pay-link {
+            display: inline-flex;
+            align-items: center;
+            background-color: #f1f1f1;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: bold;
+            font-size: 0.9rem;
+            transition: transform 0.2s;
+        }
+
+        /* --- 6. Forms --- */
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-group.mb-25 {
+            margin-bottom: 25px;
+        }
+
+        .form-label {
+            display: block;
+            color: var(--text-secondary);
+            margin-bottom: 8px;
+            font-size: 0.9rem;
+            font-weight: bold;
+        }
+
+        .form-label-dark {
+            color: var(--text-main);
+            margin-bottom: 5px;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 12px;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+            font-size: 1rem;
+            background: var(--bg-card);
+            color: var(--text-main);
+            outline: none;
+            transition: border-color 0.2s ease;
+        }
+        
+        select.form-input {
+            cursor: pointer;
+        }
+
+        .form-input:focus {
+            border-color: var(--accent-color);
+        }
+
+        .form-input.highlight-input {
+            border: 2px solid var(--accent-color);
+        }
+
+        .submit-btn {
+            width: 100%;
+            padding: 15px;
+            background: var(--text-main);
+            color: var(--bg-card);
+            border: none;
+            border-radius: 8px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: opacity 0.2s ease;
+        }
+
+        .submit-btn:hover {
+            opacity: 0.9;
+        }
+
+        /* --- 7. Mobile Responsive Adjustments --- */
+        @media (max-width: 768px) {
+            .page-wrapper {
+                padding: 20px 10px;
+            }
+            
+            /* Forces the left and right panels to stack vertically */
+            .subscription-card {
+                flex-direction: column;
+            }
+
+            .left-panel {
+                border-right: none;
+                border-bottom: 1px solid var(--border-color);
+                padding: 30px 20px;
+            }
+
+            .right-panel {
+                padding: 30px 20px;
+            }
+        }
+    </style>
 </head>
 
 <body>
     {% block content %}
-    <div
-        style="min-height: 100vh; background: var(--bg-primary); display: flex; justify-content: center; align-items: center; padding: 40px 20px; font-family: 'Segoe UI', sans-serif;">
-        <div
-            style="background: var(--bg-card); width: 100%; max-width: 1000px; border-radius: 16px; overflow: hidden; display: flex; flex-wrap: wrap; box-shadow: 0 10px 40px rgba(0,0,0,0.1);">
+    <div class="page-wrapper">
+        <div class="subscription-card">
 
-            <div
-                style="flex: 1; background: var(--bg-primary); padding: 40px; min-width: 300px; border-right: 1px solid var(--border-color);">
+            <div class="left-panel">
+                <h2 class="section-title">Choose Your Plan</h2>
 
-                <h2 style="color: var(--text-main); margin-top: 0; margin-bottom: 20px;">Choose Your Plan</h2>
-
-                <div style="margin-bottom: 30px;">
-                    <label
-                        style="display: block; color: var(--text-secondary); margin-bottom: 8px; font-size: 0.9rem; font-weight: bold;">Select
-                        Duration</label>
-                    <select id="plan-selector" onchange="updatePlan()"
-                        style="width: 100%; padding: 12px; border-radius: 8px; border: 1px solid var(--border-color); font-size: 1rem; cursor: pointer; background: var(--bg-card); color: var(--text-main); outline: none;">
+                <div class="form-group mb-25">
+                    <label class="form-label">Select Duration</label>
+                    <select id="plan-selector" onchange="updatePlan()" class="form-input">
                         <option value="monthly">Monthly - ₹149</option>
                         <option value="yearly">Yearly - ₹1299 (Save 27%)</option>
                     </select>
                 </div>
 
-                <div
-                    style="background: var(--bg-card); padding: 25px; border-radius: 12px; border: 1px solid var(--border-color);">
-                    <h3 id="plan-title" style="margin-top: 0; color: var(--accent-color); font-size: 1.5rem;">Monthly
-                        Premium</h3>
+                <div class="plan-details-box">
+                    <h3 id="plan-title" class="plan-title">Monthly Premium</h3>
 
-                    <div style="margin: 20px 0;">
-                        <span id="display-price"
-                            style="font-size: 2.5rem; font-weight: bold; color: var(--text-main);">₹149</span>
-                        <span style="color: var(--text-secondary);"> / total</span>
+                    <div class="price-container">
+                        <span id="display-price" class="display-price">₹149</span>
+                        <span class="price-suffix"> / total</span>
                     </div>
 
-                    <ul id="feature-list"
-                        style="list-style: none; padding: 0; color: var(--text-secondary); line-height: 2;">
-                    </ul>
+                    <ul id="feature-list" class="feature-list"></ul>
                 </div>
             </div>
 
-            <div style="flex: 1.4; padding: 40px; min-width: 350px; display: flex; flex-direction: column;">
+            <div class="right-panel">
+                <h2 class="section-title">Payment Details</h2>
 
-                <h2 style="margin-top: 0; color: var(--text-main); margin-bottom: 20px;">Payment Details</h2>
-
-                <div
-                    style="background: var(--bg-primary); border: 1px solid var(--border-color); border-radius: 12px; padding: 20px; text-align: center; margin-bottom: 30px;">
-
-                    <p style="color: var(--accent-color); font-weight: bold; margin-bottom: 15px;">
-                        Scan QR
-                    </p>
-                    <div
-                        style="display: flex; flex-direction: column; gap: 15px; justify-content: center; align-items: center;">
-
-                        <div
-                            style="background: white; padding: 10px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.05);">
-                            <img id="qr-image" src="/media/profile_photos/quizolve-subscription.png" alt="QR Code"
-                                width="150" height="150" style="display: block;">
+                <div class="qr-section">
+                    <p class="qr-title">Scan QR</p>
+                    <div class="qr-content">
+                        <div class="qr-image-wrapper">
+                            <img id="qr-image" src="/media/profile_photos/quizolve-subscription.png" alt="QR Code" width="150" height="150" style="display: block;">
                         </div>
-                        <p
-                            style="color: #000000; font-size: 0.9rem; margin-top: 10px; max-width: 250px; line-height: 1.4;">
-                            <i class="fas fa-info-circle" style="color: #3b82f6;"></i>
-                            Note: If the QR code isn't working, try scanning it using <strong>Google Lens</strong> or
-                            your
-                            <strong>Browser's Scanner</strong>.
+                        <p class="info-text">
+                            <i class="fas fa-info-circle info-icon"></i>
+                            Note: If the QR code isn't working, try scanning it using <strong>Google Lens</strong> or your <strong>Browser's Scanner</strong>.
                         </p>
 
                         <div style="display: flex;">
-                            <a id="pay-link" href="#"
-                                style="display: inline-flex; align-items: center; background-color: #f1f1f1; color: white; padding: 10px 20px; border-radius: 50px; text-decoration: none; font-weight: bold; font-size: 0.9rem; transition: transform 0.2s;">
-                                <!-- <i class="fas fa-mobile-alt" style="margin-right: 8px;"></i> Open UPI App -->
-                            </a>
+                            <a id="pay-link" href="#" class="pay-link">
+                                </a>
                         </div>
-
                     </div>
                 </div>
-                <h3 style="font-size: 1.1rem; color: var(--text-main); margin-bottom: 15px;">Confirm Payment</h3>
+
+                <h3 class="section-title" style="font-size: 1.1rem; margin-bottom: 15px;">Confirm Payment</h3>
 
                 <form method="POST">
                     {% csrf_token %}
                     <input type="hidden" id="selected-plan-input" name="plan_type" value="monthly">
 
-                    <div style="margin-bottom: 15px;">
-                        <label
-                            style="display: block; font-size: 0.9rem; font-weight: bold; color: var(--text-main); margin-bottom: 5px;">Your
-                            Name</label>
-                        <input type="text" name="name" required placeholder="Enter your name"
-                            style="width: 100%; padding: 12px; border: 1px solid var(--border-color); background: var(--bg-card); color: var(--text-main); border-radius: 8px; outline: none;">
+                    <div class="form-group">
+                        <label class="form-label form-label-dark">Your Name</label>
+                        <input type="text" name="name" required placeholder="Enter your name" class="form-input">
                     </div>
 
-                    <div style="margin-bottom: 15px;">
-                        <label
-                            style="display: block; font-size: 0.9rem; font-weight: bold; color: var(--text-main); margin-bottom: 5px;">Your
-                            UPI ID</label>
-                        <input type="text" name="upi_id" required placeholder="example@oksbi"
-                            style="width: 100%; padding: 12px; border: 1px solid var(--border-color); background: var(--bg-card); color: var(--text-main); border-radius: 8px; outline: none;">
+                    <div class="form-group">
+                        <label class="form-label form-label-dark">Your UPI ID</label>
+                        <input type="text" name="upi_id" required placeholder="example@oksbi" class="form-input">
                     </div>
 
-                    <div style="margin-bottom: 25px;">
-                        <label
-                            style="display: block; font-size: 0.9rem; font-weight: bold; color: var(--text-main); margin-bottom: 5px;">Transaction
-                            ID (UTR)</label>
-                        <input type="text" name="transaction_id" required placeholder="Ex: 432109876543"
-                            style="width: 100%; padding: 12px; border: 2px solid var(--accent-color); background: var(--bg-card); color: var(--text-main); border-radius: 8px; outline: none;">
+                    <div class="form-group mb-25">
+                        <label class="form-label form-label-dark">Transaction ID (UTR)</label>
+                        <input type="text" name="transaction_id" required placeholder="Ex: 432109876543" class="form-input highlight-input">
                     </div>
 
-                    <button type="submit"
-                        style="width: 100%; padding: 15px; background: var(--text-main); color: var(--bg-card); border: none; border-radius: 8px; font-weight: bold; cursor: pointer;">
-                        Submit Verification
-                    </button>
+                    <button type="submit" class="submit-btn">Submit Verification</button>
                 </form>
             </div>
         </div>
     </div>
-</body>
-<script src="{% static 'js/main.js' %}"></script>
-<script>
-    // 1. Define Data for Plans
-    const plans = {
-        'monthly': {
-            title: "Monthly Premium",
-            price: "149",
-            features: [
-                "✨ Get 20 Quizzes per day",
-                "✨ Access to all categories",
-                "✨ No commitment, cancel anytime"
-            ]
-        },
-        'yearly': {
-            title: "Yearly Pro",
-            price: "1299",
-            features: [
-                "🔥 Get 20 Quizzes per day",
-                "💰 Save ₹489 compared to monthly",
-                "🏷️ 27.35% Discount applied",
-                "🚀 Priority Support"
-            ]
+
+    <script src="{% static 'js/main.js' %}"></script>
+    <script>
+        // 1. Define Data for Plans
+        const plans = {
+            'monthly': {
+                title: "Monthly Premium",
+                price: "149",
+                features: [
+                    "✨ Get 20 Quizzes per day",
+                    "✨ Access to all categories",
+                    "✨ No commitment, cancel anytime"
+                ]
+            },
+            'yearly': {
+                title: "Yearly Pro",
+                price: "1299",
+                features: [
+                    "🔥 Get 20 Quizzes per day",
+                    "💰 Save ₹489 compared to monthly",
+                    "🏷️ 27.35% Discount applied",
+                    "🚀 Priority Support"
+                ]
+            }
+        };
+
+        // Your UPI ID from Django Context
+        const myUpiId = "{{ my_upi_id }}";
+
+        function updatePlan() {
+            // 1. Get Selected Value (monthly/yearly)
+            const selected = document.getElementById('plan-selector').value;
+            const planData = plans[selected];
+
+            // 2. Update Left Side (Title, Price, Features)
+            document.getElementById('plan-title').innerText = planData.title;
+            document.getElementById('display-price').innerText = "₹" + planData.price;
+
+            // Clear and Rebuild Feature List
+            const featureList = document.getElementById('feature-list');
+            featureList.innerHTML = ""; // Clear old
+            planData.features.forEach(feature => {
+                const li = document.createElement('li');
+                // I updated the JS slightly here to use the new CSS class for the green icon!
+                li.innerHTML = `<i class="fas fa-check-circle feature-icon"></i> ${feature}`;
+                featureList.appendChild(li);
+            });
+
+            // 3. Update Hidden Form Input
+            document.getElementById('selected-plan-input').value = selected;
+
+            // 4. Update Right Side (QR Code & Payment Link)
+            // Construct the UPI String: upi://pay?pa=YOUR_ID&am=AMOUNT
+            const upiString = `upi://pay?pa=${myUpiId}&pn=QuizForge&am=${planData.price}&cu=INR`;
+
+            // Update Link
+            document.getElementById('pay-link').href = upiString;
         }
-    };
 
-    // Your UPI ID from Django Context
-    const myUpiId = "{{ my_upi_id }}";
-
-    function updatePlan() {
-        // 1. Get Selected Value (monthly/yearly)
-        const selected = document.getElementById('plan-selector').value;
-        const planData = plans[selected];
-
-        // 2. Update Left Side (Title, Price, Features)
-        document.getElementById('plan-title').innerText = planData.title;
-        document.getElementById('display-price').innerText = "₹" + planData.price;
-
-        // Clear and Rebuild Feature List
-        const featureList = document.getElementById('feature-list');
-        featureList.innerHTML = ""; // Clear old
-        planData.features.forEach(feature => {
-            const li = document.createElement('li');
-            li.innerHTML = `<i class="fas fa-check-circle" style="color: #10b981; margin-right: 8px;"></i> ${feature}`;
-            featureList.appendChild(li);
-        });
-
-        // 3. Update Hidden Form Input
-        document.getElementById('selected-plan-input').value = selected;
-
-        // 4. Update Right Side (QR Code & Payment Link)
-        // Construct the UPI String: upi://pay?pa=YOUR_ID&am=AMOUNT
-        const upiString = `upi://pay?pa=${myUpiId}&pn=QuizForge&am=${planData.price}&cu=INR`;
-
-        // Update Link
-        document.getElementById('pay-link').href = upiString;
-
-        /* Update QR Code (Using Google Charts API or qrserver)
-        const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(upiString)}`;
-        document.getElementById('qr-image').src = qrUrl; */
-    }
-
-    // Initialize on page load
-    window.onload = updatePlan;
-</script>
-{% endblock %}
-
+        // Initialize on page load
+        window.onload = updatePlan;
+    </script>
+    {% endblock %}
+</body>
 </html>

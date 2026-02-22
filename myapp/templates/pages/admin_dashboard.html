@@ -8,7 +8,6 @@
 </head>
 
 <body>
-
     {% block content %}
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -115,6 +114,11 @@
     {{ free_count|json_script:"free-count-data" }}
 
     <style>
+        /* --- NEW: Global Reset --- */
+        *, *::before, *::after {
+            box-sizing: border-box;
+        }
+
         /* Global Reset */
         .display-admin-link {
             background: white;
@@ -123,14 +127,12 @@
             font-weight: 600;
             color: #475569;
             border: 1px solid #e2e8f0;
-            /* Border added */
             box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
         }
 
         .dashboard-container {
             font-family: 'Inter', sans-serif;
             background-color: #f8fafc;
-            /* Very light slate background */
             min-height: 100vh;
             padding: 40px;
             color: #334155;
@@ -141,7 +143,6 @@
             display: flex;
             justify-content: space-between;
             align-items: flex-end;
-            /* Aligns text bottom with button bottom */
             margin-bottom: 35px;
         }
 
@@ -149,12 +150,10 @@
             display: flex;
             align-items: center;
             gap: 15px;
-            /* Space between Admin button and Date */
         }
 
         .admin-btn {
             background-color: #3b82f6;
-            /* Blue Color */
             color: white;
             text-decoration: none;
             padding: 8px 16px;
@@ -170,7 +169,6 @@
 
         .admin-btn:hover {
             background-color: #2563eb;
-            /* Darker Blue on Hover */
             transform: translateY(-1px);
             color: white;
         }
@@ -196,6 +194,9 @@
             color: #475569;
             border: 1px solid #e2e8f0;
             box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+            display: flex;
+            align-items: center;
+            gap: 8px;
         }
 
         /* Stat Cards */
@@ -214,9 +215,7 @@
             align-items: center;
             gap: 20px;
             border: 1px solid #e2e8f0;
-            /* Border added */
             box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
-            /* Softer shadow */
             transition: transform 0.2s, box-shadow 0.2s, border-color 0.2s;
         }
 
@@ -224,7 +223,6 @@
             transform: translateY(-3px);
             box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
             border-color: #cbd5e1;
-            /* Darker border on hover */
         }
 
         .icon-box {
@@ -236,28 +234,12 @@
             justify-content: center;
             font-size: 1.5rem;
             border: 1px solid rgba(0, 0, 0, 0.05);
-            /* Subtle inner border */
         }
 
-        .icon-box.blue {
-            background: #eff6ff;
-            color: #3b82f6;
-        }
-
-        .icon-box.gold {
-            background: #fffbeb;
-            color: #f59e0b;
-        }
-
-        .icon-box.green {
-            background: #f0fdf4;
-            color: #10b981;
-        }
-
-        .icon-box.purple {
-            background: #faf5ff;
-            color: #a855f7;
-        }
+        .icon-box.blue { background: #eff6ff; color: #3b82f6; }
+        .icon-box.gold { background: #fffbeb; color: #f59e0b; }
+        .icon-box.green { background: #f0fdf4; color: #10b981; }
+        .icon-box.purple { background: #faf5ff; color: #a855f7; }
 
         .stat-details h3 {
             font-size: 0.85rem;
@@ -287,13 +269,11 @@
             border-radius: 12px;
             padding: 24px;
             border: 1px solid #e2e8f0;
-            /* Border added */
             box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
         }
 
         .panel-header {
             border-bottom: 1px solid #f1f5f9;
-            /* Separator line added */
             margin: -24px -24px 20px -24px;
             padding: 20px 24px;
         }
@@ -313,13 +293,8 @@
             width: 100%;
         }
 
-        .main-canvas {
-            height: 350px;
-        }
-
-        .small-canvas {
-            height: 220px;
-        }
+        .main-canvas { height: 350px; }
+        .small-canvas { height: 220px; }
 
         .side-panels {
             display: flex;
@@ -327,14 +302,45 @@
             gap: 24px;
         }
 
-        /* Mobile Responsive */
+        /* --- Tablet Responsive --- */
         @media (max-width: 992px) {
             .charts-grid {
                 grid-template-columns: 1fr;
             }
-
             .dashboard-container {
                 padding: 20px;
+            }
+        }
+
+        /* --- NEW: Mobile Phone Responsive --- */
+        @media (max-width: 600px) {
+            .dashboard-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 20px;
+            }
+            
+            .header-actions {
+                width: 100%;
+                flex-direction: column;
+                align-items: stretch;
+            }
+            
+            .admin-btn, .date-display {
+                width: 100%;
+                justify-content: center;
+            }
+            
+            .page-title {
+                font-size: 1.5rem;
+            }
+            
+            .stat-card {
+                padding: 15px;
+            }
+            
+            .main-canvas {
+                height: 250px; /* Scales the large chart down for small screens */
             }
         }
     </style>
@@ -342,7 +348,6 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>
         document.addEventListener("DOMContentLoaded", function () {
-
             function getData(id) { return JSON.parse(document.getElementById(id).textContent); }
 
             // Global Font Setting
@@ -359,7 +364,7 @@
                         datasets: [{
                             label: 'Quizzes Taken',
                             data: getData('quiz-counts-data'),
-                            borderColor: '#3b82f6', // Bright Blue
+                            borderColor: '#3b82f6',
                             backgroundColor: 'rgba(59, 130, 246, 0.1)',
                             borderWidth: 2,
                             pointBackgroundColor: '#fff',
@@ -390,7 +395,7 @@
                         labels: ['Premium', 'Free'],
                         datasets: [{
                             data: [getData('premium-count-data'), getData('free-count-data')],
-                            backgroundColor: ['#fbbf24', '#e2e8f0'], // Gold & Slate
+                            backgroundColor: ['#fbbf24', '#e2e8f0'],
                             borderWidth: 0,
                             hoverOffset: 4
                         }]
@@ -414,7 +419,7 @@
                         datasets: [{
                             label: 'Attempts',
                             data: getData('topic-counts-data'),
-                            backgroundColor: '#10b981', // Emerald Green
+                            backgroundColor: '#10b981',
                             borderRadius: 4,
                             barPercentage: 0.5
                         }]

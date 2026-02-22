@@ -304,16 +304,16 @@ body {
 }
 
 .mobile-menu {
- display: none; 
-    flex-direction: column; 
-    background: #ffffff; 
-    padding: 1rem; 
-    border-top: 1px solid #e5e7eb; 
-    position: absolute; 
-    top: 4.5rem; 
-    left: 0; 
-    right: 0;
-    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+  display: none;
+  flex-direction: column;
+  background: #ffffff;
+  padding: 1rem;
+  border-top: 1px solid #e5e7eb;
+  position: absolute;
+  top: 4.5rem;
+  left: 0;
+  right: 0;
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
 }
 
 .mobile-menu.active {
@@ -345,18 +345,22 @@ body {
 }
 
 .mobile-card {
-    position: static; 
-    width: 100%; 
-    box-shadow: none; 
-    border: 1px solid #e5e7eb; /* Light border around profile card */
-    border-radius: 12px; 
-    margin-top: 15px;
+  position: static;
+  width: 100%;
+  box-shadow: none;
+  border: 1px solid #e5e7eb; /* Light border around profile card */
+  border-radius: 12px;
+  margin-top: 15px;
 }
 
-.mobile-card .pd-header { padding: 15px; } 
-.mobile-card .pd-avatar-container { display: none; }
+.mobile-card .pd-header {
+  padding: 15px;
+}
+.mobile-card .pd-avatar-container {
+  display: none;
+}
 .mobile-profile-trigger span {
-    color: #334155; /* Name color */
+  color: #334155; /* Name color */
 }
 /* =================================================================
    BUTTONS & BADGES
@@ -364,7 +368,7 @@ body {
 .btn-ghost {
   text-decoration: none;
   font-weight: 500;
-  color: #551A8B;
+  color: #551a8b;
 }
 .btn-primary {
   background: var(--primary-color, #a855f7);
@@ -462,6 +466,25 @@ body {
   .nav-links {
     display: flex;
     gap: 2rem;
+  }
+}
+@media (max-width: 600px) {
+  body.lock-scroll {
+    overflow: hidden !important;
+  }
+
+  /* Changed from .dropdown-menu to .mobile-menu to match your HTML id */
+  .mobile-menu {
+    max-height: calc(100vh - 70px) !important;
+    overflow-y: auto !important;
+    overscroll-behavior: contain !important;
+    -webkit-overflow-scrolling: touch !important; /* Smooth scrolling for iOS */
+    padding-bottom: 40px !important; /* Extra space so bottom items aren't cut off */
+  }
+  .profile-dropdown-card.mobile-card.show {
+    display: block !important;
+    position: relative !important;
+    margin-bottom: 30px !important;
   }
 }
 @keyframes slideDown {
