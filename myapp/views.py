@@ -109,18 +109,28 @@ def registration_form(request):
             return redirect('registration')
          
         try:
-            user = AppUsers(
-                email=email,
-                password=hashed_password,
+            otp = str(random.randint(100000, 999999))
+
+            # store the raw password temporarily so create_user can hash it later
+            request.session['pending_registration'] = {
+                'email': email,
+                'password': password
+            }
+
+            # Save the OTP in the cache for 5 minutes (using the email as the key)
+            cache.set(f'otp_reg_{email}', otp, 300)
+
+            # Send the verification email
+            send_mail(
+                subject='Verify your Quizolve Account',
+                message=f'Welcome to Quizolve! Your verification code is: {otp}',
+                from_email=None, 
+                recipient_list=[email],
+                fail_silently=False,
             )
-
-            if profile_photo:
-                user.profile_photo = profile_photo
-
-            user.save()
-
-            messages.success(request, "User registered successfully!")
-            return redirect('login')
+            messages.success(request, "Please check your email for the verification code.")
+            return redirect('verify-registration-otp')
+        
         except Exception as e:
             messages.error(request, f"Something went wrong: {str(e)}")
             return redirect('registration')
@@ -792,6 +802,49 @@ def verify_login_otp_view(request):
         'demo_otp': demo_otp
     })
 
+# CUSTOM REGISTRATION WITH OTP 
+def verify_registration_otp_view(request):
+    # Retrieve the pending data from the session
+    pending_user = request.session.get('pending_registration')
+    
+    # If there is no pending user data, they shouldn't be on this page
+    if not pending_user:
+        messages.error(request, "Session expired or invalid. Please register again.")
+        return redirect('registration')
+
+    email = pending_user.get('email')
+
+    if request.method == 'POST':
+        entered_otp = request.POST.get('otp')
+        cached_otp = cache.get(f'otp_reg_{email}')
+        
+        if cached_otp and str(entered_otp) == str(cached_otp):
+            # OTP Matches! NOW we save the user to the database.
+            try:
+                # We use create_user so the password gets hashed securely
+                user = AppUsers.objects.create_user(
+                    email=email,
+                    password=pending_user.get('password')
+                )
+                
+                # Cleanup the cache and session
+                cache.delete(f'otp_reg_{email}')
+                del request.session['pending_registration']
+                
+                messages.success(request, "Account created successfully! You can now log in.")
+                return redirect('login')
+                
+            except Exception as e:
+                messages.error(request, f"Error creating account: {str(e)}")
+                return redirect('registration')
+        else:
+            messages.error(request, "Invalid or expired OTP.")
+
+    # We can reuse your existing OTP template here
+    return render(request, 'user/ForgetPassword/verify_otp.html', {
+        'action': 'Register',
+        'email': email
+    })
 
 # --- 2. FORGOT PASSWORD WITH OTP ---
 def forgot_password_view(request):

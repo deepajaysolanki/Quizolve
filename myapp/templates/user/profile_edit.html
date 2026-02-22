@@ -179,11 +179,11 @@
             </div>
             <div class="form-group">
                 <label for="{{ form.first_name.id_for_label }}">First name:</label>
-                {{ form.first_name }}
+                <input type="text" name="first_name" value="{{ user.first_name|default:'' }}" class="form-control">
             </div>
             <div class="form-group">
                 <label for="{{ form.last_name.id_for_label }}">Last name:</label>
-                {{ form.last_name }}
+                <input type="text" name="last_name" value="{{ user.last_name|default:'' }}" class="form-control">
             </div>
             <a href="{% url 'account_password_change' %}" class="btn btn-secondary">Change Password</a>
             <div class="button-group">
