@@ -1,7 +1,7 @@
 from pathlib import Path
 from decouple import config, Csv
 import dj_database_url
-import os
+import os, dj_database_url
 
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -77,7 +77,11 @@ WSGI_APPLICATION = 'myproject.wsgi.application'
 
 
 DATABASES = {
-    'default': {}
+    'default': dj_database_url.config(
+        # This tells Django to use the Render DATABASE_URL if it exists, or fall back to local SQLite.
+        default=os.environ.get('DATABASE_URL', 'sqlite:///db.sqlite3'),
+        conn_max_age=600
+    )
 }
 
 # INTELLIGENT DATABASE SWITCH
