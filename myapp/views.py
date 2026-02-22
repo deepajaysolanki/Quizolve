@@ -60,8 +60,6 @@ def contact_page(request):
 
 def registration_form(request):
     if request.method == 'POST':
-        first_name = request.POST.get('first_name')
-        last_name = request.POST.get('last_name')
         email = request.POST.get('email')
         password = request.POST.get('password')
         confirm_password = request.POST.get('confirm_password')
@@ -69,24 +67,12 @@ def registration_form(request):
 
         field_errors = {}
 
-        if not first_name:
-            field_errors['first_name'] = "First Name is required."
-        if not last_name:
-            field_errors['last_name'] = "Last Name is required."
         if not email:
             field_errors['email'] = "Email is required."
         if not password:
             field_errors['password'] = "Password is required."
         if not confirm_password:
             field_errors['confirm_password'] = "Confirm password is required."
-
-        # first name validation
-        if first_name and not re.match(r'^[a-zA-Z]{1,25}$', first_name):
-            field_errors['first_name'] = "Enter a valid First name."
-
-        # last name validation
-        if last_name and not re.match(r'^[a-zA-Z]{1,25}$', last_name):
-            field_errors['last_name'] = "Enter a valid Last name."
 
          # Password validation
         if password and not re.match(r'^(?=.*\d)(?=.*[\W_]).{8,}$', password):
@@ -101,7 +87,7 @@ def registration_form(request):
             field_errors['email'] = "Invalid email format."
 
         # Field validation
-        if not all([first_name, last_name, email, password, confirm_password]):
+        if not all([email, password, confirm_password]):
             messages.error(request, "All fields are required.")
             return redirect('registration')
         
@@ -116,8 +102,6 @@ def registration_form(request):
         if field_errors:
             request.session['field_errors'] = field_errors  # store for template
             request.session['old_data'] = {
-                'first_name': first_name,
-                'last_name': last_name,
                 'email': email,
                 'password': hashed_password,
                 'confirm_password': confirm_password
@@ -126,8 +110,8 @@ def registration_form(request):
          
         try:
             user = AppUsers(
-                first_name=first_name,
-                last_name=last_name,
+                first_name=None,
+                last_name=None,
                 email=email,
                 password=hashed_password,
             )
