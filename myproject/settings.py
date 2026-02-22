@@ -80,7 +80,7 @@ DATABASES = {
     'default': dj_database_url.config(
         # This tells Django to use the Render DATABASE_URL if it exists, or fall back to local SQLite.
         default=os.environ.get('DATABASE_URL', 'sqlite:///db.sqlite3'),
-        conn_max_age=600
+        conn_max_age=0
     )
 }
 
