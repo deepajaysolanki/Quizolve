@@ -97,14 +97,6 @@
             <p style="color: red">{{ field_errors.email }}</p>
             {% endif %}
           </div>
-          <div class="form-group">
-            <label for="dob">Date of Birth</label>
-            <input type="date" name="date_of_birth" value="{{ old_data.date_of_birth|default:'' }}" class="form-input"
-              required />
-            {% if field_errors.date_of_birth %}
-            <p style="color: red">{{ field_errors.date_of_birth }}</p>
-            {% endif %}
-          </div>
           <div class="form-row">
             <div class="form-group">
               <label for="password">Password</label>

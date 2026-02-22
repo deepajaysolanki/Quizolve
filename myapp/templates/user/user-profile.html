@@ -143,7 +143,7 @@
         <h1>{% if user.first_name and user.last_name %}
             {{ user.first_name }} {{ user.last_name }}
             {% else %}
-            {{ user.username }}
+                 <a href="{% url 'profile-edit' %}" class="set-link">Set Name</a>
             {% endif %}</h1>
 
         <div class="details-grid">
@@ -151,15 +151,6 @@
                 <strong>Email:</strong>
                 <span>{{ user.email }}</span>
             </div>
-            <div class="profile-detail">
-                <strong>Date Of Birth:</strong>
-                {% if user.date_of_birth %}
-                {{ user.date_of_birth|date:"F d, Y" }}
-                {% else %}
-                <a href="{% url 'profile-edit' %}" class="set-link">Set Date</a>
-                {% endif %}
-            </div>
-
         </div>
 
         <a href="{% url 'profile-edit' %}" class="edit-profile-btn">Edit Profile</a>

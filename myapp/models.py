@@ -30,7 +30,6 @@ class AppUsers(AbstractBaseUser, PermissionsMixin):
     first_name = models.CharField(max_length=100, null=True, blank=True)
     last_name = models.CharField(max_length=100, null=True, blank=True)
     email = models.EmailField(unique=True)
-    date_of_birth = models.DateField(null=True, blank=True)
     password = models.CharField(max_length=128, verbose_name='password')
     profile_photo = models.ImageField(
         upload_to='profile_photos/',

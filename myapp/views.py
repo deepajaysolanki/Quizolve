@@ -63,7 +63,6 @@ def registration_form(request):
         first_name = request.POST.get('first_name')
         last_name = request.POST.get('last_name')
         email = request.POST.get('email')
-        dob = request.POST.get('date_of_birth') 
         password = request.POST.get('password')
         confirm_password = request.POST.get('confirm_password')
         profile_photo = request.FILES.get('profile_photo')  
@@ -74,8 +73,6 @@ def registration_form(request):
             field_errors['first_name'] = "First Name is required."
         if not last_name:
             field_errors['last_name'] = "Last Name is required."
-        if not dob:
-            field_errors['date_of_birth'] = "Date of birth is required."
         if not email:
             field_errors['email'] = "Email is required."
         if not password:
@@ -104,7 +101,7 @@ def registration_form(request):
             field_errors['email'] = "Invalid email format."
 
         # Field validation
-        if not all([first_name, last_name, dob, email, password, confirm_password]):
+        if not all([first_name, last_name, email, password, confirm_password]):
             messages.error(request, "All fields are required.")
             return redirect('registration')
         
@@ -122,7 +119,6 @@ def registration_form(request):
                 'first_name': first_name,
                 'last_name': last_name,
                 'email': email,
-                'date_of_birth': dob,
                 'password': hashed_password,
                 'confirm_password': confirm_password
             }
@@ -132,7 +128,6 @@ def registration_form(request):
             user = AppUsers(
                 first_name=first_name,
                 last_name=last_name,
-                date_of_birth=dob,
                 email=email,
                 password=hashed_password,
             )
@@ -214,7 +209,6 @@ def profile_view(request):
         first_name = current_user.first_name
         last_name = current_user.last_name
         email = current_user.email
-        date_of_birth = current_user.date_of_birth
         profile_photo = current_user.profile_photo.url
 
         # Create a context dictionary with your variables
@@ -222,7 +216,6 @@ def profile_view(request):
             'first_name': first_name,
             'last_name': last_name,
             'email': email,
-            'date_of_birth': date_of_birth,
             'profile_photo': profile_photo  
         }
         
