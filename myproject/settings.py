@@ -34,6 +34,11 @@ INSTALLED_APPS = [
     'allauth.socialaccount',
     'allauth.socialaccount.providers.google',
 
+    # for cloudinary media storage
+    'cloudinary_storage',
+    'django.contrib.staticfiles',
+    'cloudinary',
+
     # my app
     'myapp',
 
@@ -220,6 +225,9 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+
+# Cloudinary settings for media storage
+DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
 
 # API key for AI models
 GROQ_API_KEY = os.environ.get("GROQ_API_KEY")
