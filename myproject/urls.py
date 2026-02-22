@@ -23,6 +23,7 @@ urlpatterns = [
     path('login/', views.login_view, name='login'),
     path('login/verify/', views.verify_login_otp_view, name='verify-login-otp'),
     path('registration/', views.registration_form, name='registration'),
+    path('verify-registration-otp/', views.verify_registration_otp_view, name='verify-registration-otp'),
     path('logout/', views.logout_view, name='logout'),
     path('profile/', views.profile_view, name='user-profile'),
     path('profile/edit/', views.profile_edit_view, name='profile-edit'),

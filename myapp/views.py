@@ -63,10 +63,8 @@ def registration_form(request):
         email = request.POST.get('email')
         password = request.POST.get('password')
         confirm_password = request.POST.get('confirm_password')
-        profile_photo = request.FILES.get('profile_photo')  
 
         field_errors = {}
-
         if not email:
             field_errors['email'] = "Email is required."
         if not password:
@@ -109,26 +107,26 @@ def registration_form(request):
             return redirect('registration')
          
         try:
-            otp = str(random.randint(100000, 999999))
-
-            # store the raw password temporarily so create_user can hash it later
+            # Store registration data temporarily (NO database save yet!)
             request.session['pending_registration'] = {
                 'email': email,
                 'password': password
             }
 
-            # Save the OTP in the cache for 5 minutes (using the email as the key)
+            # Generate OTP using your existing helper function
+            otp = generate_otp()
+
+            # Store the OTP in the cache for 5 minutes (300 seconds)
             cache.set(f'otp_reg_{email}', otp, 300)
 
-            # Send the verification email
-            send_mail(
-                subject='Verify your Quizolve Account',
-                message=f'Welcome to Quizolve! Your verification code is: {otp}',
-                from_email=None, 
-                recipient_list=[email],
-                fail_silently=False,
-            )
-            messages.success(request, "Please check your email for the verification code.")
+            # BYPASS LOGIC
+            if email == 'demo09125@gmail.com':
+                send_otp_email(email, otp)
+                messages.success(request, f"OTP sent to {email}")
+            else:
+                # Save OTP in session to display on the next page
+                request.session['demo_otp'] = otp
+                messages.warning(request, "Email bypassed. Please use the OTP displayed below.")
             return redirect('verify-registration-otp')
         
         except Exception as e:
@@ -730,7 +728,7 @@ def record_attempt_on_leave_api(request):
         return redirect('login')
     
 # OTP Email Functionalities
-# --- 1. CUSTOM LOGIN WITH OTP ---
+# ---  CUSTOM LOGIN WITH OTP ---
 def login_view(request):
     if request.method == 'POST':
         email = request.POST.get('email')
@@ -802,7 +800,7 @@ def verify_login_otp_view(request):
         'demo_otp': demo_otp
     })
 
-# CUSTOM REGISTRATION WITH OTP 
+# --- REGISTRATION WITH OTP ---
 def verify_registration_otp_view(request):
     # Retrieve the pending data from the session
     pending_user = request.session.get('pending_registration')
@@ -813,6 +811,9 @@ def verify_registration_otp_view(request):
         return redirect('registration')
 
     email = pending_user.get('email')
+
+    # Grab the demo OTP if it exists for testing
+    demo_otp = request.session.get('demo_otp')
 
     if request.method == 'POST':
         entered_otp = request.POST.get('otp')
@@ -831,6 +832,9 @@ def verify_registration_otp_view(request):
                 cache.delete(f'otp_reg_{email}')
                 del request.session['pending_registration']
                 
+                if 'demo_otp' in request.session:
+                    del request.session['demo_otp']
+
                 messages.success(request, "Account created successfully! You can now log in.")
                 return redirect('login')
                 
@@ -840,10 +844,11 @@ def verify_registration_otp_view(request):
         else:
             messages.error(request, "Invalid or expired OTP.")
 
-    # We can reuse your existing OTP template here
+    # Reuse your existing OTP template here
     return render(request, 'user/ForgetPassword/verify_otp.html', {
         'action': 'Register',
-        'email': email
+        'email': email,
+        'demo_otp': demo_otp
     })
 
 # --- 2. FORGOT PASSWORD WITH OTP ---
