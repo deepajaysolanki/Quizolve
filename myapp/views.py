@@ -110,8 +110,6 @@ def registration_form(request):
          
         try:
             user = AppUsers(
-                first_name=None,
-                last_name=None,
                 email=email,
                 password=hashed_password,
             )
