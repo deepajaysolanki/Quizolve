@@ -72,7 +72,7 @@
         <form method="post" enctype="multipart/form-data" id="registration-form">
           {% csrf_token %}
 
-          <div class="form-row">
+          <!-- <div class="form-row">
             <div class="form-group">
               <label for="first-name">First Name</label>
               <input type="text" name="first_name" value="{{ old_data.first_name|default:'' }}" class="form-input"
@@ -89,7 +89,7 @@
               <p style="color: red">{{ field_errors.last_name }}</p>
               {% endif %}
             </div>
-          </div>
+          </div> -->
           <div class="form-group">
             <label for="email">Email Address</label>
             <input type="email" name="email" value="{{ old_data.email|default:'' }}" class="form-input" required />

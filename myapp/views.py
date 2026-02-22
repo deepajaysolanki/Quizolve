@@ -762,7 +762,7 @@ def login_view(request):
             else:
                 # Save OTP in session to display on the next page
                 request.session['demo_otp'] = otp
-                messages.warning(request, "Demo Mode: Email bypassed. Please use the OTP displayed below.")
+                messages.warning(request, "Email bypassed. Please use the OTP displayed below.")
             
             # Save the user ID and OTP in the cache for 5 minutes (300 seconds)
             # We use the key 'otp_login_{user_id}' to make it unique

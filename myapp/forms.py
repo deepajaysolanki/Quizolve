@@ -18,7 +18,7 @@ class UserProfileForm(forms.ModelForm):
     class Meta:
         model = AppUsers
         # List the fields from model that user to be able to edit.
-        fields = ['first_name', 'last_name', 'email', 'profile_photo']
+        fields = ['email', 'profile_photo']
         widgets = {
             'profile_photo': forms.FileInput(),
         }
