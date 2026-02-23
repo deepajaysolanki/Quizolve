@@ -19,13 +19,13 @@ ALLOWED_HOSTS = ['*']
 # Application definition
 
 INSTALLED_APPS = [
+    'cloudinary_storage',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'cloudinary_storage',
 
     # for signup with google functionality
     'django.contrib.sites',
@@ -43,6 +43,14 @@ INSTALLED_APPS = [
     # for cloudinary media storage
     'cloudinary',
 ]
+
+# Cloudinary configuration for media storage (profile photos)
+CLOUDINARY_STORAGE = {
+    'CLOUD_NAME': os.getenv('CLOUDINARY_CLOUD_NAME'),
+    'API_KEY': os.getenv('CLOUDINARY_API_KEY'),
+    'API_SECRET': os.getenv('CLOUDINARY_API_SECRET'),
+    'STATICFILES_WHITELIST': (os.path.join(BASE_DIR, 'static'),), # Fixes the CSS issue
+}
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -114,14 +122,6 @@ else:
             'init_command': "SET sql_mode='STRICT_TRANS_TABLES'"
         }
     }
-
-# Cloudinary configuration for media storage (profile photos)
-CLOUDINARY_STORAGE = {
-    'CLOUD_NAME': os.getenv('CLOUDINARY_CLOUD_NAME'),
-    'API_KEY': os.getenv('CLOUDINARY_API_KEY'),
-    'API_SECRET': os.getenv('CLOUDINARY_API_SECRET')
-}
-
 
 AUTH_PASSWORD_VALIDATORS = [
     {
