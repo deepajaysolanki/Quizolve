@@ -13,7 +13,6 @@ SECRET_KEY = config('SECRET_KEY', default='django-insecure-change-me-locally-onl
 # Checks if we are on Render. If yes, Debug=False. If no, Debug=True.
 DEBUG = False
 
-# DEBUG = not config('RENDER', default=False, cast=bool)
 # Allow all hosts for now to prevent 400 Bad Request errors
 ALLOWED_HOSTS = ['*']
 
@@ -45,15 +44,6 @@ INSTALLED_APPS = [
     'cloudinary',
 ]
 
-CLOUDINARY_STORAGE = {
-    'CLOUD_NAME': os.getenv('CLOUDINARY_CLOUD_NAME'),
-    'API_KEY': os.getenv('CLOUDINARY_API_KEY'),
-    'API_SECRET': os.getenv('CLOUDINARY_API_SECRET')
-}
-
-DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
-AUTH_USER_MODEL = 'myapp.AppUsers'
-
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'whitenoise.middleware.WhiteNoiseMiddleware',
@@ -67,6 +57,7 @@ MIDDLEWARE = [
 ]
 
 ROOT_URLCONF = 'myproject.urls'
+AUTH_USER_MODEL = 'myapp.AppUsers'
 
 TEMPLATES = [
     {
@@ -99,15 +90,12 @@ DATABASES = {
 if config('RENDER', default=False, cast=bool):
     # YES -> Use PostgreSQL (Render automatically provides DATABASE_URL)
     DATABASES['default'] = dj_database_url.config(conn_max_age=600, ssl_require=True)
-
-    # # FIX SSL LOOP (Crucial for "Infinite Loading")
-    # SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
-    # SECURE_SSL_REDIRECT = True
     
     # Enable Compressed Static Files (Crucial for CSS)
     STATICFILES_STORAGE = 'whitenoise.storage.CompressedStaticFilesStorage'
+    DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
 
-    # We TRUST Render to handle the HTTPS. We do NOT ask Django to redirect.
+    # Sequirity settings for production on Render
     SECURE_SSL_REDIRECT = False            
     SESSION_COOKIE_SECURE = True            
     CSRF_COOKIE_SECURE = True               
@@ -126,6 +114,13 @@ else:
             'init_command': "SET sql_mode='STRICT_TRANS_TABLES'"
         }
     }
+
+# Cloudinary configuration for media storage (profile photos)
+CLOUDINARY_STORAGE = {
+    'CLOUD_NAME': os.getenv('CLOUDINARY_CLOUD_NAME'),
+    'API_KEY': os.getenv('CLOUDINARY_API_KEY'),
+    'API_SECRET': os.getenv('CLOUDINARY_API_SECRET')
+}
 
 
 AUTH_PASSWORD_VALIDATORS = [
