@@ -152,12 +152,13 @@ USE_TZ = True
 
 STATIC_URL = 'static/'
 STATICFILES_DIRS = [
-    # BASE_DIR / "static",
-    os.path.join(BASE_DIR, 'static'),
+    BASE_DIR / "static",
+    # os.path.join(BASE_DIR, 'static'),
 ]
 
-# This is for production (but good to have)
-STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+# In production, STATIC_ROOT is where 'collectstatic' will gather all static files for efficient serving.
+STATIC_ROOT = BASE_DIR/ "staticfiles"
+# STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
 # Signup with google functionality
 SOCIALACCOUNT_ADAPTER = 'myapp.adapters.MySocialAccountAdapter'
