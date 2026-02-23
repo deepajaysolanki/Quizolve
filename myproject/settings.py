@@ -49,7 +49,7 @@ CLOUDINARY_STORAGE = {
     'CLOUD_NAME': os.getenv('CLOUDINARY_CLOUD_NAME'),
     'API_KEY': os.getenv('CLOUDINARY_API_KEY'),
     'API_SECRET': os.getenv('CLOUDINARY_API_SECRET'),
-    'STATICFILES_WHITELIST': (os.path.join(BASE_DIR, 'static'),), # Fixes the CSS issue
+    'STATICFILES_WHITELIST': (os.path.join(BASE_DIR, 'static'),)
 }
 
 MIDDLEWARE = [
@@ -154,11 +154,9 @@ STATIC_URL = 'static/'
 STATICFILES_DIRS = [
     # BASE_DIR / "static",
     os.path.join(BASE_DIR, 'static'),
-    os.path.join(BASE_DIR, 'myapp', 'static')
 ]
 
 # In production, STATIC_ROOT is where 'collectstatic' will gather all static files for efficient serving.
-# STATIC_ROOT = BASE_DIR/ "staticfiles"
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
 # Signup with google functionality
