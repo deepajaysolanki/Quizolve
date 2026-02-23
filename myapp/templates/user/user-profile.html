@@ -145,7 +145,7 @@
 
     <div class="profile-card">
         <div class="profile-picture-container">
-            <img src="/media/{{ user.profile_photo }}" alt="Profile Photo" class="profile-picture">
+            <img src="{{ request.user.profile_photo.url }}" alt="Profile Photo" class="profile-picture">
         </div>
 
         <h1>{% if user.first_name and user.last_name %}
