@@ -92,7 +92,7 @@ if config('RENDER', default=False, cast=bool):
     DATABASES['default'] = dj_database_url.config(conn_max_age=600, ssl_require=True)
     
     # Enable Compressed Static Files (Crucial for CSS)
-    STATICFILES_STORAGE = 'whitenoise.storage.CompressedStaticFilesStorage'
+    STATICFILES_STORAGE = 'whitenoise.storage.StaticFilesStorage'
     DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
 
     # Sequirity settings for production on Render
