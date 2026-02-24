@@ -120,19 +120,20 @@ def registration_form(request):
             cache.set(f'otp_reg_{email}', otp, 300)
 
             # Send OTP email
-            if email == 'demo09125@gmail.com':
+            try:
                send_otp_email(email, otp)
                messages.success(request, f"A verification code has been sent to {email}")
-            else:
+            except Exception as e:
                 print(f"Email failed: {e}")
                 messages.error(request, "Failed to send email. Please try again.")
                 return redirect('registration')
             return redirect('verify-registration-otp')
-        except Exception as main_error:
-            messages.error(request, f"Something went wrong: {str(main_error)}")
+        
+        except Exception as e:
+            messages.error(request, f"Something went wrong: {str(e)}")
             return redirect('registration')
        
-      # GET request
+    # GET request
     old_data = request.session.pop('old_data', {})
     field_errors = request.session.pop('field_errors', {})
    
