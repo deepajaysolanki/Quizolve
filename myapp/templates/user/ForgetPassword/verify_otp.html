@@ -92,14 +92,9 @@
             <button type="submit">Verify Code</button>
         </form>
 
-        {% if demo_otp %}
-        <div
-            style="background-color: #fff3cd; color: #856404; padding: 15px; border-radius: 5px; margin-bottom: 20px; text-align: center; border: 1px solid #ffeeba;">
-            Because this isn't an admin account, the email step was bypassed.<br>
-            Your OTP is: <span style="font-size: 24px; font-weight: bold; letter-spacing: 2px;">{{ demo_otp }}</span>
+        <div class="timer">
+            Code expires in: <span id="countdown">05:00</span>
         </div>
-        {% endif %}
-
     </div>
 </body>
 <script src="{% static 'js/main.js' %}"></script>

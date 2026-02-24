@@ -746,22 +746,24 @@ def login_view(request):
             
             otp = generate_otp()
 
-            if email == 'demo09125@gmail.com':
+            try:
                 send_otp_email(user.email, otp)
-                messages.success(request, f"OTP sent to {user.email}")
-            else:
-                # Save OTP in session to display on the next page
-                request.session['demo_otp'] = otp
-                messages.warning(request, "Email bypassed. Please use the OTP displayed below.")
+                messages.success(request, f"A verification code has been sent to {user.email}")
+            except Exception as e:
+                # Fallback for development if Gmail fails
+                print(f"Email failed: {e}")
+                messages.error(request, "Failed to send email. Please try again later.")
+                return redirect('login')
+                # request.session['demo_otp'] = otp
+                # messages.warning(request, "Email failed. Check Render logs or use the code below.")
             
             # Save the user ID and OTP in the cache for 5 minutes (300 seconds)
-            # We use the key 'otp_login_{user_id}' to make it unique
             cache.set(f'otp_login_{user.id}', otp, 300)
             
             # Save user ID in session temporarily to know who we are verifying
             request.session['auth_user_id'] = user.id
             
-            messages.success(request, f"OTP sent to {user.email}")
+            # messages.success(request, f"OTP sent to {user.email}")
             return redirect('verify-login-otp')
         else:
             messages.error(request, "Invalid email or password.")
@@ -872,7 +874,7 @@ def forgot_password_view(request):
             
         except AppUsers.DoesNotExist:
             # For security, don't reveal if the email doesn't exist
-            messages.error(request, "If an account exists with this email, an OTP has been sent.")
+            messages.error(request, "Account not found.")
             
     return render(request, 'user/forgot_password.html')
 
