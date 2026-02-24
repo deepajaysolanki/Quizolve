@@ -814,25 +814,29 @@ def verify_registration_otp_view(request):
     email = pending_user.get('email')
 
     if request.method == 'POST':
-        try:
-            # We use create_user so the password gets hashed securely
-            user = AppUsers.objects.create_user(
-                email=email,
-                password=pending_user.get('password')
-            )
-                
-            # Cleanup the cache and session
-            cache.delete(f'otp_reg_{email}')
-            del request.session['pending_registration']
+        entered_otp = request.POST.get('otp')
+        cached_otp = cache.get(f'otp_reg_{email}')
 
-            messages.success(request, "Account created successfully! You can now log in.")
-            return redirect('login')
-                
-        except Exception as e:
-            messages.error(request, f"Error creating account: {str(e)}")
-            return redirect('registration')
-    else:
-        messages.error(request, "Invalid or expired OTP.")
+        if cached_otp and str(entered_otp) == str(cached_otp):
+            try:
+                # We use create_user so the password gets hashed securely
+                user = AppUsers.objects.create_user(
+                    email=email,
+                    password=pending_user.get('password')
+                )
+                    
+                # Cleanup the cache and session
+                cache.delete(f'otp_reg_{email}')
+                del request.session['pending_registration']
+
+                messages.success(request, "Account created successfully! You can now log in.")
+                return redirect('login')
+                    
+            except Exception as e:
+                messages.error(request, f"Error creating account: {str(e)}")
+                return redirect('registration')
+        else:
+            messages.error(request, "Invalid or expired OTP.")
 
     # Reuse your existing OTP template here
     return render(request, 'user/ForgetPassword/verify_otp.html', {
