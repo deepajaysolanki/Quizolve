@@ -128,8 +128,8 @@ def registration_form(request):
                 messages.error(request, "Failed to send email. Please try again.")
                 return redirect('registration')
             return redirect('verify-registration-otp')
-        except Exception as e:
-            messages.error(request, f"Something went wrong: {str(e)}")
+        except Exception as main_error:
+            messages.error(request, f"Something went wrong: {str(main_error)}")
             return redirect('registration')
        
       # GET request
