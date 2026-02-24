@@ -371,16 +371,11 @@ def play_quiz_view(request):
         else:
             print(f"--- Generating New Question #{total_played + 1} ---")
             
-            # ==================================================
-            # PUT YOUR AI / QUESTION GENERATION LOGIC HERE
-            # ==================================================
-            # For now, I am putting a placeholder. Replace this with your actual AI call.
             current_question = {
                 'text': f"Question {total_played + 1}: What is the capital of France?",
                 'options': ['Paris', 'London', 'Berlin', 'Madrid'],
                 'correct': 'Paris'
             }
-            # ==================================================
 
             # Save this specific question to the session so it survives a refresh
             request.session['current_question_data'] = {
