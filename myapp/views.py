@@ -376,11 +376,11 @@ def play_quiz_view(request):
             time_limit = 59  # Set to 59 for all exam quizzes
         else:
             if difficulty == 'easy':
-                time_limit = 30
+                time_limit = 60
             elif difficulty == 'hard':
-                time_limit = 15
+                time_limit = 30
             else: # medium
-                time_limit = 20
+                time_limit = 40
         
         # # Get the number of questions the user has already played in this quiz
         # total_played = request.session.get('total_played', 0)
