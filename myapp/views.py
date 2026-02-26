@@ -139,38 +139,45 @@ def registration_form(request):
         'field_errors': field_errors
     })
 
-def login_form(request):
+def login_view(request):
     if request.method == 'POST':
-        email = request.POST.get('email', '').strip()
-        password = request.POST.get('password', '').strip()
-            
+        email = request.POST.get('email')
+        password = request.POST.get('password')
+        
+        # Check credentials but DO NOT login yet
         user = authenticate(request, email=email, password=password)
-    
+        
         if user is not None:
-            if not user .is_active:
+            if not user.is_active:
                 messages.error(request, "This account is inactive.")
                 return redirect('login')
 
-            if not ENABLE_OTP:
-                # MVP MODE: Log them straight in
-                auth_login(request, user)
-                messages.success(request, "Login successful!")
-                return redirect('home-page')
-            else:
-                # FUTURE MODE: Send the OTP
-                    otp = generate_otp()
-                    try:
-                        send_otp_email(user.email, otp)
-                        messages.success(request, f"A verification code has been sent to {user.email}")
-                    except Exception as e:
-                        messages.error(request, "Failed to send email.")
-                        return redirect('login')
+            # Generate and Send OTP
+            
+            otp = generate_otp()
 
-                    cache.set(f'otp_login_{user.id}', otp, 300)
-                    request.session['auth_user_id'] = user.id
-                    return redirect('verify-login-otp') 
+            try:
+                send_otp_email(user.email, otp)
+                messages.success(request, f"A verification code has been sent to {user.email}")
+            except Exception as e:
+                # Fallback for development if Gmail fails
+                print(f"Email failed: {e}")
+                messages.error(request, "Failed to send email. Please try again later.")
+                return redirect('login')
+                # request.session['demo_otp'] = otp
+                # messages.warning(request, "Email failed. Check Render logs or use the code below.")
+            
+            # Save the user ID and OTP in the cache for 5 minutes (300 seconds)
+            cache.set(f'otp_login_{user.id}', otp, 300)
+            
+            # Save user ID in session temporarily to know who we are verifying
+            request.session['auth_user_id'] = user.id
+            
+            # messages.success(request, f"OTP sent to {user.email}")
+            return redirect('verify-login-otp')
         else:
             messages.error(request, "Invalid email or password.")
+            
     return render(request, 'user/login.html')
 
 def logout_view(request):
@@ -709,49 +716,7 @@ def record_attempt_on_leave_api(request):
     else:
         return redirect('login')
     
-# OTP Email Functionalities
-# ---  CUSTOM LOGIN WITH OTP ---
-def login_view(request):
-    if request.method == 'POST':
-        email = request.POST.get('email')
-        password = request.POST.get('password')
-        
-        # Check credentials but DO NOT login yet
-        user = authenticate(request, email=email, password=password)
-        
-        if user is not None:
-            if not user.is_active:
-                messages.error(request, "This account is inactive.")
-                return redirect('login')
-
-            # Generate and Send OTP
-            
-            otp = generate_otp()
-
-            try:
-                send_otp_email(user.email, otp)
-                messages.success(request, f"A verification code has been sent to {user.email}")
-            except Exception as e:
-                # Fallback for development if Gmail fails
-                print(f"Email failed: {e}")
-                messages.error(request, "Failed to send email. Please try again later.")
-                return redirect('login')
-                # request.session['demo_otp'] = otp
-                # messages.warning(request, "Email failed. Check Render logs or use the code below.")
-            
-            # Save the user ID and OTP in the cache for 5 minutes (300 seconds)
-            cache.set(f'otp_login_{user.id}', otp, 300)
-            
-            # Save user ID in session temporarily to know who we are verifying
-            request.session['auth_user_id'] = user.id
-            
-            # messages.success(request, f"OTP sent to {user.email}")
-            return redirect('verify-login-otp')
-        else:
-            messages.error(request, "Invalid email or password.")
-            
-    return render(request, 'user/login.html')
-
+# OTP Verification Viewes for Login and Registration 
 def verify_login_otp_view(request):
     user_id = request.session.get('auth_user_id')
     if not user_id:
@@ -784,7 +749,6 @@ def verify_login_otp_view(request):
         'demo_otp': demo_otp
     })
 
-# --- REGISTRATION WITH OTP ---
 def verify_registration_otp_view(request):
     # Retrieve the pending data from the session
     pending_user = request.session.get('pending_registration')
@@ -827,7 +791,7 @@ def verify_registration_otp_view(request):
         'email': email,
     })
 
-# --- 2. FORGOT PASSWORD WITH OTP ---
+# FORGOT PASSWORD WITH OTP
 def forgot_password_view(request):
     if request.method == 'POST':
         email = request.POST.get('email')
