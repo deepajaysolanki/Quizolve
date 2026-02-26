@@ -142,19 +142,7 @@ document.addEventListener('DOMContentLoaded', function () {
             localStorage.setItem(FIRST_VISIT_KEY, now);
         } else {
             const daysPassed = (now - parseInt(firstVisit)) / (1000 * 60 * 60 * 24);
-
-            // Show if 3 days passed OR if you want to test it immediately
-            if (daysPassed >= 3 && !localStorage.getItem(PREMIUM_DISMISSED_KEY)) {
-                showPremiumToast();
-            }
         }
-    }
-
-    function showPremiumToast() {
-        const premiumToast = document.createElement('div');
-        premiumToast.className = 'toast-message premium-toast';
-        premiumToast.innerHTML = ``;
-        document.body.appendChild(premiumToast);
     }
 
     // Call this function on your "Start Quiz" button click
