@@ -58,6 +58,8 @@ def contact_page(request):
 
     return render(request, 'pages/contact.html')
 
+# Feature Flag fot OTP
+ENABLE_OTP = False
 def registration_form(request):
     if request.method == 'POST':
         email = request.POST.get('email')
@@ -105,33 +107,28 @@ def registration_form(request):
                 'confirm_password': confirm_password
             }
             return redirect('registration')
-         
-        try:
-            # Store registration data temporarily (NO database save yet!)
-            request.session['pending_registration'] = {
-                'email': email,
-                'password': password
-            }
-
-            # Generate OTP using your existing helper function
-            otp = generate_otp()
-
-            # Store the OTP in the cache for 5 minutes (300 seconds)
-            cache.set(f'otp_reg_{email}', otp, 300)
-
-            # Send OTP email
+        
+        if not ENABLE_OTP:
+            # MVP MODE: Just create the user and let them in immediately
             try:
-               send_otp_email(email, otp)
-               messages.success(request, f"A verification code has been sent to {email}")
+                user = AppUsers.objects.create_user(email=email, password=password)
+                messages.success(request, "Account created successfully!.")
+                return redirect('login')
             except Exception as e:
-                print(f"Email failed: {e}")
+                messages.error(request, f"Error creating account: {str(e)}")
+                return redirect('registration')
+        else:  
+            try:
+                request.session['pending_registration'] = {'email': email, 'password': password}
+                otp = generate_otp()
+                cache.set(f'otp_reg_{email}', otp, 300)
+                
+                send_otp_email(email, otp)
+                messages.success(request, f"A verification code has been sent to {email}")
+                return redirect('verify-registration-otp')
+            except Exception as e:
                 messages.error(request, "Failed to send email. Please try again.")
                 return redirect('registration')
-            return redirect('verify-registration-otp')
-        
-        except Exception as e:
-            messages.error(request, f"Something went wrong: {str(e)}")
-            return redirect('registration')
        
     # GET request
     old_data = request.session.pop('old_data', {})
@@ -147,44 +144,34 @@ def login_form(request):
         email = request.POST.get('email', '').strip()
         password = request.POST.get('password', '').strip()
             
-        # Save entered data for reloading
-        request.session['old_data'] = {'email': email}
-
-        field_errors = {}
-        if not email:
-            field_errors['email'] = "Email is required."
-        if not password:
-            field_errors['password'] = "Password is required."
-
-        if not field_errors:
-            user = AppUsers.objects.filter(email=email, password=password).first()
-            if user:
-                # messages.success(request, "Login successful!")
-                request.session.pop('old_data', None)
-                request.session.pop('field_errors', None)
-                login(request, user)  
-
-                return redirect('home-page') 
-            else:
-                field_errors['password'] = "Invalid email or password."
-
-        user = authenticate(request, username=email, password=password)
+        user = authenticate(request, email=email, password=password)
+    
         if user is not None:
-            login(request, user)
-            return redirect('home-page')
-        
-        request.session['field_errors'] = field_errors
-        return redirect('login') 
+            if not user .is_active:
+                messages.error(request, "This account is inactive.")
+                return redirect('login')
 
-    else:
-        # On GET or refresh, clean up session data
-        old_data = request.session.pop('old_data', {})
-        field_errors = request.session.pop('field_errors', {})
+            if not ENABLE_OTP:
+                # MVP MODE: Log them straight in
+                auth_login(request, user)
+                messages.success(request, "Login successful!")
+                return redirect('home-page')
+            else:
+                # FUTURE MODE: Send the OTP
+                    otp = generate_otp()
+                    try:
+                        send_otp_email(user.email, otp)
+                        messages.success(request, f"A verification code has been sent to {user.email}")
+                    except Exception as e:
+                        messages.error(request, "Failed to send email.")
+                        return redirect('login')
 
-    return render(request, 'user/login.html', {
-        'old_data': old_data,
-        'field_errors': field_errors
-    })
+                    cache.set(f'otp_login_{user.id}', otp, 300)
+                    request.session['auth_user_id'] = user.id
+                    return redirect('verify-login-otp') 
+        else:
+            messages.error(request, "Invalid email or password.")
+    return render(request, 'user/login.html')
 
 def logout_view(request):
     logout(request)
