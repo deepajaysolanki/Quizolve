@@ -152,32 +152,25 @@ def login_view(request):
                 messages.error(request, "This account is inactive.")
                 return redirect('login')
 
-            # Generate and Send OTP
-            
-            otp = generate_otp()
-
-            try:
-                send_otp_email(user.email, otp)
-                messages.success(request, f"A verification code has been sent to {user.email}")
-            except Exception as e:
-                # Fallback for development if Gmail fails
-                print(f"Email failed: {e}")
-                messages.error(request, "Failed to send email. Please try again later.")
-                return redirect('login')
-                # request.session['demo_otp'] = otp
-                # messages.warning(request, "Email failed. Check Render logs or use the code below.")
-            
-            # Save the user ID and OTP in the cache for 5 minutes (300 seconds)
-            cache.set(f'otp_login_{user.id}', otp, 300)
-            
-            # Save user ID in session temporarily to know who we are verifying
-            request.session['auth_user_id'] = user.id
-            
-            # messages.success(request, f"OTP sent to {user.email}")
-            return redirect('verify-login-otp')
+            if not ENABLE_OTP:
+                # MVP MODE: Log them straight in (No Email)
+                auth_login(request, user, backend='django.contrib.auth.backends.ModelBackend')
+                messages.success(request, "Login successful!")
+                return redirect('home-page')
+            else:
+                otp = generate_otp()
+                try:
+                    send_otp_email(user.email, otp)
+                    messages.success(request, f"A verification code has been sent to {user.email}")
+                except Exception as e:
+                    messages.error(request, "Failed to send email.")
+                    return redirect('login')
+                
+                cache.set(f'otp_login_{user.id}', otp, 300)
+                request.session['auth_user_id'] = user.id
+                return redirect('verify-login-otp')
         else:
             messages.error(request, "Invalid email or password.")
-            
     return render(request, 'user/login.html')
 
 def logout_view(request):
