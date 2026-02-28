@@ -174,7 +174,9 @@ body {
   border-radius: 28px; /* Large rounded corners */
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
   z-index: 2000; /* Ensures it sits on top of everything */
-  overflow: hidden;
+  max-height: calc(100vh - 80px);
+  overflow-y: auto; 
+  overflow-x: hidden;
   flex-direction: column;
   border: 1px solid rgba(0, 0, 0, 0.08);
   transform-origin: top right;
