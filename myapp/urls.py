@@ -3,7 +3,7 @@ from . import views
 from django.contrib.auth.views import LogoutView
 from django.contrib.sites.models import Site
 from django.http import HttpResponse
-import TemplateView
+from django.views.generic import TemplateView
 
 # Create the temporary function
 def fix_site_error(request):
