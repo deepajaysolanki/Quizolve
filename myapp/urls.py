@@ -3,8 +3,9 @@ from . import views
 from django.contrib.auth.views import LogoutView
 from django.contrib.sites.models import Site
 from django.http import HttpResponse
+import TemplateView
 
-# 1. Create the temporary function
+# Create the temporary function
 def fix_site_error(request):
     Site.objects.update_or_create(
         id=1, 
@@ -26,4 +27,7 @@ urlpatterns = [
 
     # User Authentication URLs
     path('fix-site/', fix_site_error),
+
+    # URL for Google bots 
+    path('robots.txt', TemplateView.as_view(template_name="robots.txt", content_type="text/plain")),
 ]
