@@ -71,19 +71,19 @@
                 <i class="fas fa-crown"></i>
                 <span>Subscription</span>
               </a>
+              <div class="pd-footer">
+                <a href="{% url 'logout' %}" class="pd-item logout-item">
+                  <i class="fas fa-sign-out-alt"></i>
+                  <span>Sign out</span>
+                </a>
+              </div>
             </div>
 
-            <div class="pd-footer">
-              <a href="{% url 'logout' %}" class="pd-item logout-item">
-                <i class="fas fa-sign-out-alt"></i>
-                <span>Sign out</span>
-              </a>
-            </div>
           </div>
         </div>
         {% else %}
-          <a href="{% url 'login' %}" class="btn-ghost">Login</a>&nbsp;&nbsp;&nbsp;
-          <a href="{% url 'registration' %}" class="btn-primary" style="text-align: center;">Join AI</a>
+        <a href="{% url 'login' %}" class="btn-ghost">Login</a>&nbsp;&nbsp;&nbsp;
+        <a href="{% url 'registration' %}" class="btn-primary" style="text-align: center;">Join AI</a>
         {% endif %}
 
       </div>
@@ -140,11 +140,11 @@
             <a href="{% url 'checkout' %}" class="pd-item">
               <i class="fas fa-crown"></i><span>Subscription</span>
             </a>
-          </div>
-          <div class="pd-footer">
-            <a href="{% url 'logout' %}" class="pd-item logout-item">
-              <i class="fas fa-sign-out-alt"></i><span>Sign out</span>
-            </a>
+            <div class="pd-footer">
+              <a href="{% url 'logout' %}" class="pd-item logout-item">
+                <i class="fas fa-sign-out-alt"></i><span>Sign out</span>
+              </a>
+            </div>
           </div>
         </div>
 

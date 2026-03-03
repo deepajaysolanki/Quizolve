@@ -309,11 +309,14 @@
   }
 
   /* 5. Section Spacing */
-  .about-hero,
   .mission-vision,
   .core-values,
   .team {
     padding: 40px 0;
+  }
+
+  .about-hero {
+    padding: 120px 0 40px 0; 
   }
 
   .section-title {
