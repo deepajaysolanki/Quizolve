@@ -594,11 +594,7 @@ def start_exam_quiz_view(request, exam_name):
             else:
                 DAILY_LIMIT = 3
 
-<<<<<<< HEAD
-            # Per-exam limit check
-=======
         # Per-exam limit check
->>>>>>> 138a4614f3c5636ce234a413c06324833920041b
         attempt_count = UserQuizAttempt.objects.filter(
             user=request.user, 
             quiz_type='exam', 
@@ -614,27 +610,6 @@ def start_exam_quiz_view(request, exam_name):
             else:
                 messages.error(request, f"You have reached your daily limit of {DAILY_LIMIT} quizzes for the '{exam_name}' category.")
             return redirect('exam-selection')
-<<<<<<< HEAD
-
-        # If allowed, create a new attempt record
-        attemp = UserQuizAttempt.objects.create(user=request.user, quiz_type='exam', quiz_identifier=exam_name, total_questions=50)
-
-        # Set up the session rules for the exam quiz
-        request.session['current_attempt_id'] = attemp.id
-        request.session['question_batch'] = [] # Start with an empty batch
-        request.session['topic'] = exam_name
-        request.session['difficulty'] = 'exam' # Set the difficulty to 'exam'
-        request.session['total_questions'] = 50 
-        request.session['correct_answers'] = 0
-        request.session['total_played'] = 0
-        request.session['asked_questions'] = [] 
-        request.session['quiz_review_data'] = []
-
-        request.session.save()
-        return redirect('play-exam-quiz')
-    else:
-        return redirect('login')
-=======
         
         # If allowed, create a new attempt record
         attemp = UserQuizAttempt.objects.create(user=request.user, quiz_type='exam', quiz_identifier=exam_name, total_questions=50)
@@ -654,7 +629,6 @@ def start_exam_quiz_view(request, exam_name):
         return redirect('play-exam-quiz')
     else:
         return redirect('login')    
->>>>>>> 138a4614f3c5636ce234a413c06324833920041b
 
 @login_required
 @require_POST
