@@ -90,22 +90,15 @@ def generate_groq_response(topic_or_exam: str, num_questions: int, difficulty: s
     
     data = call_groq_ai(prompt)
     
-<<<<<<< HEAD
     if not data: return get_mock_questions(topic_or_exam, difficulty)
-=======
     if not data: return "Something went wrong, please try again later."
->>>>>>> 138a4614f3c5636ce234a413c06324833920041b
 
     try:
         text = data['choices'][0]['message']['content']
         return json.loads(clean_json_text(text))
     except Exception as e:
         print(f"Parsing Error: {e}")
-<<<<<<< HEAD
-        return get_mock_questions(topic_or_exam, difficulty)
-=======
-        return "Something went wrong, please try again later."
->>>>>>> 138a4614f3c5636ce234a413c06324833920041b
+
 
 # --- WRAPPER FUNCTIONS (MATCHING VIEWS.PY) ---
 
