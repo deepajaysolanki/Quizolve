@@ -5,6 +5,7 @@
 <head>
     <meta charset="UTF-8" />
     <title>Quiz Results</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />    
     <link rel="stylesheet" href="{% static 'css/main.css' %}" />
     <link rel="stylesheet" href="{% static 'css/quiz_result.css' %}" />
 </head>
@@ -106,7 +107,7 @@
 
     // Note: Gmail often ignores this 'text' if a file is attached.
     // WhatsApp handles both perfectly.
-    const shareText = `🔥 I just scored ${score}/${total} on the ${topic} Quiz in ${time}!`;
+    const shareText = `I just completed a ${topic} Quiz on Quizolve!`;
     const shareTitle = "My Quiz Score";
 
     async function shareScreenshot() {

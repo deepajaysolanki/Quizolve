@@ -71,14 +71,14 @@
                 <i class="fas fa-crown"></i>
                 <span>Subscription</span>
               </a>
+              <div class="pd-footer">
+                <a href="{% url 'logout' %}" class="pd-item logout-item">
+                  <i class="fas fa-sign-out-alt"></i>
+                  <span>Sign out</span>
+                </a>
+              </div>
             </div>
 
-            <div class="pd-footer">
-              <a href="{% url 'logout' %}" class="pd-item logout-item">
-                <i class="fas fa-sign-out-alt"></i>
-                <span>Sign out</span>
-              </a>
-            </div>
           </div>
         </div>
         {% else %}
@@ -140,11 +140,11 @@
             <a href="{% url 'checkout' %}" class="pd-item">
               <i class="fas fa-crown"></i><span>Subscription</span>
             </a>
-          </div>
-          <div class="pd-footer">
-            <a href="{% url 'logout' %}" class="pd-item logout-item">
-              <i class="fas fa-sign-out-alt"></i><span>Sign out</span>
-            </a>
+            <div class="pd-footer">
+              <a href="{% url 'logout' %}" class="pd-item logout-item">
+                <i class="fas fa-sign-out-alt"></i><span>Sign out</span>
+              </a>
+            </div>
           </div>
         </div>
 
@@ -167,6 +167,7 @@
     if (mobileMenuBtn && mobileMenu) {
       mobileMenuBtn.addEventListener("click", () => {
         mobileMenu.classList.toggle("active");
+        document.body.classList.toggle("lock-scroll");
       });
     }
 

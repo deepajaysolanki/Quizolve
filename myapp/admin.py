@@ -11,19 +11,20 @@ class CustomUserAdmin(UserAdmin):
     list_display = ('email', 'is_staff', 'is_active', 'is_premium', 'subscription_expiry', 'last_login')
     ordering = ('email',)
     
-    # The rest of your configuration
+    # The rest of configuration
     list_filter = ('is_staff', 'is_active', 'is_premium')
     search_fields = ('email',)
     fieldsets = (
         (None, {'fields': ('email', 'password')}),
+        ('Personal Info', {'fields': ('first_name', 'last_name', 'profile_photo')}),
         ('Subscription', {'fields': ('is_premium', 'subscription_expiry')}),
         ('Permissions', {'fields': ('is_staff', 'is_active', 'is_superuser', 'groups')}),
-        ('Important dates', {'fields': ('last_login', 'date_of_birth')}),
+        ('Important dates', {'fields': ('last_login',)}),
     )
     add_fieldsets = (
         (None, {
             'classes': ('wide',),
-            'fields': ('email', 'password', 'password2'),
+            'fields': ('email', 'password', 'first_name', 'last_name', 'profile_photo'),
         }),
     )
     # def get_queryset(self, request):

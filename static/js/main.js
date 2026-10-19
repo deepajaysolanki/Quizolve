@@ -142,30 +142,7 @@ document.addEventListener('DOMContentLoaded', function () {
             localStorage.setItem(FIRST_VISIT_KEY, now);
         } else {
             const daysPassed = (now - parseInt(firstVisit)) / (1000 * 60 * 60 * 24);
-
-            // Show if 3 days passed OR if you want to test it immediately
-            if (daysPassed >= 3 && !localStorage.getItem(PREMIUM_DISMISSED_KEY)) {
-                showPremiumToast();
-            }
         }
-    }
-
-    function showPremiumToast() {
-        const premiumToast = document.createElement('div');
-        premiumToast.className = 'toast-message premium-toast';
-        premiumToast.innerHTML = `
-            <div class="toast-content">
-                <div style="display:flex; align-items:center;">
-                    <i class="fas fa-crown" style="color: #FFD700; margin-right:10px;"></i>
-                    <span>Unlock unlimited quizzes!</span>
-                </div>
-                <div style="display:flex; align-items:center;">
-                    <button onclick="window.location.href='/checkout/'" class="btn-buy">Upgrade</button>
-                    <i class="fas fa-times close-toast" onclick="this.closest('.toast-message').remove(); localStorage.setItem('quizolve_premium_dismissed', 'true');"></i>
-                </div>
-            </div>
-        `;
-        document.body.appendChild(premiumToast);
     }
 
     // Call this function on your "Start Quiz" button click

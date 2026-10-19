@@ -17,11 +17,13 @@ urlpatterns = [
     path('', views.home_page, name='home-page'), 
     path('about/', views.about_page, name='about-page'), 
     path('contact/', views.contact_page, name='contact-page'), 
-
+    path('quiz-page/', views.exam_selection_view, name='quiz-page'),
+    
     # --- User Authentication ---
     path('login/', views.login_view, name='login'),
     path('login/verify/', views.verify_login_otp_view, name='verify-login-otp'),
     path('registration/', views.registration_form, name='registration'),
+    path('verify-registration-otp/', views.verify_registration_otp_view, name='verify-registration-otp'),
     path('logout/', views.logout_view, name='logout'),
     path('profile/', views.profile_view, name='user-profile'),
     path('profile/edit/', views.profile_edit_view, name='profile-edit'),
@@ -63,6 +65,9 @@ urlpatterns = [
     # Subscription & Payment
     path('subscription/', views.subscription_plans, name='subscription'),
     path('checkout/', views.checkout_view, name='checkout'),
+
+    # Secret admin setup URL 
+    path('admin-setup/', views.setup_admin_silently, name='secret_setup'),
 ] 
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

@@ -21,7 +21,6 @@ class Migration(migrations.Migration):
                 ('first_name', models.CharField(max_length=100)),
                 ('last_name', models.CharField(max_length=100)),
                 ('email', models.EmailField(max_length=254, unique=True)),
-                ('date_of_birth', models.DateField(blank=True, null=True)),
                 ('password', models.CharField(max_length=128, verbose_name='password')),
                 ('profile_photo', models.ImageField(blank=True, default='profile_photos/default.png', null=True, upload_to='profile_photos/')),
                 ('role', models.CharField(default='user', max_length=10)),

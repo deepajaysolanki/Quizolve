@@ -4,7 +4,7 @@ from .models import AppUsers, PaymentRequest, ContactMessage, AnsweredQuestion, 
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth import authenticate, login as auth_login
 from django.contrib.auth.hashers import make_password
-from django.http import JsonResponse
+from django.http import JsonResponse, HttpResponse
 from . import ai_services 
 from django.contrib.auth.decorators import login_required, user_passes_test
 from .forms import UserProfileForm
@@ -29,6 +29,9 @@ def home_page(request):
 def about_page(request):
     return render(request, 'pages/about.html')
 def quiz_page(request):
+    if not request.user.is_authenticated:
+        messages.error(request, "You must be logged in to access the quiz.")
+        return render(request, 'pages/quiz.html')
     return render(request, 'pages/quiz.html')
 def contact_page(request):
     if request.user.is_authenticated:
@@ -55,38 +58,21 @@ def contact_page(request):
 
     return render(request, 'pages/contact.html')
 
+# Feature Flag fot OTP
+ENABLE_OTP = False
 def registration_form(request):
     if request.method == 'POST':
-        first_name = request.POST.get('first_name')
-        last_name = request.POST.get('last_name')
         email = request.POST.get('email')
-        dob = request.POST.get('date_of_birth') 
         password = request.POST.get('password')
         confirm_password = request.POST.get('confirm_password')
-        profile_photo = request.FILES.get('profile_photo')  
 
         field_errors = {}
-
-        if not first_name:
-            field_errors['first_name'] = "First Name is required."
-        if not last_name:
-            field_errors['last_name'] = "Last Name is required."
-        if not dob:
-            field_errors['date_of_birth'] = "Date of birth is required."
         if not email:
             field_errors['email'] = "Email is required."
         if not password:
             field_errors['password'] = "Password is required."
         if not confirm_password:
             field_errors['confirm_password'] = "Confirm password is required."
-
-        # first name validation
-        if first_name and not re.match(r'^[a-zA-Z]{1,25}$', first_name):
-            field_errors['first_name'] = "Enter a valid First name."
-
-        # last name validation
-        if last_name and not re.match(r'^[a-zA-Z]{1,25}$', last_name):
-            field_errors['last_name'] = "Enter a valid Last name."
 
          # Password validation
         if password and not re.match(r'^(?=.*\d)(?=.*[\W_]).{8,}$', password):
@@ -101,7 +87,7 @@ def registration_form(request):
             field_errors['email'] = "Invalid email format."
 
         # Field validation
-        if not all([first_name, last_name, dob, email, password, confirm_password]):
+        if not all([email, password, confirm_password]):
             messages.error(request, "All fields are required.")
             return redirect('registration')
         
@@ -116,36 +102,35 @@ def registration_form(request):
         if field_errors:
             request.session['field_errors'] = field_errors  # store for template
             request.session['old_data'] = {
-                'first_name': first_name,
-                'last_name': last_name,
                 'email': email,
-                'date_of_birth': dob,
                 'password': hashed_password,
                 'confirm_password': confirm_password
             }
             return redirect('registration')
-         
-        try:
-            user = AppUsers(
-                first_name=first_name,
-                last_name=last_name,
-                date_of_birth=dob,
-                email=email,
-                password=hashed_password,
-            )
-
-            if profile_photo:
-                user.profile_photo = profile_photo
-
-            user.save()
-
-            messages.success(request, "User registered successfully!")
-            return redirect('login')
-        except Exception as e:
-            messages.error(request, f"Something went wrong: {str(e)}")
-            return redirect('registration')
+        
+        if not ENABLE_OTP:
+            # MVP MODE: Just create the user and let them in immediately
+            try:
+                user = AppUsers.objects.create_user(email=email, password=password)
+                messages.success(request, "Account created successfully!.")
+                return redirect('login')
+            except Exception as e:
+                messages.error(request, f"Error creating account: {str(e)}")
+                return redirect('registration')
+        else:  
+            try:
+                request.session['pending_registration'] = {'email': email, 'password': password}
+                otp = generate_otp()
+                cache.set(f'otp_reg_{email}', otp, 300)
+                
+                send_otp_email(email, otp)
+                messages.success(request, f"A verification code has been sent to {email}")
+                return redirect('verify-registration-otp')
+            except Exception as e:
+                messages.error(request, "Failed to send email. Please try again.")
+                return redirect('registration')
        
-      # GET request
+    # GET request
     old_data = request.session.pop('old_data', {})
     field_errors = request.session.pop('field_errors', {})
    
@@ -154,49 +139,39 @@ def registration_form(request):
         'field_errors': field_errors
     })
 
-def login_form(request):
+def login_view(request):
     if request.method == 'POST':
-        email = request.POST.get('email', '').strip()
-        password = request.POST.get('password', '').strip()
-            
-        # Save entered data for reloading
-        request.session['old_data'] = {'email': email}
-
-        field_errors = {}
-        if not email:
-            field_errors['email'] = "Email is required."
-        if not password:
-            field_errors['password'] = "Password is required."
-
-        if not field_errors:
-            user = AppUsers.objects.filter(email=email, password=password).first()
-            if user:
-                # messages.success(request, "Login successful!")
-                request.session.pop('old_data', None)
-                request.session.pop('field_errors', None)
-                login(request, user)  
-
-                return redirect('home-page') 
-            else:
-                field_errors['password'] = "Invalid email or password."
-
-        user = authenticate(request, username=email, password=password)
-        if user is not None:
-            login(request, user)
-            return redirect('home-page')
+        email = request.POST.get('email')
+        password = request.POST.get('password')
         
-        request.session['field_errors'] = field_errors
-        return redirect('login') 
+        # Check credentials but DO NOT login yet
+        user = authenticate(request, email=email, password=password)
+        
+        if user is not None:
+            if not user.is_active:
+                messages.error(request, "This account is inactive.")
+                return redirect('login')
 
-    else:
-        # On GET or refresh, clean up session data
-        old_data = request.session.pop('old_data', {})
-        field_errors = request.session.pop('field_errors', {})
-
-    return render(request, 'user/login.html', {
-        'old_data': old_data,
-        'field_errors': field_errors
-    })
+            if not ENABLE_OTP:
+                # MVP MODE: Log them straight in (No Email)
+                auth_login(request, user, backend='django.contrib.auth.backends.ModelBackend')
+                messages.success(request, "Login successful!")
+                return redirect('home-page')
+            else:
+                otp = generate_otp()
+                try:
+                    send_otp_email(user.email, otp)
+                    messages.success(request, f"A verification code has been sent to {user.email}")
+                except Exception as e:
+                    messages.error(request, "Failed to send email.")
+                    return redirect('login')
+                
+                cache.set(f'otp_login_{user.id}', otp, 300)
+                request.session['auth_user_id'] = user.id
+                return redirect('verify-login-otp')
+        else:
+            messages.error(request, "Invalid email or password.")
+    return render(request, 'user/login.html')
 
 def logout_view(request):
     logout(request)
@@ -211,7 +186,6 @@ def profile_view(request):
         first_name = current_user.first_name
         last_name = current_user.last_name
         email = current_user.email
-        date_of_birth = current_user.date_of_birth
         profile_photo = current_user.profile_photo.url
 
         # Create a context dictionary with your variables
@@ -219,7 +193,6 @@ def profile_view(request):
             'first_name': first_name,
             'last_name': last_name,
             'email': email,
-            'date_of_birth': date_of_birth,
             'profile_photo': profile_photo  
         }
         
@@ -385,16 +358,11 @@ def play_quiz_view(request):
         else:
             print(f"--- Generating New Question #{total_played + 1} ---")
             
-            # ==================================================
-            # PUT YOUR AI / QUESTION GENERATION LOGIC HERE
-            # ==================================================
-            # For now, I am putting a placeholder. Replace this with your actual AI call.
             current_question = {
                 'text': f"Question {total_played + 1}: What is the capital of France?",
                 'options': ['Paris', 'London', 'Berlin', 'Madrid'],
                 'correct': 'Paris'
             }
-            # ==================================================
 
             # Save this specific question to the session so it survives a refresh
             request.session['current_question_data'] = {
@@ -408,11 +376,11 @@ def play_quiz_view(request):
             time_limit = 59  # Set to 59 for all exam quizzes
         else:
             if difficulty == 'easy':
-                time_limit = 30
+                time_limit = 60
             elif difficulty == 'hard':
-                time_limit = 15
+                time_limit = 30
             else: # medium
-                time_limit = 20
+                time_limit = 40
         
         # # Get the number of questions the user has already played in this quiz
         # total_played = request.session.get('total_played', 0)
@@ -568,7 +536,6 @@ def get_next_question_api(request):
         else:
                 # For regular quizzes, use the general function
                 new_batch = ai_services.generate_question_batch(topic, difficulty, exclude_questions=asked_questions)
-            # --- END OF NEW LOGIC ---
 
         if not new_batch:
             return JsonResponse({'error': 'Failed to generate new questions from the AI.'}, status=500)
@@ -609,6 +576,9 @@ def check_answer_api(request):
 
 # views for Exam Quiz Feature
 def exam_selection_view(request):
+    if not request.user.is_authenticated:
+        messages.error(request, "You must be logged in to access the exam quiz.")
+        return render(request, 'AI_features/exam_selection.html')
     return render(request, 'AI_features/exam_selection.html')
 
 def start_exam_quiz_view(request, exam_name):
@@ -624,7 +594,11 @@ def start_exam_quiz_view(request, exam_name):
             else:
                 DAILY_LIMIT = 3
 
+<<<<<<< HEAD
             # Per-exam limit check
+=======
+        # Per-exam limit check
+>>>>>>> 138a4614f3c5636ce234a413c06324833920041b
         attempt_count = UserQuizAttempt.objects.filter(
             user=request.user, 
             quiz_type='exam', 
@@ -640,6 +614,7 @@ def start_exam_quiz_view(request, exam_name):
             else:
                 messages.error(request, f"You have reached your daily limit of {DAILY_LIMIT} quizzes for the '{exam_name}' category.")
             return redirect('exam-selection')
+<<<<<<< HEAD
 
         # If allowed, create a new attempt record
         attemp = UserQuizAttempt.objects.create(user=request.user, quiz_type='exam', quiz_identifier=exam_name, total_questions=50)
@@ -659,6 +634,27 @@ def start_exam_quiz_view(request, exam_name):
         return redirect('play-exam-quiz')
     else:
         return redirect('login')
+=======
+        
+        # If allowed, create a new attempt record
+        attemp = UserQuizAttempt.objects.create(user=request.user, quiz_type='exam', quiz_identifier=exam_name, total_questions=50)
+
+        # Set up the session rules for the exam quiz
+        request.session['current_attempt_id'] = attemp.id
+        request.session['question_batch'] = [] # Start with an empty batch
+        request.session['topic'] = exam_name
+        request.session['difficulty'] = 'exam' # Set the difficulty to 'exam'
+        request.session['total_questions'] = 50 
+        request.session['correct_answers'] = 0
+        request.session['total_played'] = 0
+        request.session['asked_questions'] = [] 
+        request.session['quiz_review_data'] = []
+
+        request.session.save()
+        return redirect('play-exam-quiz')
+    else:
+        return redirect('login')    
+>>>>>>> 138a4614f3c5636ce234a413c06324833920041b
 
 @login_required
 @require_POST
@@ -739,43 +735,14 @@ def record_attempt_on_leave_api(request):
     else:
         return redirect('login')
     
-# OTP Email Functionalities
-# --- 1. CUSTOM LOGIN WITH OTP ---
-def login_view(request):
-    if request.method == 'POST':
-        email = request.POST.get('email')
-        password = request.POST.get('password')
-        
-        # Check credentials but DO NOT login yet
-        user = authenticate(request, email=email, password=password)
-        
-        if user is not None:
-            if not user.is_active:
-                messages.error(request, "This account is inactive.")
-                return redirect('login')
-
-            # Generate and Send OTP
-            otp = generate_otp()
-            send_otp_email(user.email, otp)
-            
-            # Save the user ID and OTP in the cache for 5 minutes (300 seconds)
-            # We use the key 'otp_login_{user_id}' to make it unique
-            cache.set(f'otp_login_{user.id}', otp, 300)
-            
-            # Save user ID in session temporarily to know who we are verifying
-            request.session['auth_user_id'] = user.id
-            
-            messages.success(request, f"OTP sent to {user.email}")
-            return redirect('verify-login-otp')
-        else:
-            messages.error(request, "Invalid email or password.")
-            
-    return render(request, 'user/login.html')
-
+# OTP Verification Viewes for Login and Registration 
 def verify_login_otp_view(request):
     user_id = request.session.get('auth_user_id')
     if not user_id:
         return redirect('login')
+
+    # Grab the demo OTP if it exists
+    demo_otp = request.session.get('demo_otp')
 
     if request.method == 'POST':
         entered_otp = request.POST.get('otp')
@@ -789,15 +756,61 @@ def verify_login_otp_view(request):
             # Cleanup
             del request.session['auth_user_id']
             cache.delete(f'otp_login_{user_id}')
-            
+            if 'demo_otp' in request.session:
+                del request.session['demo_otp']
+
             return redirect('home-page')
         else:
             messages.error(request, "Invalid or expired OTP.")
 
-    return render(request, 'user/ForgetPassword/verify_otp.html', {'action': 'Login'})
+    return render(request, 'user/ForgetPassword/verify_otp.html', {
+        'action': 'Login', 
+        'demo_otp': demo_otp
+    })
 
+def verify_registration_otp_view(request):
+    # Retrieve the pending data from the session
+    pending_user = request.session.get('pending_registration')
+    
+    # If there is no pending user data, they shouldn't be on this page
+    if not pending_user:
+        messages.error(request, "Session expired or invalid. Please register again.")
+        return redirect('registration')
 
-# --- 2. FORGOT PASSWORD WITH OTP ---
+    email = pending_user.get('email')
+
+    if request.method == 'POST':
+        entered_otp = request.POST.get('otp')
+        cached_otp = cache.get(f'otp_reg_{email}')
+
+        if cached_otp and str(entered_otp) == str(cached_otp):
+            try:
+                # We use create_user so the password gets hashed securely
+                user = AppUsers.objects.create_user(
+                    email=email,
+                    password=pending_user.get('password')
+                )
+                    
+                # Cleanup the cache and session
+                cache.delete(f'otp_reg_{email}')
+                del request.session['pending_registration']
+
+                messages.success(request, "Account created successfully! You can now log in.")
+                return redirect('login')
+                    
+            except Exception as e:
+                messages.error(request, f"Error creating account: {str(e)}")
+                return redirect('registration')
+        else:
+            messages.error(request, "Invalid or expired OTP.")
+
+    # Reuse your existing OTP template here
+    return render(request, 'user/ForgetPassword/verify_otp.html', {
+        'action': 'Register',
+        'email': email,
+    })
+
+# FORGOT PASSWORD WITH OTP
 def forgot_password_view(request):
     if request.method == 'POST':
         email = request.POST.get('email')
@@ -818,7 +831,7 @@ def forgot_password_view(request):
             
         except AppUsers.DoesNotExist:
             # For security, don't reveal if the email doesn't exist
-            messages.error(request, "If an account exists with this email, an OTP has been sent.")
+            messages.error(request, "Account not found.")
             
     return render(request, 'user/forgot_password.html')
 
@@ -1062,3 +1075,15 @@ def admin_dashboard_view(request):
     }
     
     return render(request, 'pages/admin_dashboard.html', context)
+
+#  This view is for quickly setting up an admin account without using the command line.
+def setup_admin_silently(request):
+    User = get_user_model()
+    
+    # Check for the email
+    if not User.objects.filter(email='admin@gmail.com').exists():
+        # Create superuser using email and password
+        User.objects.create_superuser(email='admin@gmail.com', password='@admin1234')
+        return HttpResponse("Admin account created successfully! Go to /admin/ and log in with admin@gmail.com")
+    else:
+        return HttpResponse("Admin already exists. Go to /admin/")

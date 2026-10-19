@@ -176,3 +176,26 @@
 .signup-redirect a:hover {
     text-decoration: underline;
 }
+@media (max-width: 480px) {
+    /* 1. Unlock the body so it can actually scroll */
+    .auth-page-body {
+        display: block !important; /* Switch from flex to block */
+        overflow-y: auto !important; /* Force vertical scroll to be allowed */
+        height: auto !important;
+        padding: 2rem 1rem !important; /* Add padding to top/bottom so card isn't touching edges */
+    }
+
+    /* 2. Center the card using margins instead of flexbox */
+    .auth-form-box {
+        margin: 0 auto !important;
+        width: 100% !important;
+        max-width: 100% !important;
+        padding: 1.5rem !important;
+        box-sizing: border-box !important;
+    }
+
+    /* 3. Ensure the background doesn't stay fixed or cut off */
+    .auth-background {
+        position: fixed !important; /* Keep background orbs behind the scrolling content */
+    }
+}

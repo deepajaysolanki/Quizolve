@@ -1,0 +1,7 @@
+User-agent: *
+Disallow: /admin/
+Disallow: /checkout/
+Allow: /
+
+# Tells Google exactly what our site is
+Host: https://quizolve.onrender.com

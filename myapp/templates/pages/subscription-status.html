@@ -3,6 +3,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>My Subscription</title>
     <link rel="stylesheet" href="{% static 'css/main.css' %}" />
     <style>
@@ -58,6 +59,14 @@
         .home-btn:hover {
             background: #4338ca;
             box-shadow: 0 5px 15px rgba(79, 70, 229, 0.3);
+        }
+        @media (max-width: 600px) {
+            .status-card {
+                padding: 2rem;
+            }
+            .crown-icon {
+                font-size: 3rem;
+            }
         }
     </style>
 </head>

@@ -1,23 +1,20 @@
 from pathlib import Path
-from decouple import config
-import os
+from decouple import config, Csv
+import dj_database_url
+import os, dj_database_url
 
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-
-# Quick-start development settings - unsuitable for production
-# See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
-
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-$$wraba!qqpc-5wf88uq1tny+j04y@6htu2uywr0f6_r=m)e29'
+SECRET_KEY = config('SECRET_KEY', default='django-insecure-change-me-locally-only')
 
-# SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+# Checks if we are on Render. If yes, Debug=False. If no, Debug=True.
+DEBUG = False
 
-ALLOWED_HOSTS = ['127.0.0.1', 'localhost']
-
+# Allow all hosts for now to prevent 400 Bad Request errors
+ALLOWED_HOSTS = ['*']
 
 # Application definition
 
@@ -28,6 +25,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'cloudinary_storage',
 
     # for signup with google functionality
     'django.contrib.sites',
@@ -38,12 +36,25 @@ INSTALLED_APPS = [
 
     # my app
     'myapp',
+
+    # for sending emails (OTPs)
+    'anymail',
+
+    # for cloudinary media storage
+    'cloudinary',
 ]
 
-AUTH_USER_MODEL = 'myapp.AppUsers'
+# Cloudinary configuration for media storage (profile photos)
+CLOUDINARY_STORAGE = {
+    'CLOUD_NAME': os.getenv('CLOUDINARY_CLOUD_NAME'),
+    'API_KEY': os.getenv('CLOUDINARY_API_KEY'),
+    'API_SECRET': os.getenv('CLOUDINARY_API_SECRET'),
+    'STATICFILES_WHITELIST': (os.path.join(BASE_DIR, 'static'),)
+}
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -54,6 +65,7 @@ MIDDLEWARE = [
 ]
 
 ROOT_URLCONF = 'myproject.urls'
+AUTH_USER_MODEL = 'myapp.AppUsers'
 
 TEMPLATES = [
     {
@@ -74,11 +86,32 @@ TEMPLATES = [
 WSGI_APPLICATION = 'myproject.wsgi.application'
 
 
-# Database
-# https://docs.djangoproject.com/en/5.2/ref/settings/#databases
-
 DATABASES = {
-    'default': {
+    'default': dj_database_url.config(
+        # This tells Django to use the Render DATABASE_URL if it exists, or fall back to local SQLite.
+        default=f"sqlite:///{os.path.join(BASE_DIR, 'db.sqlite3')}",
+        conn_max_age=600
+    )
+}
+
+# INTELLIGENT DATABASE SWITCH
+if config('RENDER', default=False, cast=bool):
+    # YES -> Use PostgreSQL (Render automatically provides DATABASE_URL)
+    DATABASES['default'] = dj_database_url.config(conn_max_age=600, ssl_require=True)
+    
+    # Enable Compressed Static Files (Crucial for CSS)
+    STATICFILES_STORAGE = 'whitenoise.storage.StaticFilesStorage'
+    DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
+
+    # Sequirity settings for production on Render
+    SECURE_SSL_REDIRECT = False            
+    SESSION_COOKIE_SECURE = True            
+    CSRF_COOKIE_SECURE = True               
+    SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+
+else:
+    # NO -> Use MySQL (Your local setup)
+    DATABASES['default'] = {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': config('DB_NAME'),
         'USER': config('DB_USER'),
@@ -89,11 +122,6 @@ DATABASES = {
             'init_command': "SET sql_mode='STRICT_TRANS_TABLES'"
         }
     }
-}
-
-
-# Password validation
-# https://docs.djangoproject.com/en/5.2/ref/settings/#auth-password-validators
 
 AUTH_PASSWORD_VALIDATORS = [
     {
@@ -109,10 +137,6 @@ AUTH_PASSWORD_VALIDATORS = [
         'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
     },
 ]
-
-
-# Internationalization
-# https://docs.djangoproject.com/en/5.2/topics/i18n/
 
 LANGUAGE_CODE = 'en-us'
 
@@ -132,7 +156,7 @@ STATICFILES_DIRS = [
     os.path.join(BASE_DIR, 'static'),
 ]
 
-# This is for production (but good to have)
+# In production, STATIC_ROOT is where 'collectstatic' will gather all static files for efficient serving.
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
 # Signup with google functionality
@@ -204,17 +228,21 @@ MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 # API key for AI models
+<<<<<<< HEAD
 GROQ_API_KEY = config('GROQ_API_KEY')
+=======
+GROQ_API_KEY = os.environ.get("GROQ_API_KEY")
+>>>>>>> 138a4614f3c5636ce234a413c06324833920041b
 
-# 1. DEVELOPMENT MODE 
-# This prints the OTP to black terminal screen instead of sending it to fGoogle.
-EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+# Email settings for sending OTPs in user email 
+EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER = os.getenv('GMAIL_USER') 
+EMAIL_HOST_PASSWORD = os.getenv('GMAIL_APP_PASSWORD')
 
-# 2. PRODUCTION MODE (Google)
-# EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-# EMAIL_HOST = 'smtp.gmail.com' 
-# EMAIL_PORT = 587
-# EMAIL_USE_TLS = True
-# EMAIL_HOST_USER = config('EMAIL_HOST_USER')
-# EMAIL_HOST_PASSWORD = config('EMAIL_HOST_PASSWORD')
+# Resend uses this default address for testing without a custom domain
+DEFAULT_FROM_EMAIL = f"Quizolve <{os.getenv('GMAIL_USER')}>"
+
                                                                                                                                                             
