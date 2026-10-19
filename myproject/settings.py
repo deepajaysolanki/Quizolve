@@ -228,11 +228,7 @@ MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 # API key for AI models
-<<<<<<< HEAD
-GROQ_API_KEY = config('GROQ_API_KEY')
-=======
 GROQ_API_KEY = os.environ.get("GROQ_API_KEY")
->>>>>>> 138a4614f3c5636ce234a413c06324833920041b
 
 # Email settings for sending OTPs in user email 
 EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
