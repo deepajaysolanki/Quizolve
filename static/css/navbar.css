@@ -363,7 +363,6 @@ body {
    ================================================================= */
 .btn-ghost {
   text-decoration: none;
-  color: var(--text-primary, #fff); /* Fixed color visibility */
   font-weight: 500;
 }
 

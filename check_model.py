@@ -1,17 +1,21 @@
-# check_models.py
-import google.generativeai as genai
-from decouple import config
+import requests
 
-try:
-    # Make sure your .env file has GOOGLE_API_KEY defined
-    api_key = config('GOOGLE_API_KEY')
-    genai.configure(api_key=api_key)
+# 1. PASTE YOUR CURRENT API KEY HERE DIRECTLY (Don't use .env for this test)
+API_KEY = "AIzaSyCkCZiqTBPDHa8oLxG0UhqHqvIBlEIiU5Y"
 
-    print("\n--- Finding Available Models ---\n")
-    for m in genai.list_models():
-        if 'generateContent' in m.supported_generation_methods:
-            print(m.name)
-    print("\n------------------------------\n")
+url = f"https://generativelanguage.googleapis.com/v1beta/models?key={API_KEY}"
 
-except Exception as e:
-    print(f"An error occurred: {e}")
+print(f"Testing Key: {API_KEY[:5]}...{API_KEY[-4:]}")
+response = requests.get(url)
+
+if response.status_code == 200:
+    print("\n✅ SUCCESS! Your key works. Here are the models you can use:")
+    models = response.json().get('models', [])
+    for m in models:
+        # We only care about models that can 'generateContent'
+        if "generateContent" in m['supportedGenerationMethods']:
+            print(f" - {m['name']}")
+else:
+    print(f"\n❌ FAILURE (Error {response.status_code})")
+    print("Your API Key is invalid or the Project does not have the API enabled.")
+    print(f"Google says: {response.text}")

@@ -204,7 +204,7 @@ MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 # API key for AI models
-GOOGLE_API_KEY = config('GOOGLE_API_KEY')
+GROQ_API_KEY = config('GROQ_API_KEY')
 
 # 1. DEVELOPMENT MODE 
 # This prints the OTP to black terminal screen instead of sending it to fGoogle.

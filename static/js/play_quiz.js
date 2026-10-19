@@ -11,7 +11,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // --- Get data from Django ---
     const GET_QUESTION_URL = quizData.dataset.getQuestionUrl;
-    const RECORD_ANSWER_URL = quizData.dataset.checkAnswerUrl; // This is your 'record-answer-api'
+    const RECORD_ANSWER_URL = quizData.dataset.checkAnswerUrl; // This is 'record-answer-api'
     const END_EXAM_EARLY_URL = quizData.dataset.endExamEarlyUrl;
     const RESULTS_PAGE_URL = quizData.dataset.resultsPageUrl;
     const CSRF_TOKEN = quizData.dataset.csrfToken;
@@ -169,7 +169,7 @@ document.addEventListener('DOMContentLoaded', function () {
     document.addEventListener('visibilitychange', () => {
         const isExam = totalQuestions > 0;
         if (document.visibilityState === 'hidden' && isExam && !quizIsOver) {
-            navigator.sendBeacon(RECORD_ATTEMPT_URL, new Blob([JSON.stringify({})], { type: 'application/json' }));
+            navigator.sendBeacon(RECORD_ANSWER_URL, new Blob([JSON.stringify({})], { type: 'application/json' }));
         }
     });
 
